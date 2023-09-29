@@ -1,0 +1,148 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: sans-serif;
+  min-height: 100%;
+  color: #555;
+  background-color: #d1d1d1;
+  width: 600px;
+  margin: 0 auto;
+  padding-top: 20px;
+}
+.header{
+  text-align: center;
+  color: black;
+  margin-bottom: 20px;
+}
+label{
+  color: black;
+  font-weight: bold;
+}
+.container {
+  padding: 20px;
+  background-color: white;
+  border-radius: 10px;
+}
+
+.container header {
+  text-align: center;
+  color: #888;
+  margin-bottom: 20px;
+}
+
+.form {
+  width: 100%;
+}
+
+.input-box {
+  margin-bottom: 20px;
+}
+
+.input-box label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.input-box input {
+  padding: 5px 10px;
+  width: 100%;
+  border: none;
+  border: thin solid #d4d4d4;
+  font-size: 16px;
+  color: #888;
+  font-family: ubuntu, sans-serif;
+  background-color: #f9f9f9;
+}
+.input-box input::placeholder{
+  font-size: 13px;
+}
+
+.input-box input:focus {
+  outline: none;
+}
+
+.input-box.address {
+  display: flex;
+  align-items: center;
+}
+
+.input-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.input-container label {
+  width: 120px;
+}
+
+.input-container input {
+  flex: 1; /* Occupy remaining space */
+}
+
+.input-container span {
+  display: inline-block;
+  margin-left: 10px;
+  cursor: pointer;
+  background-color: #f9f9f9;
+  padding: 10px;
+  font-size: 20px;
+  line-height: 20px; /* Added line-height property */
+  transition: all 0.3s;
+  font-weight: bold;
+  border: thin solid #d4d4d4;
+}
+
+.input-container span:last-child {
+  display: none;
+  padding: 12px;
+}
+
+.input-container span:hover {
+  background-color: lightgreen;
+  border: thin solid lightgreen;
+  color: #fff;
+}
+
+.input-container span:last-child:hover {
+  background-color: red;
+  border: thin solid red;
+  color: #fff;
+}
+
+
+button[type="submit"] {
+  display: block;
+  padding: 10px 20px;
+  margin-top: 30px;
+  width: 150px;
+  float: left;
+  font-size: 16px;
+  background-color: green;
+  border: thin solid #d5e4d4;
+  cursor: pointer;
+  color: #fff;
+}
+textarea {
+  width: 100%;
+  height: 150px;
+  resize: none;
+  background-color: #f9f9f9;
+  border: thin solid #d4d4d4;
+  border-radius: 5px;
+  padding: 10px;
+}
+
+.date-container{
+  display: flex;
+  justify-content: space-evenly;
+}
+button[type="submit"]:active {
+  background-color: #aedea6;
+  color: #000;
+}

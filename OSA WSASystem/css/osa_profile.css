@@ -1,0 +1,64 @@
+body{
+  background-color: lightgray;
+
+}
+img{
+  width: 80px;
+  height: 80px;
+}
+section{
+  background-color: white;
+  border-radius: 20px;
+  padding: 50px;
+  position: absolute;
+  top: 20%;
+  right: 20%;
+  bottom: 20%;
+  left: 20%;
+
+}
+.profile-container{
+  margin-top: 50px;
+}
+.container{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  justify-content: center;
+  align-items: center;
+}
+.image-container{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.info-container{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.email-container{
+  margin: 15px 0px;
+}
+.phone-container{
+  margin: 15px 0px;
+}
+.update-container{
+  
+}
+.update-button{
+  position: absolute;
+  bottom: 20px;
+  left: 30%;
+  right: 30%;
+  text-align: center;
+  border: darkgreen;
+  background-color: rgb(104, 219, 104);
+  color: white;
+  width: 200px;
+  border-radius: 10px;
+  padding: 10px 10px;
+  font-size: 20px;
+  font-weight: 600;
+
+}

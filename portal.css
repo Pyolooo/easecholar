@@ -1,0 +1,199 @@
+*{
+  font-family: Arial, Helvetica, sans-serif;
+}
+body{
+  background-color: rgb(15, 63, 15);
+}
+button{
+  margin: 15px;
+}
+nav{
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.container{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgb(237, 236, 236);
+  border-radius: 5px;
+  padding: 0 15px;
+  height: 500px;
+  width: 500px;
+  position: relative;
+  box-shadow: 0 0 20px black;
+}
+.portal-header{
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: lightgray;
+  border-bottom: 1px solid darkgrey;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 60px;
+}
+.isu-logo{
+  width: 40px;
+  height: 40px;
+  margin: 10px 10px 5px 5px;
+}
+.header-title{
+  font-size: 15px;
+  text-align: center;
+  font-weight: 600;
+}
+.user-portal{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+}
+.admin-button{
+  cursor: pointer;
+  margin-bottom: 10px;
+  border: none;
+  border-radius: 5px;
+  padding: 25px 20px 25px 20px;
+  background-color: rgb(25, 128, 25);
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  transition: opacity .15s;
+}
+.admin-button:hover{
+  opacity: 0.8;
+}
+.osa-button{
+  cursor: pointer;
+  margin-bottom: 10px;
+  border: none;
+  border-radius: 5px;
+  padding: 25px 20px 25px 20px;
+  background-color: white;
+  background-color: rgb(25, 128, 25);
+  color: white;
+  font-size: 15px;
+  font-weight: 600; 
+  transition: opacity .15s;
+  width: 80px;
+}
+.osa-button:hover{
+  opacity: 0.8;
+}
+.registrar-button{
+  cursor: pointer;
+  margin-bottom: 10px;
+  border: none;
+  border-radius: 5px;
+  padding: 25px 20px 25px 20px;
+  background-color: white;
+  background-color: rgb(25, 128, 25);
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  transition: opacity .15s;
+}
+.registrar-button:hover{
+  opacity: 0.8;
+}
+.student-button{
+  cursor: pointer;
+  margin-bottom: 10px;
+  border: none;
+  border-radius: 5px;
+  padding: 25px 20px 25px 20px;
+  background-color: white;
+  background-color: rgb(25, 128, 25);
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  transition: opacity .15s;
+}
+.student-button:hover{
+  opacity: 0.8;
+}
+.fa-user-lock{
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 25px;
+  margin-bottom: 5px;
+}
+.fa-id-card-alt{
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  margin-bottom: 5px;
+}
+.fa-id-badge{
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  margin-bottom: 5px;
+}
+.fa-address-card{
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  margin-bottom: 5px;
+}
+.portal-footer{
+  background-color: lightgrey;
+  position: absolute;
+  border-top: 1px solid darkgrey;
+  height: 100px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.footer-content{
+  margin-bottom: 0;
+  font-size: 13px;
+  line-height: 5px;
+  color: black;
+}
+
+@media screen and (max-width: 768px) {
+  .user-portal{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .registrar-button{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 13px;
+    width: 80px;
+  }
+  .student-button{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 13px;
+    width: 80px;
+  }
+  .header-title,
+  .footer-content{
+    font-size: 11px;
+  }
+}

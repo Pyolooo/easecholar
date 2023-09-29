@@ -1,0 +1,125 @@
+<?php
+include('connection.php');
+
+$scholarship = "";
+$details = "";
+$requirements = array();
+$benefits = array();
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Retrieve the form data
+    $scholarship = $_POST["scholarship"];
+    $details = $_POST["details"];
+    $requirements = isset($_POST["requirements"]) ? $_POST["requirements"] : array();
+    $benefits = isset($_POST["benefits"]) ? $_POST["benefits"] : array();
+
+    $requirementsString = implode("\n", $requirements); // Convert requirements array back to a string
+    $benefitsString = implode("\n", $benefits); // Convert benefits array back to a string
+
+    $sql = "INSERT INTO `tbl_scholarship` (scholarship, details, requirements, benefits) VALUES ('$scholarship', '$details', '$requirementsString', '$benefitsString')";
+    $result = $dbConn->query($sql);
+
+    // Clear form inputs
+    $scholarship = "";
+    $details = "";
+    $requirements = array();
+    $benefits = array();
+
+    header("location: scholarships.php");
+    exit;
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Setting the pages character encoding -->
+    <meta charset="UTF-8">
+
+    <!-- The meta viewport will scale my content to any device width -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    <!-- Link to my stylesheet -->
+    <link rel="stylesheet" href="create_scholarship.css">
+    <title>Add Scholarship</title>
+</head>
+<body>
+<section class="container">
+    <header>Add Scholarship</header>
+    <form method="POST" action="#" class="form">
+        <div class="input-box">
+            <label>Scholarship</label>
+            <input type="text" name="scholarship" placeholder="" value="<?php echo $scholarship; ?>" required>
+        </div>
+
+        <div class="input-box">
+            <label>Details</label>
+            <input type="text" name="details" placeholder="" value="<?php echo $details; ?>" required>
+        </div>
+        <div class="input-box">
+            <label>Requirements</label>
+            <div id="requirements-container">
+                <?php
+                if (!empty($requirements)) {
+                    foreach ($requirements as $index => $requirement) {
+                        echo '<div class="field">';
+                        echo '<input type="text" name="requirements[]" placeholder="Requirement" value="' . $requirement . '" required>';
+                        echo '<span onclick="addField(this)">+</span>';
+                        echo '<span onclick="removeField(this)">-</span>';
+                        echo '</div>';
+                    }
+                }
+                ?>
+            </div>
+            <i class="bx bx-plus" onclick="addField('requirements-container')"></i>
+        </div>
+        <div class="input-box">
+            <label>Benefits</label>
+            <div id="benefits-container">
+                <?php
+                if (!empty($benefits)) {
+                    foreach ($benefits as $index => $benefit) {
+                        echo '<div class="input-container">';
+                        echo '<input type="text" name="benefits[]" placeholder="Benefit" value="' . $benefit . '" required>';
+                        echo '<span onclick="removeField(this)">-</span>';
+                        echo '</div>';
+                    }
+                }
+                ?>
+            </div>
+            <i class="bx bx-plus" onclick="addField('benefits-container')"></i>
+        </div>
+        <button type="submit">Submit</button>
+    </form>
+</section>
+
+    <script>
+    function addField(containerId) {
+        const container = document.getElementById(containerId);
+        const inputContainer = document.createElement('div');
+        inputContainer.classList.add('input-container');
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.name = containerId + '[]';
+        input.placeholder = containerId.charAt(0).toUpperCase() + containerId.slice(1);
+        input.required = true;
+        const minus = document.createElement('span');
+        minus.textContent = '-';
+        minus.onclick = function () {
+            removeField(minus);
+        };
+        inputContainer.appendChild(input);
+        inputContainer.appendChild(minus);
+        container.appendChild(inputContainer); // Append to the container
+    }
+
+    function removeField(minusElement) {
+        const inputContainer = minusElement.parentNode;
+        inputContainer.parentNode.removeChild(inputContainer);
+    }
+</script>
+
+</body>
+</html>
+
+

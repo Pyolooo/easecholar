@@ -1,7 +1,7 @@
 <?php
 // mark_message_as_read.php
 
-include 'connection.php';
+include '../include/connection.php';
 
 $messageId = $_POST['message_id'];
 $adminId = $_POST['admin_id'];

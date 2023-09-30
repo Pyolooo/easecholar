@@ -1,5 +1,5 @@
 <?php
-require 'connection.php';
+require '../include/connection.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
@@ -156,7 +156,7 @@ if (isset($_POST['submit'])) {
     <div class="background">
         <div class="info-logo">
             <div class="logo">
-                <img class="img-responsive" src="/EASE-CHOLAR/headerisu.png" alt="">
+                <img class="img-responsive" src="../img/headerisu.png" alt="">
             </div>
             <div class="title">
                 <span class="text">EASE-CHOLAR: A WEB-BASED SCHOLARSHIP APPLICATION MANAGEMENT SYSTEM</span>
@@ -239,7 +239,7 @@ if (isset($_POST['submit'])) {
 
             <div class="selected-image-container">
                 <div class="image-container">
-                    <img id="selected-image" src="/EASE-CHOLAR/default-avatar.png" alt="Selected Image">
+                    <img id="selected-image" src="../img/default-avatar.png" alt="Selected Image">
                 </div>
                 <label id="image-label">*Select your profile picture</label>
             </div>

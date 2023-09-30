@@ -1,11 +1,7 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
 session_name("ApplicantSession");
 session_start();
-include('connection.php');
+include('../include/connection.php');
 
 $user_id = $_SESSION['user_id'];
 
@@ -83,10 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     );
 
     if ($stmt->execute()) {
-        echo "<script>
-            alert('Details updated successfully');
-            window.location.href = 'application_status.php'; // Redirect to the desired page
-        </script>";
+        $successMessage = 'Details updated successfully';
     } else {
         echo "Error updating details: " . $stmt->error;
     }
@@ -133,16 +126,35 @@ if ($result->num_rows > 0) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/apply.css">
+    <link rel="stylesheet" href="css/update_status.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 
     <title>Application Form</title>
 </head>
         
 <body>
-    <?php include('header.php') ?>
+    <?php include('../include/header.php') ?>
     <div class="wrapper">
+
+    <?php 
+    if (isset($successMessage)) {
+        echo '<script>
+    Swal.fire({
+        position: "center",
+        icon: "success",
+        title: "' . $successMessage . '",
+        showConfirmButton: false,
+        timer: 1500
+    }).then((result) => {
+        if (result.dismiss === Swal.DismissReason.timer) {
+            window.location.href = "application_status.php";
+        }
+    });
+</script>';
+    }
+    ?>
 
         <form action="" method="POST" enctype="multipart/form-data">
             <div class="container">

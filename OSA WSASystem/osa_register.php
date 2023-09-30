@@ -1,5 +1,5 @@
 <?php
-include 'connection.php';
+include '../include/connection.php';
 
 if (isset($_POST['submit'])) {
    $username = mysqli_real_escape_string($dbConn, $_POST['username']);

@@ -1,5 +1,5 @@
 <?php
-include 'connection.php';
+include '../include/connection.php';
 session_name("AdminSession");
 session_start();
 

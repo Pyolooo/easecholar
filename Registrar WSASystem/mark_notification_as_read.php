@@ -1,5 +1,5 @@
 <?php
-include 'connection.php';
+include '../include/connection.php';
 
 if (isset($_POST['read_message'])) {
     $notificationId = $_POST['read_message'];

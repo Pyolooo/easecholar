@@ -1,5 +1,5 @@
 <?php
-include 'connection.php';
+include '../include/connection.php';
 
 // Fetch the notification count
 $getNotificationCountQuery = mysqli_query($dbConn, "SELECT COUNT(*) as count FROM tbl_notifications WHERE is_read = 'unread'") or die('query failed');

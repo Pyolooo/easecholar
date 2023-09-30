@@ -1,7 +1,7 @@
 <?php
 session_name("RegistrarSession");
 session_start();
-include 'connection.php';
+include '../include/connection.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $registrar_id = $_SESSION['registrar_id'];
@@ -34,4 +34,3 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     header('Location: view_application.php?id=' . $application_id);
     exit();
 }
-?>

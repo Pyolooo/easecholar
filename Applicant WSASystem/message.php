@@ -1,7 +1,7 @@
 <?php
 // Start the session and include the connection.php file
 session_start();
-include 'connection.php';
+include '../include/connection.php';
 
 // Retrieve the application_id and user_id from the session
 $user_id = $_SESSION['user_id'];

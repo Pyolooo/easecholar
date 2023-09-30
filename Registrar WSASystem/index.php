@@ -1,5 +1,5 @@
 <?php
-include 'connection.php';
+include '../include/connection.php';
 session_name("RegistrarSession");
 session_start();
 $registrar_id = $_SESSION['registrar_id'];
@@ -30,7 +30,7 @@ $select = mysqli_query($dbConn, "SELECT * FROM tbl_userapp") or die('query faile
     <!-- Boxicons -->
     <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
     <!-- My CSS -->
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/registrar_dashboard.css">
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.18/dist/sweetalert2.all.min.js"></script>
 

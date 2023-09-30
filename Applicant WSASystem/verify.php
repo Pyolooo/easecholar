@@ -1,5 +1,5 @@
 <?php
-include 'connection.php'; // Include your database connection script
+include '../include/connection.php';
 ?>
 
 <!DOCTYPE html>
@@ -66,7 +66,7 @@ if (isset($_GET['email']) && isset($_GET['token'])) {
         if (mysqli_stmt_execute($update)) {
             // Account verified successfully
             echo '<div class="container">';
-            echo '<img src="/EASE-CHOLAR/isulogo.png">';
+            echo '<img src="../img/isulogo.png">';
             echo '<div class="message success">Your account has been verified. You can now <a href="applicant_login.php">login</a> to the system.</div>';
             echo '</div>';
         } else {

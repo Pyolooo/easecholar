@@ -1,7 +1,7 @@
 <?php
 session_name("OsaSession");
 session_start();
-include 'connection.php';
+include '../include/connection.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $admin_id = $_SESSION['admin_id'];

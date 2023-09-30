@@ -1,5 +1,5 @@
 <?php
-include 'connection.php';
+include '../include/connection.php';
 session_name("OsaSession");
 session_start();
 
@@ -42,7 +42,7 @@ $select = mysqli_query($dbConn, "SELECT * FROM tbl_userapp") or die('query faile
     <section id="sidebar">
         <a href="#" class="brand">
             <div class="isulog-container">
-                <img class="isu-logo" src="/EASE-CHOLAR/isulogo.png">
+                <img class="isu-logo" src="../img/isulogo.png">
             </div>
             <span class="osa-hub">OSA</span>
         </a>
@@ -157,16 +157,15 @@ $select = mysqli_query($dbConn, "SELECT * FROM tbl_userapp") or die('query faile
                         $select_osa = mysqli_query($dbConn, "SELECT * FROM `tbl_admin` WHERE admin_id = '$admin_id'") or die('query failed');
                         $fetch = mysqli_fetch_assoc($select_osa);
                         if ($fetch && $fetch['profile'] != '') {
-                            // Build the absolute path to the image using $_SERVER['DOCUMENT_ROOT']
                             $imagePath = $_SERVER['DOCUMENT_ROOT'] . '/EASE-CHOLAR/user_profiles/' . $fetch['profile'];
 
                             if (file_exists($imagePath)) {
-                                echo '<img src="/EASE-CHOLAR/user_profiles/' . $fetch['profile'] . '">';
+                                echo '<img src="../user_profiles/' . $fetch['profile'] . '">';
                             } else {
-                                echo '<img src="/EASE-CHOLAR/user_profiles/default-avatar.png">';
+                                echo '<img src="../user_profiles/default-avatar.png">';
                             }
                         } else {
-                            echo '<img src="/EASE-CHOLAR/user_profiles/default-avatar.png">';
+                            echo '<img src="../user_profiles/default-avatar.png">';
                         }
                         ?>
                     </a>
@@ -197,7 +196,7 @@ $select = mysqli_query($dbConn, "SELECT * FROM tbl_userapp") or die('query faile
             $scholarshipNameVariable = $row['scholarship_name'];
             ?>
             <a href="generate_pdf.php?scholarship_name=<?php echo urlencode($scholarshipNameVariable); ?>" class="btn-download">
-                <img class="export-img" src="/EASE-CHOLAR/export.png">
+                <img class="export-img" src="../img/export.png">
                 <span class="text">Export</span>
             </a>
         <?php } ?>
@@ -222,7 +221,7 @@ $select = mysqli_query($dbConn, "SELECT * FROM tbl_userapp") or die('query faile
                 <h1>Applicant's Application</h1>
                 <div class="input-group">
                     <input type="search" placeholder="Search Data...">
-                    <img src="/EASE-CHOLAR/search.png" alt="">
+                    <img src="../img/search.png" alt="">
                 </div>
             </section>
 
@@ -248,7 +247,6 @@ $select = mysqli_query($dbConn, "SELECT * FROM tbl_userapp") or die('query faile
                             <th>Scholarship <span class="icon-arrow">&UpArrow;</span></th>
                             <th>Submission <span class="icon-arrow">&UpArrow;</span></th>
                             <th>Status <span class="icon-arrow">&UpArrow;</span></th>
-                            <th>Grade Status <span class="icon-arrow">&UpArrow;</span></th>
                             <th>Action <span class="icon-arrow">&UpArrow;</span></th>
                         </tr>
                     </thead>
@@ -261,19 +259,6 @@ $select = mysqli_query($dbConn, "SELECT ua.*, u.custom_id
 ?>
 
                         <?php
-                        function getGradeStatusClass($grade_status)
-                        {
-                            switch ($grade_status) {
-                                case 'Pending':
-                                    return 'pending-grade';
-                                case 'Passed':
-                                    return 'passed-grade';
-                                case 'Failed':
-                                    return 'failed-grade';
-                                default:
-                                    return ''; // Default class if no match is found
-                            }
-                        }
                         while ($row = mysqli_fetch_array($select)) {
                             $statusClass = '';
                             switch ($row['status']) {
@@ -295,7 +280,6 @@ $select = mysqli_query($dbConn, "SELECT ua.*, u.custom_id
                                 default:
                                     break;
                             }
-                            $gradeStatusClass = getGradeStatusClass($row['grade_status']);
                         ?>
 
                             <tr>
@@ -305,9 +289,6 @@ $select = mysqli_query($dbConn, "SELECT ua.*, u.custom_id
                                 <td><?= formatDateSubmitted($row['date_submitted']) ?></td>
                                 <td>
                                     <p class="status <?= $statusClass ?>"><?= $row['status'] ?></p>
-                                </td>
-                                <td>
-                                    <p class="<?= $gradeStatusClass ?>"><?= $row['grade_status'] ?></p>
                                 </td>
                                 <td>
                                     <strong><a href="view_application.php?id=<?= $row['application_id'] ?>">Review</a></strong>

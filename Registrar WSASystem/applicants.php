@@ -1,5 +1,5 @@
 <?php
-include 'connection.php';
+include '../include/connection.php';
 session_name("RegistrarSession");
 session_start();
 
@@ -30,7 +30,7 @@ $select = mysqli_query($dbConn, "SELECT * FROM tbl_userapp") or die('query faile
     <!-- Boxicons -->
     <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
     <!-- My CSS -->
-    <link rel="stylesheet" href="applicants.css">
+    <link rel="stylesheet" href="css/applicants.css">
 
     <title>RegistrarModule</title>
     <style>
@@ -385,7 +385,7 @@ $select = mysqli_query($dbConn, "SELECT * FROM tbl_userapp") or die('query faile
             </section>
         </main>
 
-        <script src="applicants.js"></script>
+        <script src="js/applicants.js"></script>
         <script>
             $(document).ready(function() {
                 // Function to confirm logout

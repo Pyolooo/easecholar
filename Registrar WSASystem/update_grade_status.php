@@ -1,5 +1,5 @@
 <?php
-include 'connection.php';
+include '../include/connection.php';
 session_name("RegistrarSession");
 session_start();
 $registrar_id = $_SESSION['registrar_id'];
@@ -29,4 +29,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 } else {
     echo "Invalid request.";
 }
-?>

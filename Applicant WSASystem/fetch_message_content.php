@@ -1,7 +1,5 @@
 <?php
-// fetch_message_content.php
-
-include 'connection.php';
+include '../include/connection.php';
 
 if (isset($_POST['message_id']) && isset($_POST['application_id']) && isset($_POST['admin_id'])) {
     $messageId = $_POST['message_id'];
@@ -17,17 +15,15 @@ if (isset($_POST['message_id']) && isset($_POST['application_id']) && isset($_PO
         mysqli_stmt_execute($stmtUpdate);
     }
 
-    // Check if the message is associated with the provided application ID and admin ID
     $selectMessage = mysqli_prepare($dbConn, "SELECT osa_message_content FROM tbl_user_messages WHERE message_id = ? AND application_id = ? AND admin_id = ?");
     mysqli_stmt_bind_param($selectMessage, "iii", $messageId, $applicationId, $adminId);
     mysqli_stmt_execute($selectMessage);
     $result = mysqli_stmt_get_result($selectMessage);
 
-    if ($fetchMessage = mysqli_fetch_assoc($result)) {
-        // Return the message content
+    if ($fetchMessage = mysqli_fetch_assoc($result)) { 
         echo $fetchMessage['osa_message_content'];
     } else {
-        // Handle the case when no message is found for the given message_id, application_id, and admin_id
+    
         echo "No message found.";
     }
 }

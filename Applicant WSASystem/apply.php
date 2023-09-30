@@ -1,11 +1,7 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
 session_name("ApplicantSession");
 session_start();
-include('connection.php');
+include('../include/connection.php');
 
 // Other variables
 $last_name = $_POST['last_name'] ?? '';
@@ -103,7 +99,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $file = $_FILES["file"];
         $fileCount = count($file["name"]);
 
-        $validImageExtension = ['jpg', 'jpeg', 'png'];
+        $validImageExtension = ['jpg', 'jpeg', 'png', 'pdf'];
         $uploadedFiles = array();
 
         // Specify the target directory using $_SERVER['DOCUMENT_ROOT']
@@ -238,7 +234,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
 <body>
-    <?php include('header.php') ?>
+    <?php include('../include/header.php') ?>
     <div class="wrapper">
     <?php
     if (isset($alreadyApplied)) {

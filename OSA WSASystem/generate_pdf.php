@@ -1,6 +1,6 @@
 <?php
-require('C:\wamp64\www\EASE-CHOLAR\fpdf.php');
-include 'connection.php';
+require('../fpdf.php');
+include '../include/connection.php';
 
 ob_start();
 class PDFWithHeader extends FPDF {
@@ -12,7 +12,7 @@ function Header() {
  
   $x = ($pageWidth - $logoWidth) / 2;
 
-  $this->Image($_SERVER['DOCUMENT_ROOT'] . '/EASE-CHOLAR/isulogo.png', $x, 10, 30);
+  $this->Image('../img/isulogo.png', $x, 10, 30);
 
 
   $this->SetFont('Arial', 'B', 12);
@@ -53,11 +53,11 @@ while ($row = mysqli_fetch_assoc($result)) {
         $pdf = new PDFWithHeader();
         $pdf->AddPage();
 
-        $pdf->SetFont('Arial', 'B', 16);
+        $pdf->SetFont('Arial', 'B', 14);
         $pdf->Cell(190, 10, $currentScholarshipName, 0, 1, 'C');
 
       
-        $pdf->SetFont('Arial', 'B', 12);
+        $pdf->SetFont('Arial', 'B', 10);
         $pdf->Cell(10, 10, 'No.', 1);
         $pdf->Cell(40, 10, 'Applicant Name', 1);
         $pdf->Cell(40, 10, 'ID Number', 1);
@@ -68,7 +68,7 @@ while ($row = mysqli_fetch_assoc($result)) {
     }
 
  
-    $pdf->SetFont('Arial', '', 12);
+    $pdf->SetFont('Arial', '', 10);
     $pdf->Cell(10, 10, $number++, 1); 
     $pdf->Cell(40, 10, $applicantName, 1);
     $pdf->Cell(40, 10, $idNumber, 1);

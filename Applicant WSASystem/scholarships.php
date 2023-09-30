@@ -1,5 +1,5 @@
 <?php
-include 'connection.php';
+include '../include/connection.php';
 session_name("ApplicantSession");
 session_start();
 $user_id = $_SESSION['user_id'];
@@ -290,20 +290,20 @@ if ($rowUserInfo = mysqli_fetch_assoc($resultUserInfo)) {
                         $select_user = mysqli_query($dbConn, "SELECT * FROM `tbl_user` WHERE user_id = '$user_id'") or die('query failed');
                         $fetch = mysqli_fetch_assoc($select_user);
                         if ($fetch && $fetch['image'] != '') {
-                            // Build the absolute path to the image using $_SERVER['DOCUMENT_ROOT']
                             $imagePath = $_SERVER['DOCUMENT_ROOT'] . '/EASE-CHOLAR/user_profiles/' . $fetch['image'];
 
                             if (file_exists($imagePath)) {
-                                echo '<img src="/EASE-CHOLAR/user_profiles/' . $fetch['image'] . '">';
+                                echo '<img src="../user_profiles/' . $fetch['image'] . '">';
                             } else {
-                                echo '<img src="EASE-CHOLAR/default-avatar.png">';
+                                echo '<img src="../user_profiles/default-avatar.png">';
                             }
                         } else {
-                            echo '<img src="/EASE-CHOLAR/default-avatar.png">';
+                            echo '<img src="../user_profiles/default-avatar.png">';
                         }
                         ?>
                     </a>
                 </div>
+
 			</div>
 		</nav>
 
@@ -389,7 +389,7 @@ if ($rowUserInfo = mysqli_fetch_assoc($resultUserInfo)) {
 						</thead>
 						<tbody>
 							<?php
-							include('connection.php');
+							include('../include/connection.php');
 
 							if ($dbConn->connect_error){
 								die('Connection failed: ' . $dbConn->connect_errno);
@@ -577,7 +577,7 @@ if ($rowUserInfo = mysqli_fetch_assoc($resultUserInfo)) {
         // Function to mark a message as read
         function markAsRead(messageId, adminId, registrarId) {
             $.ajax({
-                url: "index.php?read_message=" + messageId + "&admin_id=" + adminId + "&registrar_id=" + registrarId,
+                url: "applicant_dashboard.php?read_message=" + messageId + "&admin_id=" + adminId + "&registrar_id=" + registrarId,
                 type: "GET",
                 success: function() {
                     // Add a console log for success if needed

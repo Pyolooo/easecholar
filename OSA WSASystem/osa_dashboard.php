@@ -1,5 +1,5 @@
 <?php
-include 'connection.php';
+include '../include/connection.php';
 session_name("OsaSession");
 session_start();
 $admin_id = $_SESSION['admin_id'];
@@ -91,7 +91,7 @@ $select = mysqli_query($dbConn, "SELECT * FROM tbl_userapp WHERE status = 'Pendi
     <section id="sidebar">
         <a href="#" class="brand">
             <div class="isulog-container">
-                <img class="isu-logo" src="/EASE-CHOLAR/isulogo.png">
+                <img class="isu-logo" src="../img/isulogo.png">
             </div>
             <span class="osa-hub">OSA</span>
         </a>
@@ -246,7 +246,7 @@ $select = mysqli_query($dbConn, "SELECT * FROM tbl_userapp WHERE status = 'Pendi
             <ul class="box-info">
                 <li>
                     <i class='bx bxs-calendar-check'></i>
-                    <?php include('connection.php'); ?>
+                    <?php include('../include/connection.php'); ?>
 
                     <?php
                     $result = mysqli_query($dbConn, "SELECT * FROM tbl_scholarship");
@@ -259,7 +259,7 @@ $select = mysqli_query($dbConn, "SELECT * FROM tbl_userapp WHERE status = 'Pendi
                 </li>
                 <li>
                     <i class='bx bxs-group'></i>
-                    <?php include('connection.php'); ?>
+                    <?php include('../include/connection.php'); ?>
 
                     <?php
                     $result = mysqli_query($dbConn, "SELECT * FROM tbl_userapp");

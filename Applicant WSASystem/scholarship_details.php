@@ -1,7 +1,7 @@
 <?php
 session_name("ApplicantSession");
 session_start();
-include('connection.php');
+include('../include/connection.php');
 
 if ($dbConn->connect_error) {
     die('Connection failed: ' . $dbConn->connect_errno);
@@ -156,7 +156,7 @@ if (isset($_GET['id']) && isset($_SESSION['user_id'])) {
                 /* Add any additional styling as needed */
             </style>
         </head>
-        <?php include('header.php') ?>
+        <?php include('../include/header.php') ?>
 
         <body>
             <div class="table-data">

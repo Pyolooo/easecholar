@@ -1,5 +1,5 @@
 <?php
-include 'connection.php';
+include '../include/connection.php';
 session_name("RegistrarSession");
 session_start();
 
@@ -44,7 +44,7 @@ if (isset($_POST['submit'])) {
   <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <!-- My CSS -->
-  <link rel="stylesheet" href="registrar_login.css">
+  <link rel="stylesheet" href="css/registrar_login.css">
 
   <title>RegistrarModule</title>
   <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>

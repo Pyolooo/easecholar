@@ -1,33 +1,34 @@
 <?php
-include 'connection.php';
+include '../include/connection.php';
 session_name("RegistrarSession");
 session_start();
 $registrar_id = $_SESSION['registrar_id'];
 
-if(!isset($registrar_id)){
-   header('location:registrar_login.php');
+if (!isset($registrar_id)) {
+    header('location:registrar_login.php');
 };
 
-if(isset($_GET['logout'])){
-   unset($registrar_id);
-   session_destroy();
-   header('location:registrar_login.php');
+if (isset($_GET['logout'])) {
+    unset($registrar_id);
+    session_destroy();
+    header('location:registrar_login.php');
 }
 
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-	<!-- Boxicons -->
-	<link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
-	<!-- My CSS -->
-	<link rel="stylesheet" href="scholarships.css">
+    <!-- Boxicons -->
+    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    <!-- My CSS -->
+    <link rel="stylesheet" href="css/scholarships.css">
 
-	<title>RegistrarModule</title>
-	<style>
+    <title>RegistrarModule</title>
+    <style>
         .notification .bxs-bell {
             cursor: pointer;
         }
@@ -90,87 +91,90 @@ if(isset($_GET['logout'])){
         .dropdown.active {
             display: block;
         }
-        .scholarship-deadline{
+
+        .scholarship-deadline {
             font-size: 15px;
-            color:black;
+            color: black;
         }
+
         /* In your CSS file */
         .scholarship-status {
-        color: green; /* Change to your desired color */
+            color: green;
+            /* Change to your desired color */
 
-}
-		
+        }
     </style>
 </head>
+
 <body>
 
 
-	<!-- SIDEBAR -->
-	<section id="sidebar" class="hide">
-		<a href="#" class="brand">
-			<img src="img/isulogo.png">
-			<span class="text">ISU Santiago Extension</span>
-		</a>
-		<ul class="side-menu top">
-			<li>
-				<a href="index.php">
-					<i class='bx bxs-dashboard' ></i>
-					<span class="text">Dashboard</span>
-				</a>
-			</li>
+    <!-- SIDEBAR -->
+    <section id="sidebar" class="hide">
+        <a href="#" class="brand">
+            <img src="img/isulogo.png">
+            <span class="text">ISU Santiago Extension</span>
+        </a>
+        <ul class="side-menu top">
+            <li>
+                <a href="index.php">
+                    <i class='bx bxs-dashboard'></i>
+                    <span class="text">Dashboard</span>
+                </a>
+            </li>
             <li class="active">
-				<a href="#">
-					<i class='bx bxs-shopping-bag-alt' ></i>
-					<span class="text">Scholarships</span>
-				</a>
-			</li>
-			<li>
-				<a href="applicants.php">
-					<i class='bx bxs-group' ></i>
-					<span class="text">Applicants</span>
-				</a>
-			</li>
-			<li>
-				<a href="applicant_list.php">
-					<i class='bx bxs-file' ></i>
-					<span class="text">Application List</span>
-				</a>
-			</li>
-			<li>
-				<a href="#">
-					<i class='bx bxs-message-dots' ></i>
-					<span class="text">Message</span>
-				</a>
-			</li>
-			<li>
-				<a href="#">
-					<i class='bx bxs-group' ></i>
-					<span class="text">Team</span>
-				</a>
-			</li>
-		</ul>
-		<ul class="side-menu">
-			<li>
-				<a href="#" class="logout">
-					<i class='bx bxs-log-out-circle' ></i>
-					<span class="text" onclick="confirmLogout()">Logout</span>
-				</a>
-			</li>
-		</ul>
-	</section>
-	<!-- SIDEBAR -->
+                <a href="#">
+                    <i class='bx bxs-shopping-bag-alt'></i>
+                    <span class="text">Scholarships</span>
+                </a>
+            </li>
+            <li>
+                <a href="applicants.php">
+                    <i class='bx bxs-group'></i>
+                    <span class="text">Applicants</span>
+                </a>
+            </li>
+            <li>
+                <a href="applicant_list.php">
+                    <i class='bx bxs-file'></i>
+                    <span class="text">Application List</span>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <i class='bx bxs-message-dots'></i>
+                    <span class="text">Message</span>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <i class='bx bxs-group'></i>
+                    <span class="text">Team</span>
+                </a>
+            </li>
+        </ul>
+        <ul class="side-menu">
+            <li>
+                <a href="#" class="logout">
+                    <i class='bx bxs-log-out-circle'></i>
+                    <span class="text" onclick="confirmLogout()">Logout</span>
+                </a>
+            </li>
+        </ul>
+    </section>
+    <!-- SIDEBAR -->
 
 
 
-	<!-- CONTENT -->
-	<section id="content">
-		<!-- NAVBAR -->
-		<nav>
-			<div class="menu">
-				<i class='bx bx-menu'></i>
-			</div>
-			<div class="right-section">
-			<div class="notif">
+    <!-- CONTENT -->
+    <section id="content">
+        <!-- NAVBAR -->
+        <nav>
+            <div class="menu">
+                <i class='bx bx-menu'></i>
+            </div>
+            <div class="right-section">
+                <div class="notif">
                     <div class="notification">
                         <?php
                         $getNotificationCountQuery = mysqli_query($dbConn, "SELECT COUNT(*) as count FROM tbl_reg_notifications WHERE is_read = 'unread'") or die('query failed');
@@ -217,7 +221,7 @@ if(isset($_GET['logout'])){
                     </div>
 
                 </div>
-				<div class="profile">
+                <div class="profile">
                     <a href="registrar_profile.php" class="profile">
                         <?php
                         $select_registrar = mysqli_query($dbConn, "SELECT * FROM `tbl_registrar` WHERE registrar_id = '$registrar_id'") or die('query failed');
@@ -237,73 +241,74 @@ if(isset($_GET['logout'])){
                         ?>
                     </a>
                 </div>
-			</div>
-		</nav>
+            </div>
+        </nav>
 
 
-		
-		<!-- NAVBAR -->
 
-		<!-- MAIN -->
-		<main>
-			<div class="head-title">
-				<div class="left">
-					<h1>Scholarships</h1>
-					<ul class="breadcrumb">
-						<li>
-							<a href="scholarships.php">Scholarship</a>
-						</li>
-						<li><i class='bx bx-chevron-right' ></i></li>
-						<li>
-							<a class="active" href="index.php">Home</a>
-						</li>
-					</ul>
-				</div>
-			</div>
+        <!-- NAVBAR -->
+
+        <!-- MAIN -->
+        <main>
+            <div class="head-title">
+                <div class="left">
+                    <h1>Scholarships</h1>
+                    <ul class="breadcrumb">
+                        <li>
+                            <a href="scholarships.php">Scholarship</a>
+                        </li>
+                        <li><i class='bx bx-chevron-right'></i></li>
+                        <li>
+                            <a class="active" href="index.php">Home</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
 
 
 
             <?php
-                function formatExpireDate($dbExpireDate) {
-                    $dateTimeObject = new DateTime($dbExpireDate);
-                    $formatted_date = "Until " . $dateTimeObject->format('F j, Y'); // Example: "Until January 1, 2023"
-                    return $formatted_date;
-                }
-             ?>
+            function formatExpireDate($dbExpireDate)
+            {
+                $dateTimeObject = new DateTime($dbExpireDate);
+                $formatted_date = "Until " . $dateTimeObject->format('F j, Y'); // Example: "Until January 1, 2023"
+                return $formatted_date;
+            }
+            ?>
 
 
-			<div class="table-data">
-				<div class="order">
-					<div class="head">
-						<h3>Available Scholarships</h3>
-						<form action="#">
-				<div class="form-input">
-					<input type="search" placeholder="Search...">
-					<button type="submit" class="search-btn"><i class='bx bx-search' ></i></button>
-				</div>
-			</form>
-					</div>
-					<table>
-						<thead>
-							<hr>
-						</thead>
-						<tbody>
-							<?php
-							include('connection.php');
+            <div class="table-data">
+                <div class="order">
+                    <div class="head">
+                        <h3>Available Scholarships</h3>
+                        <form action="#">
+                            <div class="form-input">
+                                <input type="search" placeholder="Search...">
+                                <button type="submit" class="search-btn"><i class='bx bx-search'></i></button>
+                            </div>
+                        </form>
+                    </div>
+                    <table>
+                        <thead>
+                            <hr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            include('connection.php');
 
-							if ($dbConn->connect_error){
-								die('Connection failed: ' . $dbConn->connect_errno);
-							}
+                            if ($dbConn->connect_error) {
+                                die('Connection failed: ' . $dbConn->connect_errno);
+                            }
 
-							$sql = "SELECT * FROM tbl_scholarship";
-							$result = $dbConn->query($sql);
+                            $sql = "SELECT * FROM tbl_scholarship";
+                            $result = $dbConn->query($sql);
 
-							if (!$result){
-								die("Invalid query: " . $dbConn->connect_error);
-							}
+                            if (!$result) {
+                                die("Invalid query: " . $dbConn->connect_error);
+                            }
 
-							while($row = $result->fetch_assoc()){
-								echo "
+                            while ($row = $result->fetch_assoc()) {
+                                echo "
 								<tr>
 									<td>
 										$row[scholarship_id].
@@ -313,131 +318,132 @@ if(isset($_GET['logout'])){
 									</td>
 								</tr>
 								";
-							}
-							?>
-							
-						</tbody>
-					</table>
-				</div>
-			</div>
-		</main>
-		<!-- MAIN -->
+                            }
+                            ?>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+        <!-- MAIN -->
 
         <script>
-        $(document).ready(function() {
-            // Function to confirm logout
-            function confirmLogout() {
-                Swal.fire({
-                    title: "Logout",
-                    text: "Are you sure you want to log out?",
-                    icon: "warning",
-                    showCancelButton: true,
-                    confirmButtonColor: "#3085d6",
-                    cancelButtonColor: "#d33",
-                    confirmButtonText: "Yes, log out",
-                    cancelButtonText: "Cancel"
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        // If the user confirms, redirect to the logout script
-                        window.location.href = "registrar_logout.php";
-                    }
-                });
-            }
-
-            // Attach the click event to the "Logout" link
-            document.querySelector(".logout").addEventListener("click", function(event) {
-                event.preventDefault(); // Prevent the link from navigating directly
-                confirmLogout();
-            });
-
-            // TOGGLE SIDEBAR
-            const menuBar = document.querySelector("#content nav .bx.bx-menu");
-            const sidebar = document.getElementById("sidebar");
-
-            menuBar.addEventListener("click", function() {
-                sidebar.classList.toggle("hide");
-            });
-
-            // Function to toggle the dropdown
-            function toggleDropdown() {
-                $(".num").hide(); // Hide the notification count when the dropdown is toggled
-            }
-
-            // Add click event listener to the bell icon to mark all notifications as read
-            $(".notification .bxs-bell").on("click", function(event) {
-                event.stopPropagation();
-                // Toggle the dropdown
-                $(".dropdown").toggleClass("active");
-                toggleDropdown();
-                // If the dropdown is being opened, mark all notifications as read
-                if ($(".dropdown").hasClass("active")) {
-                    markAllNotificationsAsRead();
-                } else {
-                    // If the dropdown is being closed, perform any other actions (if needed)
+            $(document).ready(function() {
+                // Function to confirm logout
+                function confirmLogout() {
+                    Swal.fire({
+                        title: "Logout",
+                        text: "Are you sure you want to log out?",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#3085d6",
+                        cancelButtonColor: "#d33",
+                        confirmButtonText: "Yes, log out",
+                        cancelButtonText: "Cancel"
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // If the user confirms, redirect to the logout script
+                            window.location.href = "registrar_logout.php";
+                        }
+                    });
                 }
-            });
 
-            // Close the dropdown when clicking outside of it
-            $(document).on("click", function() {
-                $(".dropdown").removeClass("active");
-            });
+                // Attach the click event to the "Logout" link
+                document.querySelector(".logout").addEventListener("click", function(event) {
+                    event.preventDefault(); // Prevent the link from navigating directly
+                    confirmLogout();
+                });
 
-            // Function to mark all notifications as read
-            function markAllNotificationsAsRead() {
-                $.ajax({
-                    url: "mark_notification_as_read.php", // Replace with the correct path to your "mark_notification_as_read.php" file
-                    type: "POST",
-                    data: {
-                        read_message: "all" // Pass "all" as a parameter to mark all notifications as read
-                    },
-                    success: function() {
-                        // On successful marking as read, remove the "unread" class from all notification items
-                        $(".notify_item").removeClass("unread");
-                        // Fetch and update the notification count on the bell icon (if needed)
-                        fetchNotificationCount();
-                    },
-                    error: function() {
-                        alert("Failed to mark notifications as read.");
+                // TOGGLE SIDEBAR
+                const menuBar = document.querySelector("#content nav .bx.bx-menu");
+                const sidebar = document.getElementById("sidebar");
+
+                menuBar.addEventListener("click", function() {
+                    sidebar.classList.toggle("hide");
+                });
+
+                // Function to toggle the dropdown
+                function toggleDropdown() {
+                    $(".num").hide(); // Hide the notification count when the dropdown is toggled
+                }
+
+                // Add click event listener to the bell icon to mark all notifications as read
+                $(".notification .bxs-bell").on("click", function(event) {
+                    event.stopPropagation();
+                    // Toggle the dropdown
+                    $(".dropdown").toggleClass("active");
+                    toggleDropdown();
+                    // If the dropdown is being opened, mark all notifications as read
+                    if ($(".dropdown").hasClass("active")) {
+                        markAllNotificationsAsRead();
+                    } else {
+                        // If the dropdown is being closed, perform any other actions (if needed)
                     }
                 });
-            }
 
-            // Add click event listener to the notifications to mark them as read
-            $(".notify_item").on("click", function() {
-                var notificationId = $(this).data("notification-id");
-                markNotificationAsRead(notificationId);
-            });
+                // Close the dropdown when clicking outside of it
+                $(document).on("click", function() {
+                    $(".dropdown").removeClass("active");
+                });
 
-            // Function to handle delete option click
-            $(".notify_options .delete_option").on("click", function(event) {
-                event.stopPropagation();
-                const notificationId = $(this).data("notification-id");
-                // Send an AJAX request to delete the notification from the database
-                $.ajax({
-                    url: "delete_notification.php", // Replace with the PHP file to handle the delete operation
-                    type: "POST",
-                    data: {
-                        notification_id: notificationId
-                    },
-                    success: function() {
-                        // If deletion is successful, remove the notification from the dropdown
-                        $(".notify_item[data-notification-id='" + notificationId + "']").remove();
-                        // Fetch and update the notification count on the bell icon
-                        fetchNotificationCount();
-                    },
-                    error: function() {
-                        // Handle error if deletion fails
-                    }
+                // Function to mark all notifications as read
+                function markAllNotificationsAsRead() {
+                    $.ajax({
+                        url: "mark_notification_as_read.php", // Replace with the correct path to your "mark_notification_as_read.php" file
+                        type: "POST",
+                        data: {
+                            read_message: "all" // Pass "all" as a parameter to mark all notifications as read
+                        },
+                        success: function() {
+                            // On successful marking as read, remove the "unread" class from all notification items
+                            $(".notify_item").removeClass("unread");
+                            // Fetch and update the notification count on the bell icon (if needed)
+                            fetchNotificationCount();
+                        },
+                        error: function() {
+                            alert("Failed to mark notifications as read.");
+                        }
+                    });
+                }
+
+                // Add click event listener to the notifications to mark them as read
+                $(".notify_item").on("click", function() {
+                    var notificationId = $(this).data("notification-id");
+                    markNotificationAsRead(notificationId);
+                });
+
+                // Function to handle delete option click
+                $(".notify_options .delete_option").on("click", function(event) {
+                    event.stopPropagation();
+                    const notificationId = $(this).data("notification-id");
+                    // Send an AJAX request to delete the notification from the database
+                    $.ajax({
+                        url: "delete_notification.php", // Replace with the PHP file to handle the delete operation
+                        type: "POST",
+                        data: {
+                            notification_id: notificationId
+                        },
+                        success: function() {
+                            // If deletion is successful, remove the notification from the dropdown
+                            $(".notify_item[data-notification-id='" + notificationId + "']").remove();
+                            // Fetch and update the notification count on the bell icon
+                            fetchNotificationCount();
+                        },
+                        error: function() {
+                            // Handle error if deletion fails
+                        }
+                    });
+                });
+
+                // Function to handle cancel option click
+                $(".notify_options .cancel_option").on("click", function(event) {
+                    event.stopPropagation();
+                    // Hide the options menu
+                    $(this).closest(".options_menu").removeClass("active");
                 });
             });
-
-            // Function to handle cancel option click
-            $(".notify_options .cancel_option").on("click", function(event) {
-                event.stopPropagation();
-                // Hide the options menu
-                $(this).closest(".options_menu").removeClass("active");
-            });
-        });
-    </script>
+        </script>
 </body>
+
 </html>

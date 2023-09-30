@@ -1,7 +1,7 @@
 <?php
 // fetch_reg_message_content.php
 
-include 'connection.php';
+include '../include/connection.php';
 
 if (isset($_POST['message_id']) && isset($_POST['application_id']) && isset($_POST['registrar_id'])) {
     $messageId = $_POST['message_id'];

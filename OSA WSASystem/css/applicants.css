@@ -533,7 +533,6 @@ nav .profile img {
 #content main .table-data .order table th {
 	padding-bottom: 12px;
 	font-size: 13px;
-	text-align: left;
 	border-bottom: 1px solid var(--grey);
 }
 #content main .table-data .order table td {
@@ -996,7 +995,7 @@ tbody tr.hide td img {
 }
 
 .status {
-    padding: .4rem 0;
+    padding: 2px 0;
     border-radius: 2rem;
     text-align: center;
 }

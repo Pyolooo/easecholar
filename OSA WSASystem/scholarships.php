@@ -1,5 +1,5 @@
 <?php
-include 'connection.php';
+include '../include/connection.php';
 session_name("OsaSession");
 session_start();
 $admin_id = $_SESSION['admin_id'];
@@ -43,7 +43,7 @@ if (isset($_GET['logout'])) {
     <section id="sidebar">
         <a href="#" class="brand">
             <div class="isulog-container">
-                <img class="isu-logo" src="/EASE-CHOLAR/isulogo.png">
+                <img class="isu-logo" src="../img/isulogo.png">
             </div>
             <span class="osa-hub">OSA</span>
         </a>
@@ -230,7 +230,7 @@ if (isset($_GET['logout'])) {
                         </thead>
                         <tbody>
                             <?php
-                            include('connection.php');
+                            include('../include/connection.php');
 
                             if ($dbConn->connect_error) {
                                 die('Connection failed: ' . $dbConn->connect_errno);

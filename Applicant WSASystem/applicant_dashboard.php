@@ -1,5 +1,5 @@
 <?php
-include 'connection.php';
+include '../include/connection.php';
 session_name("ApplicantSession");
 session_start();
 $user_id = $_SESSION['user_id'];
@@ -301,12 +301,12 @@ if ($rowUserInfo = mysqli_fetch_assoc($resultUserInfo)) {
                             $imagePath = $_SERVER['DOCUMENT_ROOT'] . '/EASE-CHOLAR/user_profiles/' . $fetch['image'];
 
                             if (file_exists($imagePath)) {
-                                echo '<img src="/EASE-CHOLAR/user_profiles/' . $fetch['image'] . '">';
+                                echo '<img src="../user_profiles/' . $fetch['image'] . '">';
                             } else {
-                                echo '<img src="img/default-avatar.png">';
+                                echo '<img src="../user_profiles/default-avatar.png">';
                             }
                         } else {
-                            echo '<img src="img/default-avatar.png">';
+                            echo '<img src="../user_profiles/default-avatar.png">';
                         }
                         ?>
                     </a>
@@ -378,7 +378,7 @@ if ($rowUserInfo = mysqli_fetch_assoc($resultUserInfo)) {
             <ul class="box-info">
                 <li>
                     <i class='bx bxs-calendar-check'></i>
-                    <?php include('connection.php'); ?>
+                    <?php include('../include/connection.php'); ?>
 
                     <?php
                     $result = mysqli_query($dbConn, "SELECT * FROM tbl_scholarship");
@@ -548,8 +548,7 @@ if ($rowUserInfo = mysqli_fetch_assoc($resultUserInfo)) {
                     document.querySelector("#messageModal .modal-title").innerText = "Message from <?php echo $_SESSION['admin_username']; ?>";
                     openModal();
 
-                    // Now, after displaying the message, mark it as read by calling another AJAX request
-                    markAsRead(applicationId); // Call the function to mark the message as read
+                    markAsRead(applicationId);
                 },
                 error: function() {
                     alert("Failed to fetch message content.");
@@ -655,7 +654,7 @@ if ($rowUserInfo = mysqli_fetch_assoc($resultUserInfo)) {
         // Function to mark a message as read
         function markAsRead(messageId, adminId, registrarId) {
             $.ajax({
-                url: "index.php?read_message=" + messageId + "&admin_id=" + adminId + "&registrar_id=" + registrarId,
+                url: "applicant_dashboard.php?read_message=" + messageId + "&admin_id=" + adminId + "&registrar_id=" + registrarId,
                 type: "GET",
                 success: function() {
                     // Add a console log for success if needed

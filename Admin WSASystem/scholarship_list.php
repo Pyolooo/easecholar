@@ -111,7 +111,7 @@ if (isset($_GET['logout'])) {
 	<!-- SIDEBAR -->
 	<section id="sidebar" class="hide">
 		<a href="#" class="brand">
-			<img src="/EASE-CHOLAR/isulogo.png">
+			<img src="../img/isulogo.png">
 			<span class="text">ISU Santiago Extension</span>
 		</a>
 		<ul class="side-menu top">
@@ -236,12 +236,12 @@ if (isset($_GET['logout'])) {
                             $imagePath = $_SERVER['DOCUMENT_ROOT'] . '/EASE-CHOLAR/user_profiles/' . $fetch['profile'];
 
                             if (file_exists($imagePath)) {
-                                echo '<img src="/EASE-CHOLAR/user_profiles/' . $fetch['profile'] . '">';
+                                echo '<img src="../user_profiles/' . $fetch['profile'] . '">';
                             } else {
-                                echo '<img src="/EASE-CHOLAR/user_profiles/isulogo.png">';
+                                echo '<img src="../user_profiles/isulogo.png">';
                             }
                         } else {
-                            echo '<img src="/EASE-CHOLAR/user_profiles/isulogo.png">';
+                            echo '<img src="../user_profiles/isulogo.png">';
                         }
                         ?>
                     </a>
@@ -296,7 +296,7 @@ if (isset($_GET['logout'])) {
 						</thead>
 						<tbody>
 							<?php
-							include('connection.php');
+							include('../include/connection.php');
 
 							if ($dbConn->connect_error){
 								die('Connection failed: ' . $dbConn->connect_errno);

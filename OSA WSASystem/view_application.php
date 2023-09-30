@@ -3,9 +3,9 @@
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-require '/wamp64/www/EASE-CHOLAR/PHPMailer-master/src/Exception.php';
-require '/wamp64/www/EASE-CHOLAR/PHPMailer-master/src/PHPMailer.php';
-require '/wamp64/www/EASE-CHOLAR/PHPMailer-master/src/SMTP.php';
+require_once 'PHPMailer-master/src/Exception.php';
+require_once 'PHPMailer-master/src/PHPMailer.php';
+require_once 'PHPMailer-master/src/SMTP.php';
 
 
 include '../include/connection.php';

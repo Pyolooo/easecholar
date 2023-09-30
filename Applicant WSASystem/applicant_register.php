@@ -58,10 +58,11 @@ if (isset($_POST['submit'])) {
                     $verification_link = $base_url . 'verify.php?email=' . urlencode($email) . '&token=' . $verification_token;
 
 
-                    require_once __DIR__ . '/PHPMailer-master/src/SMTP.php';
-                    require_once __DIR__ . '/PHPMailer-master/src/PHPMailer.php';
-                    require_once __DIR__ . '/PHPMailer-master/src/Exception.php';   
-                    
+                    require_once 'PHPMailer-master/src/Exception.php';
+                    require_once 'PHPMailer-master/src/PHPMailer.php';
+                    require_once 'PHPMailer-master/src/SMTP.php';
+
+
                     $mail = new PHPMailer(true);
 
                     try {

@@ -156,7 +156,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
             </div>
                     <div class="update-container">
-            <input class="update-button" tupe="submit" value="Update Profile">
+            <button class="update-button" tupe="submit" value="Update Profile">
             </div>
         </div>
     </section>

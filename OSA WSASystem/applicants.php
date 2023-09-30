@@ -284,7 +284,7 @@ $select = mysqli_query($dbConn, "SELECT ua.*, u.custom_id
 
                             <tr>
                             <td><?= $row['custom_id'] ?></td>
-                                <td><img src="/EASE-CHOLAR/user_profiles/<?= $row['image'] ?>" alt=""><?= $row['applicant_name'] ?></td>
+                                <td><img src="../user_profiles/<?= $row['image'] ?>" alt=""><?= $row['applicant_name'] ?></td>
                                 <td><?= $row['scholarship_name'] ?></td>
                                 <td><?= formatDateSubmitted($row['date_submitted']) ?></td>
                                 <td>

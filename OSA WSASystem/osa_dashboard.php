@@ -213,12 +213,12 @@ $select = mysqli_query($dbConn, "SELECT * FROM tbl_userapp WHERE status = 'Pendi
                             $imagePath = $_SERVER['DOCUMENT_ROOT'] . '/EASE-CHOLAR/user_profiles/' . $fetch['profile'];
 
                             if (file_exists($imagePath)) {
-                                echo '<img src="/EASE-CHOLAR/user_profiles/' . $fetch['profile'] . '">';
+                                echo '<img src="../user_profiles/' . $fetch['profile'] . '">';
                             } else {
-                                echo '<img src="/EASE-CHOLAR/user_profiles/default-avatar.png">';
+                                echo '<img src="../user_profiles/default-avatar.png">';
                             }
                         } else {
-                            echo '<img src="/EASE-CHOLAR/user_profiles/default-avatar.png">';
+                            echo '<img src="../user_profiles/default-avatar.png">';
                         }
                         ?>
                     </a>
@@ -328,7 +328,7 @@ $select = mysqli_query($dbConn, "SELECT * FROM tbl_userapp WHERE status = 'Pendi
                                 }
                                 echo '
                             <tr>
-                                <td><img src="/EASE-CHOLAR/user_profiles/' . $row['image'] . '" alt="">' . $row['applicant_name'] . '</td>
+                                <td><img src="../user_profiles/' . $row['image'] . '" alt="">' . $row['applicant_name'] . '</td>
                                 <td>' . formatDateSubmitted($row['date_submitted']) . '</td>
                                 <td><p class="status ' . $statusClass . '">' . $row['status'] . '</td>
                             </tr>

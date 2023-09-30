@@ -167,7 +167,7 @@ $rejectedCount = mysqli_query($dbConn, "SELECT COUNT(*) as count FROM tbl_userap
     <!-- SIDEBAR -->
     <section id="sidebar" class="hide">
         <a href="#" class="brand">
-            <img src="/EASE-CHOLAR/isulogo.png">
+            <img src="../img/isulogo.png">
             <span class="text">ISU Santiago Extension</span>
         </a>
         <ul class="side-menu top">
@@ -264,7 +264,7 @@ $rejectedCount = mysqli_query($dbConn, "SELECT COUNT(*) as count FROM tbl_userap
                         <?php while ($row = mysqli_fetch_assoc($notifications)) { ?>
                             <div class="notify_item">
                                 <div class="notify_img">
-                                    <img src='/EASE-CHOLAR/user_profiles/<?php echo $row['image']; ?>' alt="" style="width: 50px">
+                                    <img src='../user_profiles/<?php echo $row['image']; ?>' alt="" style="width: 50px">
                                 </div>
                                 <div class="notify_info">
                                     <p><?php echo $row['message']; ?></p>
@@ -291,9 +291,9 @@ $rejectedCount = mysqli_query($dbConn, "SELECT COUNT(*) as count FROM tbl_userap
                             $fetch_admin = mysqli_fetch_assoc($select_admin);
                         }
                         if ($fetch_admin['profile'] == '') {
-                            echo '<img src="img/isulogo.png">';
+                            echo '<img src="../img/isulogo.png">';
                         } else {
-                            echo '<img src="img/' . $fetch_admin['profile'] . '">';
+                            echo '<img src="../img/' . $fetch_admin['profile'] . '">';
                         }
                         ?>
                     </a>
@@ -321,7 +321,7 @@ $rejectedCount = mysqli_query($dbConn, "SELECT COUNT(*) as count FROM tbl_userap
             <ul class="box-info">
                 <li>
                     <i class='bx bxs-calendar-check'></i>
-                    <?php include('connection.php'); ?>
+                    <?php include('../include/connection.php'); ?>
 
                     <?php
                     $result = mysqli_query($dbConn, "SELECT * FROM tbl_scholarship");
@@ -334,7 +334,7 @@ $rejectedCount = mysqli_query($dbConn, "SELECT COUNT(*) as count FROM tbl_userap
                 </li>
                 <li>
                     <i class='bx bxs-group'></i>
-                    <?php include('connection.php'); ?>
+                    <?php include('../include/connection.php'); ?>
 
                     <?php
                     $result = mysqli_query($dbConn, "SELECT * FROM tbl_userapp");

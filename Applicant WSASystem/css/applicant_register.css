@@ -44,7 +44,7 @@
 
 .log-in {
   flex: 1;
-  background-image: url('/Applicant WSASystem/img/stgocamp.jpg');
+  background-image: url('../../img/stgocamp.png');
   background-repeat: no-repeat;
   background-size: cover;
   background-position: top right;

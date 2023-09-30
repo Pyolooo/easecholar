@@ -69,7 +69,7 @@ if (!$resultRegistrar) {
   <!-- SIDEBAR -->
   <section id="sidebar" class="hide">
     <a href="#" class="brand">
-      <img src="img/isulogo.png">
+      <img src="../img/isulogo.png">
       <span class="text">ISU Santiago Extension</span>
     </a>
     <ul class="side-menu top">
@@ -164,7 +164,7 @@ if (!$resultRegistrar) {
             <?php while ($row = mysqli_fetch_assoc($notifications)) { ?>
               <div class="notify_item">
                 <div class="notify_img">
-                  <img src='/EASE-CHOLAR/user_profiles/<?php echo $row['image']; ?>' alt="" style="width: 50px">
+                  <img src='../user_profiles/<?php echo $row['image']; ?>' alt="" style="width: 50px">
                 </div>
                 <div class="notify_info">
                   <p><?php echo $row['message']; ?></p>
@@ -191,9 +191,9 @@ if (!$resultRegistrar) {
               $fetch_admin = mysqli_fetch_assoc($select_admin);
             }
             if ($fetch_admin['profile'] == '') {
-              echo '<img src="/EASE-CHOLAR/isulogo.png">';
+              echo '<img src="../user_profiles/isulogo.png">';
             } else {
-              echo '<img src="/EASE-CHOLAR/user_profiles/' . $fetch_admin['profile'] . '">';
+              echo '<img src="../user_profiles/' . $fetch_admin['profile'] . '">';
             }
             ?>
           </a>
@@ -238,7 +238,7 @@ if (!$resultRegistrar) {
       <h3>Manage Users</h3>
         <div class="input-group">
           <input type="search" placeholder="Search Data...">
-          <img src="/EASE-CHOLAR/search.png" alt="">
+          <img src="../img/search.png" alt="">
         </div>
       </section>
 
@@ -270,7 +270,7 @@ if (!$resultRegistrar) {
 
                 echo '<tr>';
                 echo '<td>' . $customId . '</td>';
-                echo '<td><img src="/EASE-CHOLAR/user_profiles/' . $image . '" alt="">' . $fullName . '</td>';
+                echo '<td><img src="../user_profiles/' . $image . '" alt="">' . $fullName . '</td>';
                 echo '<td>' . $email . '</td>';
                 echo '</tr>';
               }
@@ -303,7 +303,7 @@ if (!$resultRegistrar) {
               
                 echo '<tr>';
                 echo '<td>' . $osaId . '</td>';
-                echo '<td><img src="/EASE-CHOLAR/user_profiles/' . $profile . '" alt="">' . $fullName . '</td>';
+                echo '<td><img src="../user_profiles/' . $profile . '" alt="">' . $fullName . '</td>';
                 echo '<td>' . $email . '</td>';
                 echo '<td>' . $role . '</td>';
                 
@@ -347,7 +347,7 @@ if (!$resultRegistrar) {
 
                 echo '<tr>';
                 echo '<td>' . $registrarId . '</td>';
-                echo '<td><img src="/EASE-CHOLAR/user_profiles/' . $profile . '" alt="">' . $fullName . '</td>';
+                echo '<td><img src="../user_profiles/' . $profile . '" alt="">' . $fullName . '</td>';
                 echo '<td>' . $email . '</td>';
                 echo '<td>' . $role . '</td>';
                 // Add "Activate" or "Deactivate" button based on the user's status
@@ -524,7 +524,7 @@ document.addEventListener("click", function(event) {
           }).then((result) => {
             if (result.isConfirmed) {
               // If the user confirms, redirect to the logout script
-              window.location.href = "osa_logout.php";
+              window.location.href = "admin_logout.php";
             }
           });
         }

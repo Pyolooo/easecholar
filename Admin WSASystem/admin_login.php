@@ -43,7 +43,7 @@ if (isset($_POST['submit'])) {
     <div class="background">
         <div class="info-logo">
             <div class="logo">
-                <img class="img-responsive" src="img/headerisu.png" alt="">
+                <img class="img-responsive" src="../img/headerisu.png" alt="">
             </div>
             <div class="title">
                 <span class="text">EASE-CHOLAR: A WEB-BASED SCHOLARSHIP APPLICATION MANAGEMENT SYSTEM</span>

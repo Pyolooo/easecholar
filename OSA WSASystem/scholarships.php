@@ -164,12 +164,12 @@ if (isset($_GET['logout'])) {
                             $imagePath = $_SERVER['DOCUMENT_ROOT'] . '/EASE-CHOLAR/user_profiles/' . $fetch['profile'];
 
                             if (file_exists($imagePath)) {
-                                echo '<img src="/EASE-CHOLAR/user_profiles/' . $fetch['profile'] . '">';
+                                echo '<img src="../user_profiles/' . $fetch['profile'] . '">';
                             } else {
-                                echo '<img src="img/default-avatar.png">';
+                                echo '<img src="../img/default-avatar.png">';
                             }
                         } else {
-                            echo '<img src="img/default-avatar.png">';
+                            echo '<img src="../img/default-avatar.png">';
                         }
                         ?>
                     </a>

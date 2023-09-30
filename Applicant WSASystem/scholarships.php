@@ -131,7 +131,7 @@ if ($rowUserInfo = mysqli_fetch_assoc($resultUserInfo)) {
 	<!-- SIDEBAR -->
 	<section id="sidebar">
 		<a href="#" class="brand">
-			<img src="img/isulogo.png">
+			<img src="../img/isulogo.png">
 			<span class="text"><?= $full_name; ?></span>
 		</a>
 		<ul class="side-menu top">

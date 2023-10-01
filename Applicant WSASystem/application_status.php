@@ -121,21 +121,20 @@ if ($rowUserInfo = mysqli_fetch_assoc($resultUserInfo)) {
 
     <!-- Boxicons -->
     <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.18/dist/sweetalert2.all.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <!-- My CSS -->
     <link rel="stylesheet" href="css/application_status.css">
 
     <title>ApplicantModule</title>
 </head>
-
 <body>
 
 
     <!-- SIDEBAR -->
     <section id="sidebar">
-        <a href="#" class="brand">
+        <a class="brand">
             <img src="../img/isulogo.png">
             <span class="text"><?= $full_name; ?></span>
         </a>
@@ -379,15 +378,17 @@ if ($rowUserInfo = mysqli_fetch_assoc($resultUserInfo)) {
         }
         ?>
 
-        <main class="table">
+<main class="table">
             <section class="table__header">
-                <h2>Application Status</h2>
-                <div class="input-group">
-                    <input type="search" placeholder="Search Data...">
-                    <img src="img/search.png" alt="">
+                <h1>Applicant's Application</h1>
+                <div class="search-engine">
+                    <input type="search" placeholder="Search Data..."> 
+                    <img src="../img/search.png" alt="">
+                    
                 </div>
             </section>
             <section class="table__body">
+                
                 <table>
                     <thead>
                         <tr>

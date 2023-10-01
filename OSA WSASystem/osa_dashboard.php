@@ -89,7 +89,7 @@ $select = mysqli_query($dbConn, "SELECT * FROM tbl_userapp WHERE status = 'Pendi
 
     <!-- SIDEBAR -->
     <section id="sidebar">
-        <a href="#" class="brand">
+        <a class="brand">
             <div class="isulog-container">
                 <img class="isu-logo" src="../img/isulogo.png">
             </div>

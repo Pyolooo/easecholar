@@ -12,7 +12,7 @@
   <nav>
     <div class="container">
       <div class="portal-header">
-        <img src="isulogo.png" alt="" class="isu-logo">
+        <img src="img/isulogo.png" alt="" class="isu-logo">
         <p class="header-title">A Web-Based Scholarship Application Management System</p>
       </div>
       <div class="user-portal">

@@ -11,7 +11,10 @@ body {
   background-color: #d1d1d1;
   width: 600px;
   margin: 0 auto;
-  padding-top: 20px;
+  padding: 50px 0;
+  background-image: url('../../img/stgobg.png');
+  background-repeat: no-repeat;
+ background-size: cover;
 }
 .header{
   text-align: center;
@@ -24,8 +27,8 @@ label{
 }
 .container {
   padding: 20px;
-  background-color: white;
-  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.800);
+  border-radius: 20px;
 }
 
 .container header {
@@ -119,7 +122,6 @@ label{
 button[type="submit"] {
   display: block;
   padding: 10px 20px;
-  margin-top: 30px;
   width: 150px;
   float: left;
   font-size: 16px;
@@ -127,6 +129,7 @@ button[type="submit"] {
   border: thin solid #d5e4d4;
   cursor: pointer;
   color: #fff;
+  border-radius: 5px;
 }
 textarea {
   width: 100%;
@@ -141,6 +144,7 @@ textarea {
 .date-container{
   display: flex;
   justify-content: space-evenly;
+  align-items: center;
 }
 button[type="submit"]:active {
   background-color: #aedea6;

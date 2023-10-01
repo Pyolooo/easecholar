@@ -460,6 +460,10 @@ nav .profile img {
 	padding: 10px 10px 10px 10px;
 	cursor: pointer;
 }
+
+.closed-scholarship .scholarship-status {
+	color: red; /* Red color for 'Closed' scholarships */
+}
 /* NAVBAR */
 
 

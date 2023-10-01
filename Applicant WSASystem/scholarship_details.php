@@ -23,10 +23,33 @@ if (isset($_GET['id']) && isset($_SESSION['user_id'])) {
         $applicationStatus = "You have already applied for this scholarship.";
         $showApplyButton = false; // Do not show the "APPLY" button
     } else {
-        // Set a default message for cases where the user hasn't applied
-        $applicationStatus = "";
-        $showApplyButton = true; // Show the "APPLY" button
+        // Check the scholarship status
+        $sqlCheckScholarshipStatus = "SELECT scholarship_status FROM tbl_scholarship WHERE scholarship_id = ?";
+        $stmtCheckScholarshipStatus = $dbConn->prepare($sqlCheckScholarshipStatus);
+        $stmtCheckScholarshipStatus->bind_param("i", $scholarshipId);
+        $stmtCheckScholarshipStatus->execute();
+        $resultCheckScholarshipStatus = $stmtCheckScholarshipStatus->get_result();
+
+        if ($resultCheckScholarshipStatus->num_rows > 0) {
+            $row = $resultCheckScholarshipStatus->fetch_assoc();
+            $scholarshipStatus = $row['scholarship_status'];
+
+            if ($scholarshipStatus === 'Closed') {
+                // The scholarship is closed, display a message
+                $applicationStatus = "This scholarship is closed and no longer accepting applications.";
+                $showApplyButton = false; // Do not show the "APPLY" button
+            } else {
+                // The scholarship is ongoing, set a default message for cases where the user hasn't applied
+                $applicationStatus = "";
+                $showApplyButton = true; // Show the "APPLY" button
+            }
+        } else {
+            // Scholarship status not found, handle as needed
+            $applicationStatus = "Scholarship status not found.";
+            $showApplyButton = false; // Do not show the "APPLY" button
+        }
     }
+
 
     $sql = "SELECT * FROM tbl_scholarship WHERE scholarship_id = $scholarshipId";
     $result = $dbConn->query($sql);
@@ -37,6 +60,7 @@ if (isset($_GET['id']) && isset($_SESSION['user_id'])) {
         $requirements = explode("\n", $row['requirements']);
         $benefits = explode("\n", $row['benefits']);
 ?>
+
         <!DOCTYPE html>
         <html lang="en">
 

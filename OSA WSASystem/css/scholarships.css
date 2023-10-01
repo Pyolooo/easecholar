@@ -557,15 +557,7 @@ nav .profile img {
 	border-radius: 20px;
 	font-weight: 700;
 }
-#content main .table-data .order table tr td .status.completed {
-	background: var(--blue);
-}
-#content main .table-data .order table tr td .status.process {
-	background: var(--yellow);
-}
-#content main .table-data .order table tr td .status.pending {
-	background: var(--orange);
-}
+
 #content main .form-input {
 	display: flex;
 	align-items: center;
@@ -666,6 +658,10 @@ nav .profile img {
 .scholarship-status {
 color: green; /* Change to your desired color */
 
+}
+
+.closed-scholarship .scholarship-status {
+	color: red; /* Red color for 'Closed' scholarships */
 }
 
 

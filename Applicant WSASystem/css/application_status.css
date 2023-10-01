@@ -77,15 +77,14 @@ body {
 	height: 56px;
 	display: flex;
 	align-items: center;
-	color: rgb(36 95 36);
-	font-size: 15px;
-	font-weight: 600;
+	color: rgb(41, 162, 41);
 	position: sticky;
 	top: 0;
 	left: 0;
 	background: var(--light);
 	z-index: 500;
-	padding-bottom: 20px;
+	padding-bottom: 10px;
+	padding-top: 5px;
 	box-sizing: content-box;
 }
 #sidebar .brand img {
@@ -360,6 +359,26 @@ nav .profile img {
 #content nav #switch-mode:checked + .switch-mode::before {
 	left: calc(100% - (25px - 4px) - 2px);
 }
+.osa-hub {
+	text-align: center;
+	flex: 0.7;
+	color: green;
+	font-size: 20px;
+	font-weight: 600px;
+	text-shadow: 0 0 1px black;
+}
+.school-name{
+	margin-left: 30px;
+	font-weight: 600;
+	font-size: 20px;
+	letter-spacing: 5px;
+	word-spacing: 5px;
+	color: green;
+	text-shadow: 0 0 2px darkgoldenrod;
+}
+.export-img{
+	width: 30px;
+}
 /* NAVBAR */
 
 
@@ -404,8 +423,8 @@ nav .profile img {
 	pointer-events: unset;
 }
 #content main .head-title .btn-download {
-	height: 36px;
-	padding: 0 16px;
+	height: 40px;
+	padding: 0 26px;
 	border-radius: 36px;
 	background: var(--blue);
 	color: var(--light);
@@ -413,100 +432,10 @@ nav .profile img {
 	justify-content: center;
 	align-items: center;
 	grid-gap: 10px;
-	font-weight: 500;
+	font-weight: 600;
 }
-.notification .bxs-bell {
-	cursor: pointer;
-}
-
-.bxs-bell {
-	font-size: x-large;
-}
-.dropdown {
-	width: 350px;
-	height: auto;
-	background: var(--grey);
-	border-radius: 5px;
-	box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.125);
-	margin: 15px auto 0;
-	padding: 0;
-	position: absolute;
-	top: 41px;
-	/* Adjust the distance from the notification icon as needed */
-	right: 0;
-	/* To align it with the notification icon */
-	display: none;
-}
-
-.notif-label {
-	font-size: 20px;
-	border-bottom: 1px solid grey;
-	margin-bottom: 20px;
-	padding: 10px;
-	font-weight: bold;
-	color: rgba(0, 0, 0, 0.65);
-}
-
-.dropdown .notify_item {
-	display: flex;
-	align-items: center;
-	padding: 10px 0;
-	border-bottom: 1px solid #dbdaff;
-	cursor: pointer;
-}
-
-.notify_item:hover {
-	background-color: whitesmoke;
-}
-
-.dropdown .notify_item:last-child {
-	border-bottom: 0px;
-}
-
-.dropdown .notify_item .notify_img {
-	margin-right: 15px;
-}
-
-.dropdown .notify_item .notify_info p {
-	margin-bottom: 5px;
-}
-
-.dropdown .notify_item .notify_info p span {
-	color: #605dff;
-	margin-left: 5px;
-}
-
-.dropdown .notify_item .notify_info .notify_time {
-	color: #c5c5e6;
-	font-size: 12px;
-}
-
-.dropdown:before {
-	content: "";
-	position: absolute;
-	top: -30px;
-	left: 73%;
-	transform: translateX(-50%);
-	border: 15px solid;
-	border-color: transparent transparent #fff transparent;
-}
-
-.dropdown.active {
-	display: block;
-}
-
-.clear-button {
-	display: flex;
-	float: right;
-	margin-right: 10px;
-
-}
-
-.clear {
-	border: none;
-	color: green;
-	padding: 10px 10px 10px 10px;
-	cursor: pointer;
+#content main .head-title .btn-download:hover{
+	opacity: 0.8;
 }
 
 
@@ -604,7 +533,6 @@ nav .profile img {
 #content main .table-data .order table th {
 	padding-bottom: 12px;
 	font-size: 13px;
-	text-align: left;
 	border-bottom: 1px solid var(--grey);
 }
 #content main .table-data .order table td {
@@ -645,15 +573,11 @@ nav .profile img {
 	background: var(--yellow);
 }
 
-#content main .table__body table tr td p.incomplete {
-	color: white;
-	background: var(--red);
-}
+
 #content main .table__body table tr td p.qualified {
 	color: white;
-	background: #00d084;;
+	background: #00d084;
 }
-
 #content main .table__body table tr td p.accepted {
 	color: white;
 	background: #28a745;
@@ -695,6 +619,146 @@ nav .profile img {
 	border-radius: 0 36px 36px 0;
 	cursor: pointer;
 }
+.notification .bxs-bell {
+	cursor: pointer;
+}
+
+.dropdown {
+	width: 350px;
+	height: auto;
+	background: whitesmoke;
+	border-radius: 5px;
+	box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.125);
+	margin: 15px auto 0;
+	padding: 15px;
+	position: absolute;
+	top: 40px;
+	/* Adjust the distance from the notification icon as needed */
+	right: 0;
+	/* To align it with the notification icon */
+	display: none;
+}
+
+.dropdown .notify_item {
+	display: flex;
+	align-items: center;
+	padding: 10px 0;
+	border-bottom: 1px solid #dbdaff;
+}
+
+.dropdown .notify_item:last-child {
+	border-bottom: 0px;
+}
+
+.dropdown .notify_item .notify_img {
+	margin-right: 15px;
+}
+
+.dropdown .notify_item .notify_info p {
+	margin-bottom: 5px;
+}
+
+.dropdown .notify_item .notify_info p span {
+	color: #605dff;
+	margin-left: 5px;
+}
+
+.dropdown .notify_item .notify_info .notify_time {
+	color: #c5c5e6;
+	font-size: 12px;
+}
+
+.dropdown:before {
+	content: "";
+	position: absolute;
+	top: -30px;
+	left: 50%;
+	transform: translateX(-50%);
+	border: 15px solid;
+	border-color: transparent transparent #fff transparent;
+}
+
+.dropdown.active {
+	display: block;
+}
+
+option {
+	text-align: center;
+}
+
+.filter {
+	background-color: #a5a3a8;
+	font-size: 20px;
+	font-weight: 700;
+	padding-top: 20px;
+}
+
+.status-filter {
+	border: none;
+	border-radius: 5px;
+	text-align: center;
+	font-size: 15px;
+}
+
+/* Define CSS classes for grade status */
+.pending-grade {
+	color: orange;
+	/* Change the color to your desired indicator color */
+}
+
+.passed-grade {
+	color: green;
+	/* Change the color to your desired indicator color */
+}
+
+.failed-grade {
+	color: red;
+	/* Change the color to your desired indicator color */
+}
+.status-filter {
+display: flex;
+gap: 10px;
+align-items: end;
+}
+
+.status-button {
+padding: 5px 15px;
+cursor: pointer;
+background-color: white;
+font-weight: 600;
+border: none;
+box-shadow: 0 0 3px black;
+border-top-left-radius: 10px;
+border-top-right-radius: 10px;
+}
+.pending-button{
+background-color: var(--orange);
+color: white;
+}
+.inreview-button{
+background-color: var(--yellow);
+color: white;
+}
+.qualified-button{
+background-color: #00d084;
+color: white;
+}
+.accepted-button{
+background-color: #28a745;
+color: white;
+}
+.rejected-button{
+background-color: red;
+color: white;
+}
+
+.status-button.active {
+background-color: #d5d1defe;
+color: black;
+border: none;
+padding: 5px 15px;
+}
+
 
 
 /* MAIN */
@@ -805,7 +869,7 @@ main.table {
     align-items: center;
 }
 
-.table__header .input-group {
+.table__header .search-engine {
     width: 35%;
     height: 100%;
     background-color: #fff5;
@@ -819,18 +883,18 @@ main.table {
     transition: .2s;
 }
 
-.table__header .input-group:hover {
+.table__header .search-engine:hover {
     width: 45%;
     background-color: #fff8;
     box-shadow: 0 .1rem .4rem #0002;
 }
 
-.table__header .input-group img {
+.table__header .search-engine img {
     width: 1.2rem;
     height: 1.2rem;
 }
 
-.table__header .input-group input {
+.table__header .search-engine input {
     width: 100%;
     padding: 0 .5rem 0 .3rem;
     background-color: transparent;
@@ -931,7 +995,7 @@ tbody tr.hide td img {
 }
 
 .status {
-    padding: .4rem 0;
+    padding: 2px 0;
     border-radius: 2rem;
     text-align: center;
 }

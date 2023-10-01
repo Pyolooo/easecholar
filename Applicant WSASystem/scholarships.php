@@ -4,14 +4,14 @@ session_name("ApplicantSession");
 session_start();
 $user_id = $_SESSION['user_id'];
 
-if(!isset($user_id)){
-   header('location:applicant_login.php');
+if (!isset($user_id)) {
+    header('location:applicant_login.php');
 };
 
-if(isset($_GET['logout'])){
-   unset($user_id);
-   session_destroy();
-   header('location:applicant_login.php');
+if (isset($_GET['logout'])) {
+    unset($user_id);
+    session_destroy();
+    header('location:applicant_login.php');
 }
 // Fetch and store the admin's username in a session variable
 $sqlAdmin = "SELECT username FROM tbl_admin WHERE admin_id = ?";
@@ -105,89 +105,98 @@ if ($rowUserInfo = mysqli_fetch_assoc($resultUserInfo)) {
     $full_name = "Unknown User";
 }
 
+function formatExpireDate($dbExpireDate)
+{
+    $dateTimeObject = new DateTime($dbExpireDate);
+    $formatted_date = "Until " . $dateTimeObject->format('F j, Y');
+    return $formatted_date;
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-	<!-- Boxicons -->
-	<link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Boxicons -->
+    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.18/dist/sweetalert2.all.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-	<!-- My CSS -->
-	<link rel="stylesheet" href="css/scholarships.css">
+    <!-- My CSS -->
+    <link rel="stylesheet" href="css/scholarships.css">
 
-	<title>ApplicantModule</title>
+    <title>ApplicantModule</title>
     <style>
-        
+
     </style>
 </head>
+
 <body>
 
 
-	<!-- SIDEBAR -->
-	<section id="sidebar">
-		<a href="#" class="brand">
-			<img src="../img/isulogo.png">
-			<span class="text"><?= $full_name; ?></span>
-		</a>
-		<ul class="side-menu top">
-			<li>
-				<a href="applicant_dashboard.php">
-					<i class='bx bxs-dashboard' ></i>
-					<span class="text">Dashboard</span>
-				</a>
-			</li>
+    <!-- SIDEBAR -->
+    <section id="sidebar">
+        <a class="brand">
+            <img src="../img/isulogo.png">
+            <span class="text"><?= $full_name; ?></span>
+        </a>
+        <ul class="side-menu top">
+            <li>
+                <a href="applicant_dashboard.php">
+                    <i class='bx bxs-dashboard'></i>
+                    <span class="text">Dashboard</span>
+                </a>
+            </li>
             <li class="active">
-				<a href="#">
-					<i class='bx bxs-shopping-bag-alt' ></i>
-					<span class="text">Scholarships</span>
-				</a>
-			</li>
-			<li>
-				<a href="application_status.php">
-					<i class='bx bxs-file-blank' ></i>
-					<span class="text">Application</span>
-				</a>
-			</li>
-			<li>
-				<a href="#">
-					<i class='bx bxs-message-dots' ></i>
-					<span class="text">Message</span>
-				</a>
-			</li>
-			<li>
-				<a href="#">
-					<i class='bx bxs-group' ></i>
-					<span class="text">Team</span>
-				</a>
-			</li>
-		</ul>
-		<ul class="side-menu">
-			<li>
-				<a href="applicant_logout.php" class="logout">
-					<i class='bx bxs-log-out-circle' ></i>
-					<span class="text">Logout</span>
-				</a>
-			</li>
-		</ul>
-	</section>
-	<!-- SIDEBAR -->
+                <a href="#">
+                    <i class='bx bxs-shopping-bag-alt'></i>
+                    <span class="text">Scholarships</span>
+                </a>
+            </li>
+            <li>
+                <a href="application_status.php">
+                    <i class='bx bxs-file-blank'></i>
+                    <span class="text">Application</span>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <i class='bx bxs-message-dots'></i>
+                    <span class="text">Message</span>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <i class='bx bxs-group'></i>
+                    <span class="text">Team</span>
+                </a>
+            </li>
+        </ul>
+        <ul class="side-menu">
+            <li>
+                <a href="applicant_logout.php" class="logout">
+                    <i class='bx bxs-log-out-circle'></i>
+                    <span class="text">Logout</span>
+                </a>
+            </li>
+        </ul>
+    </section>
+    <!-- SIDEBAR -->
 
 
 
-	<!-- CONTENT -->
-	<section id="content">
-		<!-- NAVBAR -->
-		<nav>
-			<div class="menu">
-				<i class='bx bx-menu'></i>
-			</div>
-			<div class="right-section">
-			<div class="notif">
+    <!-- CONTENT -->
+    <section id="content">
+        <!-- NAVBAR -->
+        <nav>
+            <div class="menu">
+                <i class='bx bx-menu'></i>
+            </div>
+            <div class="right-section">
+                <div class="notif">
                     <div class="notification">
                         <?php
                         // Query to fetch the count of unread messages for the logged-in applicant's application
@@ -284,7 +293,7 @@ if ($rowUserInfo = mysqli_fetch_assoc($resultUserInfo)) {
                         <?php } ?>
                     </div>
                 </div>
-				<div class="profile">
+                <div class="profile">
                     <a href="applicant_profile.php" class="profile">
                         <?php
                         $select_user = mysqli_query($dbConn, "SELECT * FROM `tbl_user` WHERE user_id = '$user_id'") or die('query failed');
@@ -304,17 +313,17 @@ if ($rowUserInfo = mysqli_fetch_assoc($resultUserInfo)) {
                     </a>
                 </div>
 
-			</div>
-		</nav>
+            </div>
+        </nav>
 
 
-		
-		<!-- NAVBAR -->
 
-		<!-- MAIN -->
-		<main>
+        <!-- NAVBAR -->
 
-                        <!-- MODAL -->
+        <!-- MAIN -->
+        <main>
+
+            <!-- MODAL -->
             <div class="modal" id="messageModal">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
@@ -353,76 +362,104 @@ if ($rowUserInfo = mysqli_fetch_assoc($resultUserInfo)) {
                 </div>
             </div>
 
-			<div class="head-title">
-				<div class="left">
-					<h1>Scholarships</h1>
-					<ul class="breadcrumb">
-						<li>
-							<a href="scholarships.php">Scholarship</a>
-						</li>
-						<li><i class='bx bx-chevron-right' ></i></li>
-						<li>
-							<a class="active" href="#">Home</a>
-						</li>
-					</ul>
-				</div>
-			</div>
+            <div class="head-title">
+                <div class="left">
+                    <h1>Scholarships</h1>
+                    <ul class="breadcrumb">
+                        <li>
+                            <a href="scholarships.php">Scholarship</a>
+                        </li>
+                        <li><i class='bx bx-chevron-right'></i></li>
+                        <li>
+                            <a class="active" href="#">Home</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
 
-            <?php
-                function formatExpireDate($dbExpireDate) {
-                    $dateTimeObject = new DateTime($dbExpireDate);
-                    $formatted_date = "Until " . $dateTimeObject->format('F j, Y');
-                    return $formatted_date;
-                }
-             ?>
+            <div class="table-data">
+                <div class="order">
+                    <div class="head">
+                        <h3>Available Scholarships</h3>
+                        <div class="filter-select">
+                            <label for="filter-type">Filter:</label>
+                            <select id="filter-type">
+                                <option value="Ongoing">Ongoing</option>
+                                <option value="Closed">Closed</option>
+                                <option value="All">All</option>
+                            </select>
+                        </div>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="scholarship-list">
+                            <?php
+                            $sql = "SELECT scholarship_id, scholarship, scholarship_status, expire_date FROM tbl_scholarship";
+                            $result = $dbConn->query($sql);
 
-			<div class="table-data">
-				<div class="order">
-					<div class="head">
-						<h3>Available Scholarships</h3>
-						<form action="#">
-			</form>
-					</div>
-					<table>
-						<thead>
-							<hr>
-						</thead>
-						<tbody>
-							<?php
-							include('../include/connection.php');
+                            while ($row = $result->fetch_assoc()) {
+                                $scholarshipId = $row['scholarship_id'];
+                                $scholarshipName = $row['scholarship'];
+                                $expireDate = $row['expire_date'];
+                                $scholarshipStatus = $row['scholarship_status'];
 
-							if ($dbConn->connect_error){
-								die('Connection failed: ' . $dbConn->connect_errno);
-							}
+                                $currentDate = date('Y-m-d');
 
-							$sql = "SELECT * FROM tbl_scholarship";
-							$result = $dbConn->query($sql);
+                                if ($currentDate >= $expireDate && $scholarshipStatus == 'Ongoing') {
+                                    $updateSql = "UPDATE tbl_scholarship SET scholarship_status = 'Closed' WHERE scholarship_id = $scholarshipId";
+                                    $updateResult = $dbConn->query($updateSql);
 
-							if (!$result){
-								die("Invalid query: " . $dbConn->connect_error);
-							}
+                                    if (!$updateResult) {
+                                        echo "Error updating scholarship status for ID: $scholarshipId<br>";
+                                    } else {
+                                        echo "Scholarship ID: $scholarshipId marked as 'Closed'<br>";
+                                        $scholarshipStatus = 'Closed';
+                                    }
+                                }
+                                // Add the data-status attribute based on scholarship status
+                                $dataStatusAttribute = ($scholarshipStatus == 'Ongoing') ? 'Ongoing' : 'Closed';
 
-							while($row = $result->fetch_assoc()){
-								echo "
-								<tr>
-									<td>
-										$row[scholarship_id].
-										<a href='scholarship_details.php?id=$row[scholarship_id]'>
-                                        $row[scholarship] <div class='scholarship-deadline'> <span class ='scholarship-status'> $row[scholarship_status] </span>  " . formatExpireDate($row['expire_date']) . " </div>
-										</a>
-									</td>
-								</tr>
-								";
-							}
-							?>
-							
-						</tbody>
-					</table>
-				</div>
-			</div>
-		</main>
-		<!-- MAIN -->
-	</section>
+                                // Modify the output based on the scholarship status
+                                $output = "<tr data-status='$dataStatusAttribute'>";
+
+                                if ($scholarshipStatus == 'Ongoing') {
+                                    $output .= "<td>";
+                                    $output .= "<a href='scholarship_details.php?id=$scholarshipId'>";
+                                    $output .= "$scholarshipName";
+                                    $output .= "<div class='scholarship-deadline'>";
+                                    $output .= "<span class='scholarship-status'>$scholarshipStatus</span>";
+                                    $output .= "  " . formatExpireDate($expireDate);
+                                    $output .= "</div>";
+                                    $output .= "</a>";
+                                    $output .= "</td>";
+                                } else {
+                                    $output .= "<td class='closed-scholarship'>";
+                                    $output .= "<a href='scholarship_details.php?id=$scholarshipId'>";
+                                    $output .= "$scholarshipName";
+                                    $output .= "<div class='scholarship-deadline'>";
+                                    $output .= "<span class='scholarship-status'>$scholarshipStatus</span>";
+                                    $output .= "</div>";
+                                    $output .= "</a>";
+                                    $output .= "</td>";
+                                }
+
+                                $output .= "</tr>";
+
+                                echo $output;
+                            }
+                            ?>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </main>
+        <!-- MAIN -->
+    </section>
     <script>
         function confirmLogout() {
             // Display a SweetAlert confirmation
@@ -442,6 +479,38 @@ if ($rowUserInfo = mysqli_fetch_assoc($resultUserInfo)) {
                 }
             });
         }
+
+        // Function to filter scholarships
+        function filterScholarships(status) {
+            const $scholarshipRows = $("#scholarship-list tr");
+
+            $scholarshipRows.each(function() {
+                const scholarshipStatus = $(this).data("status");
+
+                if (status === "All" || status === scholarshipStatus) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+
+            // Remove the 'active' class from all filter buttons
+            $(".filter-buttons button").removeClass("active");
+            // Add the 'active' class to the clicked filter button
+            $(`#filter-${status.toLowerCase()}`).addClass("active");
+        }
+
+        // Function to handle select option change
+        $("#filter-type").change(function() {
+            const status = $(this).val(); // Get the selected option's value
+            filterScholarships(status);
+        });
+
+        // Set 'Ongoing' as the default filter when the page loads
+        $(document).ready(function() {
+            filterScholarships("Ongoing");
+        });
+
 
         // Attach the click event to the "Logout" link
         document.querySelector(".logout").addEventListener("click", function(event) {
@@ -651,4 +720,5 @@ if ($rowUserInfo = mysqli_fetch_assoc($resultUserInfo)) {
         });
     </script>
 </body>
+
 </html>

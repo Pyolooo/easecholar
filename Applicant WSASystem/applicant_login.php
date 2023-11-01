@@ -8,17 +8,23 @@ if (isset($_POST['submit'])) {
     $password = mysqli_real_escape_string($dbConn, $_POST['password']);
 
     // Use a prepared statement to prevent SQL injection
-    $query = mysqli_prepare($dbConn, "SELECT * FROM tbl_user WHERE (email = ? OR student_num = ?) AND acc_status = 'verified'");
+    $query = mysqli_prepare($dbConn, "SELECT * FROM tbl_user WHERE (email = ? OR student_num = ?)");
     mysqli_stmt_bind_param($query, "ss", $emailOrStudentNum, $emailOrStudentNum);
     mysqli_stmt_execute($query);
     $result = mysqli_stmt_get_result($query);
 
+    if (isset($_POST['remember_me'])) {
+        // Set cookies with user credentials
+        setcookie('remember_user', $emailOrStudentNum, time() + (30 * 24 * 3600), '/');
+        setcookie('remember_password', $password, time() + (30 * 24 * 3600), '/');
+    }
+
     if ($row = mysqli_fetch_assoc($result)) {
         if ($password === $row['password']) {
             $_SESSION['user_id'] = $row['user_id'];
-            $successMessage = 'Login Successfuly';
+            $successMessage = 'Login Successfully';
         } else {
-            $incorrectMessage = 'Incorrect Password!';
+            $incorrectMessage = 'Incorrect LRN!';
         }
     } else {
         // Check if the user exists in the database (not verified)
@@ -28,11 +34,8 @@ if (isset($_POST['submit'])) {
         $result = mysqli_stmt_get_result($query);
 
         if ($row = mysqli_fetch_assoc($result)) {
-            // User exists but is not verified
-            $notVerifiedMessage = 'User not verified. Please check your email to verify your account.';
-        } else {
-            // User not registered
             $notRegisteredMessage = 'User not registered.';
+        } else {
         }
     }
 }
@@ -153,13 +156,13 @@ if (isset($_POST['submit'])) {
             ?>
             <div class="page-links">
                 <a href="applicant_login.php" class="active">Login</a>
-                <a href="applicant_register.php">Register</a>
             </div>
             <div class="input-container">
                 <span class="input-container-addon">
                     <i class="fa fa-envelope-square"></i>
                 </span>
-                <input class="input-style" name="email_or_student_num" type="text" placeholder="Email or Student Number" required>
+                <input class="input-style" name="email_or_student_num" type="text" placeholder="Email or Student Number" required
+    value="<?php echo isset($_COOKIE['remember_user']) ? htmlspecialchars($_COOKIE['remember_user']) : ''; ?>">
             </div>
 
 
@@ -167,14 +170,33 @@ if (isset($_POST['submit'])) {
                 <span class="input-container-addon">
                     <i class="fa fa-lock"></i>
                 </span>
-                <input class="input-style" name="password" type="password" placeholder="LRN's number" required>
+                <input class="input-style" id="password" name="password" type="password" placeholder="LRN's number" required
+    value="<?php echo isset($_COOKIE['remember_password']) ? htmlspecialchars($_COOKIE['remember_password']) : ''; ?>">
             </div>
+
+            <label class="show-password" for="show-password">
+                <input type="checkbox" id="show-password"> Show LRN's Number
+            </label>
+            <label class="show-password" for="remember-me">
+    <input type="checkbox" id="remember-me" name="remember_me"> Remember Me
+</label>
+
 
             <div class="button">
                 <button type="submit" name="submit" class="submit">Login</button>
             </div>
         </form>
     </div>
-</body>
 
+    <script>
+        document.getElementById("show-password").addEventListener("change", function() {
+            var passwordInput = document.getElementById("password");
+            if (this.checked) {
+                passwordInput.type = "text";
+            } else {
+                passwordInput.type = "password";
+            }
+        });
+    </script>
+</body>
 </html>

@@ -42,7 +42,9 @@ if ($stmt) {
 
     if ($result->num_rows === 1) {
         $row = $result->fetch_assoc();
-        // Assign values to variables
+
+        $username = $row['username'];
+        $full_name = $row['full_name'];
         $email = $row['email'];
         $phone_num = $row['phone_num'];
         $profile_path = $row['profile'];
@@ -54,6 +56,8 @@ if ($stmt) {
 $conn->close();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $username = $_POST['username'];
+    $full_name = $_POST['full_name'];
     $email = $_POST['email'];
     $phone_num = $_POST['phone_num'];
 
@@ -61,6 +65,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $errors[] = 'Valid email address is required.';
+    }
+
+    if (!empty($phone_num) && !preg_match('/^\d{11}$/', $phone_num)) {
+        $errors[] = 'Phone number must have exactly 11 digits.';
     }
 
     $profile = $_FILES['profile'];
@@ -77,11 +85,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $upload_directory = $_SERVER['DOCUMENT_ROOT'] . '/EASE-CHOLAR/user_profiles/' . $file_name;
 
         if (move_uploaded_file($profile['tmp_name'], $upload_directory)) {
-            // Store only the file name in the database
+            // Only update $profile_path if the move operation was successful
             $profile_path = $file_name;
         } else {
             $errors[] = 'File upload failed.';
-        }
+        }        
     }
 
     if (empty($errors)) {
@@ -91,15 +99,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             die("Connection failed: " . $conn->connect_error);
         }
 
-        $sql = "UPDATE tbl_admin SET email = ?, phone_num = ?, profile = ? WHERE admin_id = ?";
+        $sql = "UPDATE tbl_admin SET email = ?, phone_num = ?, profile = ?, username = ?, full_name = ? WHERE admin_id = ?";
         $stmt = $conn->prepare($sql);
 
         if ($stmt) {
             // Bind parameters
-            $stmt->bind_param("sssi", $email, $phone_num, $profile_path, $admin_id);
+            $stmt->bind_param("sssssi", $email, $phone_num, $profile_path, $username, $full_name, $admin_id);
 
             if ($stmt->execute()) {
-                echo "Profile updated successfully.";
+                $success_message = "Profile updated successfully.";
             } else {
                 echo "Profile update failed.";
             }
@@ -112,7 +120,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $conn->close();
     } else {
         foreach ($errors as $error) {
-            echo "<p>{$error}</p>";
         }
     }
 }
@@ -122,45 +129,113 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html>
 
 <head>
-    <title>Your Profile</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Boxicons -->
+    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
     <link rel="stylesheet" href="css/osa_profile.css">
+    <title>Your Profile</title>
 </head>
 
 <body>
-    <h1>Your Profile</h1>
     <form method="POST" action="" enctype="multipart/form-data">
 
-    <section>
-        <div class="profile-container">
-            <div class="container">
-                <div class="info-container">
-                    <div class="email-container">
-                        <label for="email">Email:</label>
-                        <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($email); ?>" required>
-                    </div>
+        <section>
+            <h2 style="font-size:25px; color: #636363">PROFILE</h2>
+            <div class="profile-container">
+                <div class="container">
+                    <div class="info-container">
 
-                    <div class="phone-container">
-                        <label for="phone_num">Phone Number:</label>
-                        <input type="text" id="phone_num" name="phone_num" value="<?php echo htmlspecialchars($phone_num); ?>">
+                        <div class="label-container">
+                            <i class='bx bxs-user-rectangle' ></i>
+                            <input type="text" id="full_name" name="full_name" value="<?php echo htmlspecialchars($full_name); ?>" required>
+                        </div>
+
+                        <div class="label-container">
+                        <i class='bx bxs-user-detail' ></i>
+                            <input type="text" id="username" name="username" value="<?php echo htmlspecialchars($username); ?>" required>
+                        </div>
+                        
+
+                        <div class="label-container">
+                             <i class='bx bxs-envelope'></i>
+                            <input type="email" id="email" name="email" placeholder="Provide your email address" value="<?php echo htmlspecialchars($email); ?>" required>
+                        </div>
+
+                        <div class="label-container">
+                        <i class='bx bxs-phone' ></i>
+                            <input type="text" id="phone_num" name="phone_num" placeholder="Provide your phone number" value="<?php echo htmlspecialchars($phone_num); ?>" required>
+                        </div>
+
+                    </div>
+                    <div class="image-container">
+                        <div id="updated-profile-image">
+                            <?php
+                            if (!empty($profile_path)) {
+                                echo "<img src='/EASE-CHOLAR/user_profiles/{$profile_path}' width='250' height='250'>";
+                            }
+                            ?>
+                        </div>
+
+                        <div class="round">
+                            <input type="file" id="profile" name="profile" accept=".jpg, .jpeg, .png">
+                            <i class='bx bxs-camera'></i>
+                        </div>
+
                     </div>
                 </div>
-                <div class="image-container">
-                    <?php
-
-                    if (!empty($profile_path)) {
-                        echo "<img src='/EASE-CHOLAR/user_profiles/{$profile_path}' width='150' height='150'>";
-                    }
-                    ?>
-                    <label for="profile">Profile Picture:</label>
-                    <input type="file" id="profile" name="profile">
+                <div class="update-container">
+                    <button class="cancel-button" type="button" onclick="window.location.href='osa_dashboard.php'">Cancel</button>
+                    <button class="update-button" type="submit" value="Update Profile">Update </button>
                 </div>
+                <?php
+if (isset($errors)) {
+    foreach ($errors as $error) {
+        echo '<p style="color: red; text-align: center;">' . $error . '</p>';
+    }
+}
+?>
+                <?php
+                if (isset($success_message)) {
+                    echo '<p style="color: green; text-align:center">' . $success_message . '</p>';
+                }
+                ?>
             </div>
-                    <div class="update-container">
-            <button class="update-button" tupe="submit" value="Update Profile">
-            </div>
-        </div>
-    </section>
+        </section>
     </form>
+
+    <script>
+        $(document).ready(function() {
+            $('#profile').on('change', function() {
+                var formData = new FormData($('form')[0]);
+
+                $.ajax({
+                    type: 'POST',
+                    url: 'pdate_profile.php',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function(response) {
+                        // Check if the response contains the success message
+                        if (response.includes('Profile Updated Successfully')) {
+                            // Display the success message
+                            $('#success-message').text(response);
+                        }
+
+                        // Update the profile image
+                        $('#updated-profile-image').html(response);
+                    }
+                });
+
+                $('form').submit();
+            });
+        });
+        
+    </script>
 </body>
 
 </html>

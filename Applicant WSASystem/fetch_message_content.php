@@ -15,16 +15,20 @@ if (isset($_POST['message_id']) && isset($_POST['application_id']) && isset($_PO
         mysqli_stmt_execute($stmtUpdate);
     }
 
-    $selectMessage = mysqli_prepare($dbConn, "SELECT osa_message_content FROM tbl_user_messages WHERE message_id = ? AND application_id = ? AND admin_id = ?");
+    $selectMessage = mysqli_prepare($dbConn, "SELECT osa_message_content, attach_files FROM tbl_user_messages WHERE message_id = ? AND application_id = ? AND admin_id = ?");
     mysqli_stmt_bind_param($selectMessage, "iii", $messageId, $applicationId, $adminId);
     mysqli_stmt_execute($selectMessage);
     $result = mysqli_stmt_get_result($selectMessage);
 
     if ($fetchMessage = mysqli_fetch_assoc($result)) { 
-        echo $fetchMessage['osa_message_content'];
+        if (!empty($fetchMessage['osa_message_content'])) {
+            echo $fetchMessage['osa_message_content'];
+        } else {
+            echo $fetchMessage['attach_files'];
+        }
     } else {
-    
         echo "No message found.";
     }
 }
+
 ?>

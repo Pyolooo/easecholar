@@ -9,6 +9,9 @@
 a {
 	text-decoration: none;
 }
+a:hover{
+	text-decoration: none;
+}
 
 li {
 	list-style: none;
@@ -46,6 +49,10 @@ body {
 	overflow-x: hidden;
 }
 
+.swal2-container.swal2-bottom, .swal2-container.swal2-center, .swal2-container.swal2-top {
+	grid-template-columns: auto minmax(0,1fr) auto;
+	z-index: 2000;
+}
 
 
 
@@ -371,11 +378,11 @@ nav .profile img {
 .school-name{
 	margin-left: 30px;
 	font-weight: 600;
-	font-size: 20px;
+	font-size: x-large;
 	letter-spacing: 5px;
 	word-spacing: 5px;
-	color: green;
-	text-shadow: 0 0 2px darkgoldenrod;
+	color: #066606;
+	text-shadow: 0 0 1px darkgoldenrod;
 }
 /* NAVBAR */
 
@@ -421,16 +428,18 @@ nav .profile img {
 	pointer-events: unset;
 }
 #content main .head-title .btn-download {
-	height: 36px;
 	padding: 0 16px;
-	border-radius: 36px;
-	background: var(--blue);
-	color: var(--light);
+	color: rgb(51 106 19);
+	border-radius: 5px;
 	display: flex;
 	justify-content: center;
 	align-items: center;
 	grid-gap: 10px;
 	font-weight: 500;
+	font-size: 50px;
+}
+#content main .head-title .btn-download:hover{
+	opacity: 0.8;
 }
 
 
@@ -508,6 +517,7 @@ nav .profile img {
 	margin-right: auto;
 	font-size: 24px;
 	font-weight: 600;
+	color: #565656;
 }
 #content main .table-data .head .bx {
 	cursor: pointer;
@@ -535,7 +545,7 @@ nav .profile img {
 	padding: 16px 0;
 }
 #content main .table-data tbody a {
-	color: black;
+	color: #444444;
 	font-size: 20px;
 	font-weight: 500;
   }

@@ -65,7 +65,6 @@ nav{
   padding: 25px 20px 25px 20px;
   background-color: rgb(25, 128, 25);
   color: white;
-  font-size: 15px;
   font-weight: 600;
   transition: opacity .15s;
 }
@@ -81,7 +80,6 @@ nav{
   background-color: white;
   background-color: rgb(25, 128, 25);
   color: white;
-  font-size: 15px;
   font-weight: 600; 
   transition: opacity .15s;
   width: 80px;
@@ -98,7 +96,6 @@ nav{
   background-color: white;
   background-color: rgb(25, 128, 25);
   color: white;
-  font-size: 15px;
   font-weight: 600;
   transition: opacity .15s;
 }
@@ -114,7 +111,6 @@ nav{
   background-color: white;
   background-color: rgb(25, 128, 25);
   color: white;
-  font-size: 15px;
   font-weight: 600;
   transition: opacity .15s;
 }
@@ -174,6 +170,9 @@ nav{
 }
 
 @media screen and (max-width: 768px) {
+  a{
+    text-decoration: none;
+  }
   .user-portal{
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -182,7 +181,7 @@ nav{
     display: flex;
     flex-direction: column;
     align-items: center;
-    font-size: 13px;
+    font-size: 10px;
     width: 80px;
   }
   .student-button{

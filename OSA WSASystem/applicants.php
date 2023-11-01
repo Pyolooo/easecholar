@@ -17,7 +17,6 @@ if (isset($_GET['logout'])) {
     exit();
 }
 
-$select = mysqli_query($dbConn, "SELECT * FROM tbl_userapp") or die('query failed');
 ?>
 
 <!DOCTYPE html>
@@ -61,34 +60,16 @@ $select = mysqli_query($dbConn, "SELECT * FROM tbl_userapp") or die('query faile
             </li>
             <li class="active">
                 <a href="applicants.php">
-                    <i class='bx bxs-group'></i>
-                    <span class="text">Applicants</span>
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <i class='bx bxs-message-dots'></i>
-                    <span class="text">Message</span>
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <i class='bx bxs-group'></i>
-                    <span class="text">Team</span>
+                    <i class='bx bxs-file'></i>
+                    <span class="text">Applications</span>
                 </a>
             </li>
         </ul>
         <ul class="side-menu">
             <li>
-                <a href="#">
-                    <i class='bx bxs-cog'></i>
-                    <span class="text">Settings</span>
-                </a>
-            </li>
-            <li>
                 <a href="#" class="logout">
                     <i class='bx bxs-log-out-circle'></i>
-                    <span class="text">Logout</span>
+                    <span class="text" onclick="confirmLogout()">Logout</span>
                 </a>
             </li>
         </ul>
@@ -138,14 +119,6 @@ $select = mysqli_query($dbConn, "SELECT * FROM tbl_userapp") or die('query faile
                                     <p><?php echo $row['message']; ?></p>
                                     <span class="notify_time"><?php echo $row['created_at']; ?></span>
                                 </div>
-                                <div class="notify_options">
-                                    <i class="bx bx-dots-vertical-rounded"></i>
-                                    <!-- Add the ellipsis (three-dots) icon and the options menu -->
-                                    <div class="options_menu">
-                                        <span class="delete_option" data-notification-id="<?php echo $row['notification_id']; ?>">Delete</span>
-                                        <span class="cancel_option">Cancel</span>
-                                    </div>
-                                </div>
                             </div>
                         <?php } ?>
                     </div>
@@ -191,15 +164,7 @@ $select = mysqli_query($dbConn, "SELECT * FROM tbl_userapp") or die('query faile
                     </ul>
                 </div>
 
-        <?php while ($row = mysqli_fetch_array($select)) { ?>
-            <?php
-            $scholarshipNameVariable = $row['scholarship_name'];
-            ?>
-            <a href="generate_pdf.php?scholarship_name=<?php echo urlencode($scholarshipNameVariable); ?>" class="btn-download">
-                <img class="export-img" src="../img/export.png">
-                <span class="text">Export</span>
-            </a>
-        <?php } ?>
+
 
 
 
@@ -218,7 +183,35 @@ $select = mysqli_query($dbConn, "SELECT * FROM tbl_userapp") or die('query faile
 
         <main class="table">
             <section class="table__header">
-                <h1>Applicant's Application</h1>
+                <div class="export-container">
+                    <select id="scholarshipSelect" name="scholarship_id">
+                        <option value="">All Scholarships</option>
+                        <?php
+
+                        $scholarshipQuery = "(SELECT DISTINCT scholarship_id, scholarship_name FROM tbl_userapp WHERE status = 'Accepted') UNION (SELECT scholarship_id, scholarship_name FROM tbl_scholarship_1_form WHERE status = 'Accepted')";
+
+                        $scholarshipResult = mysqli_query($dbConn, $scholarshipQuery);
+
+                        if ($scholarshipResult) {
+                            while ($row = mysqli_fetch_assoc($scholarshipResult)) {
+                                $scholarshipId = $row['scholarship_id'];
+                                $scholarshipName = $row['scholarship_name'];
+                                echo '<option value="' . urlencode($scholarshipId) . '">' . $scholarshipName . '</option>';
+                            }
+                        }
+                        ?>
+
+                    </select>
+                    <select id="exportFormatSelect">
+                        <option value="pdf">PDF</option>
+                        <option value="excel">Excel</option>
+                    </select>
+
+                    <button id="exportButton" class="btn-download" title="Export Data">
+                        <i class='bx bxs-file-export'></i> Export
+                    </button>
+
+                </div>
                 <div class="input-group">
                     <input type="search" placeholder="Search Data...">
                     <img src="../img/search.png" alt="">
@@ -250,63 +243,75 @@ $select = mysqli_query($dbConn, "SELECT * FROM tbl_userapp") or die('query faile
                             <th>Action <span class="icon-arrow">&UpArrow;</span></th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <?php
+                    $select = mysqli_query($dbConn, "SELECT ua.application_id, ua.image, ua.applicant_name, ua.scholarship_name, ua.date_submitted, ua.status, ua.user_id, 'tbl_userapp' AS source
+                    FROM tbl_userapp ua
+                    JOIN tbl_user u ON ua.user_id = u.user_id
+                    UNION
+                    SELECT s1f.application_id, s1f.image, s1f.applicant_name, s1f.scholarship_name, s1f.date_submitted, s1f.status, s1f.user_id, 'tbl_scholarship_1_form' AS source
+                    FROM tbl_scholarship_1_form s1f
+                    JOIN tbl_user u ON s1f.user_id = u.user_id") or die('query failed');
+
+                    $number = 1;
+                    ?>
 
                     <?php
-$select = mysqli_query($dbConn, "SELECT ua.*, u.custom_id
-            FROM tbl_userapp ua
-            JOIN tbl_user u ON ua.user_id = u.user_id") or die('query failed');
-?>
-
-                        <?php
-                        while ($row = mysqli_fetch_array($select)) {
-                            $statusClass = '';
-                            switch ($row['status']) {
-                                case 'Pending':
-                                    $statusClass = 'pending';
-                                    break;
-                                case 'In Review':
-                                    $statusClass = 'inreview';
-                                    break;
-                                case 'Qualified':
-                                    $statusClass = 'qualified';
-                                    break;
-                                case 'Accepted':
-                                    $statusClass = 'accepted';
-                                    break;
-                                case 'Rejected':
-                                    $statusClass = 'rejected';
-                                    break;
-                                default:
-                                    break;
-                            }
-                        ?>
-
-                            <tr>
-                            <td><?= $row['custom_id'] ?></td>
-                                <td><img src="../user_profiles/<?= $row['image'] ?>" alt=""><?= $row['applicant_name'] ?></td>
-                                <td><?= $row['scholarship_name'] ?></td>
-                                <td><?= formatDateSubmitted($row['date_submitted']) ?></td>
-                                <td>
-                                    <p class="status <?= $statusClass ?>"><?= $row['status'] ?></p>
-                                </td>
-                                <td>
-                                    <strong><a href="view_application.php?id=<?= $row['application_id'] ?>">Review</a></strong>
-                                </td>
-                            </tr>
-                        <?php
+                    while ($row = mysqli_fetch_array($select)) {
+                        $statusClass = '';
+                        switch ($row['status']) {
+                            case 'Pending':
+                                $statusClass = 'pending';
+                                break;
+                            case 'In Review':
+                                $statusClass = 'inreview';
+                                break;
+                            case 'Qualified':
+                                $statusClass = 'qualified';
+                                break;
+                            case 'Accepted':
+                                $statusClass = 'accepted';
+                                break;
+                            case 'Rejected':
+                                $statusClass = 'rejected';
+                                break;
+                            default:
+                                break;
                         }
-                        ?>
-                    </tbody>
+                    ?>
+
+                        <tr>
+                            <td><?= $number ?></td>
+                            <td><img src="../user_profiles/<?= $row['image'] ?>" alt=""><?= $row['applicant_name'] ?></td>
+                            <td><?= $row['scholarship_name'] ?></td>
+                            <td><?= formatDateSubmitted($row['date_submitted']) ?></td>
+                            <td>
+                                <p class="status <?= $statusClass ?>"><?= $row['status'] ?></p>
+                            </td>
+                            <td>
+                                <?php
+                                $source = $row['source'];
+                                $viewLink = ($source == 'tbl_userapp') ? 'view_application.php' : 'view_application1.php';
+                                $applicationId = $row['application_id'];
+                                $user_id = $row['user_id'];
+                                $reviewLink = $viewLink . '?id=' . $applicationId . '&user_id=' . $user_id; // Include user_id in the URL
+                                ?>
+                                <strong><a class="view-link" href="<?= $reviewLink ?>">Review</a></strong>
+                            </td>
+                        </tr>
+
+                    <?php
+                        $number++;
+                    }
+                    ?>
 
                 </table>
+                <div class="pagination"></div>
             </section>
         </main>
 
         <script src="js/applicants.js"></script>
         <script>
             $(document).ready(function() {
-                // Function to confirm logout
                 function confirmLogout() {
                     Swal.fire({
                         title: "Logout",
@@ -319,19 +324,36 @@ $select = mysqli_query($dbConn, "SELECT ua.*, u.custom_id
                         cancelButtonText: "Cancel"
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            // If the user confirms, redirect to the logout script
                             window.location.href = "osa_logout.php";
                         }
                     });
                 }
 
-                // Attach the click event to the "Logout" link
+
                 document.querySelector(".logout").addEventListener("click", function(event) {
-                    event.preventDefault(); // Prevent the link from navigating directly
+                    event.preventDefault();
                     confirmLogout();
                 });
 
-                // TOGGLE SIDEBAR
+                document.getElementById("exportButton").addEventListener("click", function() {
+                    var scholarshipSelect = document.getElementById("scholarshipSelect");
+                    var exportFormatSelect = document.getElementById("exportFormatSelect");
+                    var selectedScholarshipId = scholarshipSelect.value;
+                    var selectedFormat = exportFormatSelect.value;
+
+                    var exportURL = "generate_pdf.php";
+
+                    if (selectedFormat === "excel") {
+                        exportURL = "generate_excel.php";
+                    }
+
+                    if (selectedScholarshipId) {
+                        exportURL += "?scholarship_id=" + selectedScholarshipId;
+                    }
+
+                    window.location.href = exportURL;
+                });
+
                 const menuBar = document.querySelector('#content nav .bx.bx-menu');
                 const sidebar = document.getElementById('sidebar');
 
@@ -341,7 +363,6 @@ $select = mysqli_query($dbConn, "SELECT ua.*, u.custom_id
 
                 menuBar.addEventListener('click', toggleSidebar);
 
-                // Function to handle window resize and toggle sidebar based on screen width
                 function handleResize() {
                     const screenWidth = window.innerWidth;
 
@@ -352,48 +373,35 @@ $select = mysqli_query($dbConn, "SELECT ua.*, u.custom_id
                     }
                 }
 
-                // Add a window resize event listener
                 window.addEventListener('resize', handleResize);
-
-                // Initial check and toggle based on current screen width
                 handleResize();
 
-                // Function to toggle the dropdown
                 function toggleDropdown() {
-                    $(".num").hide(); // Hide the notification count when the dropdown is toggled
+                    $(".num").hide();
                 }
 
-                // Add click event listener to the bell icon to mark all notifications as read
                 $(".notification .bxs-bell").on("click", function(event) {
                     event.stopPropagation();
-                    // Toggle the dropdown
                     $(".dropdown").toggleClass("active");
                     toggleDropdown();
-                    // If the dropdown is being opened, mark all notifications as read
                     if ($(".dropdown").hasClass("active")) {
                         markAllNotificationsAsRead();
-                    } else {
-                        // If the dropdown is being closed, perform any other actions (if needed)
-                    }
+                    } else {}
                 });
 
-                // Close the dropdown when clicking outside of it
                 $(document).on("click", function() {
                     $(".dropdown").removeClass("active");
                 });
 
-                // Function to mark all notifications as read
                 function markAllNotificationsAsRead() {
                     $.ajax({
-                        url: "mark_notification_as_read.php", // Replace with the correct path to your "mark_notification_as_read.php" file
+                        url: "mark_notification_as_read.php",
                         type: "POST",
                         data: {
-                            read_message: "all" // Pass "all" as a parameter to mark all notifications as read
+                            read_message: "all"
                         },
                         success: function() {
-                            // On successful marking as read, remove the "unread" class from all notification items
                             $(".notify_item").removeClass("unread");
-                            // Fetch and update the notification count on the bell icon (if needed)
                             fetchNotificationCount();
                         },
                         error: function() {
@@ -402,44 +410,34 @@ $select = mysqli_query($dbConn, "SELECT ua.*, u.custom_id
                     });
                 }
 
-                // Add click event listener to the notifications to mark them as read
                 $(".notify_item").on("click", function() {
                     var notificationId = $(this).data("notification-id");
                     markNotificationAsRead(notificationId);
                 });
 
-                // Function to handle delete option click
                 $(".notify_options .delete_option").on("click", function(event) {
                     event.stopPropagation();
                     const notificationId = $(this).data("notification-id");
-                    // Send an AJAX request to delete the notification from the database
                     $.ajax({
-                        url: "delete_notification.php", // Replace with the PHP file to handle the delete operation
+                        url: "delete_notification.php",
                         type: "POST",
                         data: {
                             notification_id: notificationId
                         },
                         success: function() {
-                            // If deletion is successful, remove the notification from the dropdown
                             $(".notify_item[data-notification-id='" + notificationId + "']").remove();
-                            // Fetch and update the notification count on the bell icon
                             fetchNotificationCount();
                         },
-                        error: function() {
-                            // Handle error if deletion fails
-                        }
+                        error: function() {}
                     });
                 });
 
-                // Function to handle cancel option click
                 $(".notify_options .cancel_option").on("click", function(event) {
                     event.stopPropagation();
-                    // Hide the options menu
                     $(this).closest(".options_menu").removeClass("active");
                 });
             });
 
-            // Function to filter table rows based on status
             function filterTableByStatus(status) {
                 const rows = document.querySelectorAll(".table__body tbody tr");
 
@@ -453,21 +451,14 @@ $select = mysqli_query($dbConn, "SELECT ua.*, u.custom_id
                 });
             }
 
-            // Add click event listeners to the status buttons
             document.querySelectorAll(".status-button").forEach(button => {
                 button.addEventListener("click", () => {
-                    // Remove the "active" class from all buttons
                     document.querySelectorAll(".status-button").forEach(btn => {
                         btn.classList.remove("active");
                     });
 
-                    // Add the "active" class to the clicked button
                     button.classList.add("active");
-
-                    // Get the status from the button's data attribute
                     const status = button.getAttribute("data-status");
-
-                    // Filter the table rows based on the selected status
                     filterTableByStatus(status);
                 });
             });

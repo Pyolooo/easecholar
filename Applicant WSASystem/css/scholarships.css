@@ -46,9 +46,23 @@ body {
 	overflow-x: hidden;
 }
 
+.swal2-container.swal2-bottom, .swal2-container.swal2-center, .swal2-container.swal2-top {
+	grid-template-columns: auto minmax(0,1fr) auto;
+	z-index: 2000;
+}
 
-
-
+.modal {
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	z-index: 2000;
+	display: none;
+	overflow: hidden;
+	outline: 0;
+	background-color: #0000004f;
+}
 
 /* SIDEBAR */
 #sidebar {
@@ -78,14 +92,13 @@ body {
 	display: flex;
 	align-items: center;
 	color: rgb(36 95 36);
-	font-size: 15px;
-	font-weight: 600;
 	position: sticky;
 	top: 0;
 	left: 0;
 	background: var(--light);
 	z-index: 500;
-	padding-bottom: 20px;
+	padding-bottom: 10px;
+	padding-top: 5px;
 	box-sizing: content-box;
 }
 #sidebar .brand img {
@@ -190,6 +203,16 @@ body {
 
 
 /* NAVBAR */
+.school-name{
+	margin-left: 30px;
+	font-weight: 600;
+	font-size: x-large;
+	letter-spacing: 5px;
+	word-spacing: 5px;
+	color: #066606;
+	text-shadow: 0 0 1px darkgoldenrod;
+}
+
 nav {
 	height: 56px;
 	background: var(--light);
@@ -391,7 +414,9 @@ nav .profile img {
 }
 
 .notif-label {
-	font-size: 20px;
+	display: flex;
+	align-items: center;
+	font-size: 18px;
 	border-bottom: 1px solid grey;
 	margin-bottom: 20px;
 	padding: 10px;
@@ -463,6 +488,12 @@ nav .profile img {
 
 .closed-scholarship .scholarship-status {
 	color: red; /* Red color for 'Closed' scholarships */
+}
+.name-hub {
+	text-align: center;
+	color: green;
+	font-weight: 600px;
+	text-shadow: 0 0 1px black;
 }
 /* NAVBAR */
 
@@ -595,6 +626,7 @@ nav .profile img {
 	margin-right: auto;
 	font-size: 24px;
 	font-weight: 600;
+	color: #565656;
 }
 #content main .table-data .head .bx {
 	cursor: pointer;
@@ -622,7 +654,7 @@ nav .profile img {
 	padding: 16px 0;
 }
 #content main .table-data tbody a {
-	color: black;
+	color: #444444;
 	font-size: 20px;
 	font-weight: 500;
 	text-decoration: none;
@@ -688,10 +720,10 @@ nav .profile img {
 	font-size: 15px;
 	color:black;
 }
-/* In your CSS file */
 .scholarship-status {
-color: green; /* Change to your desired color */
+color: green; 
 }
+
 
 
 /* MAIN */
@@ -763,5 +795,28 @@ color: green; /* Change to your desired color */
 	}
 	#content main .table-data .todo .todo-list {
 		min-width: 420px;
+	}
+	.dropdown {
+		width: 300px;
+		height: auto;
+		background: var(--grey);
+		border-radius: 5px;
+		box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.125);
+		margin: 15px auto 0;
+		padding: 0;
+		position: absolute;
+		top: 41px;
+		right: 0;
+		display: none;
+	}
+
+	.school-name {
+    margin-left: 20px;
+		font-size: 7px;
+    font-weight: 600;
+		letter-spacing: 0px;
+    word-spacing: 5px;
+    color: #066606;
+    text-shadow: 0 0 1px darkgoldenrod;
 	}
 }

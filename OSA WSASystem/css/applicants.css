@@ -46,7 +46,10 @@ body {
 	overflow-x: hidden;
 }
 
-
+.swal2-container.swal2-bottom, .swal2-container.swal2-center, .swal2-container.swal2-top {
+	grid-template-columns: auto minmax(0,1fr) auto;
+	z-index: 2000;
+}
 
 
 
@@ -370,14 +373,11 @@ nav .profile img {
 .school-name{
 	margin-left: 30px;
 	font-weight: 600;
-	font-size: 20px;
+	font-size: x-large;
 	letter-spacing: 5px;
 	word-spacing: 5px;
-	color: green;
-	text-shadow: 0 0 2px darkgoldenrod;
-}
-.export-img{
-	width: 30px;
+	color: #066606;
+	text-shadow: 0 0 1px darkgoldenrod;
 }
 /* NAVBAR */
 
@@ -422,21 +422,87 @@ nav .profile img {
 	color: var(--blue);
 	pointer-events: unset;
 }
-#content main .head-title .btn-download {
-	height: 40px;
-	padding: 0 26px;
-	border-radius: 36px;
-	background: var(--blue);
-	color: var(--light);
+.export-container{
+	width: 30%;
 	display: flex;
-	justify-content: center;
 	align-items: center;
-	grid-gap: 10px;
-	font-weight: 600;
+	justify-content: space-evenly;
 }
+.export-img{
+	width: 30px;
+}
+#scholarshipSelect{
+	border-radius: 5px;
+	padding: 3px 5px;
+}
+
+#exportFormatSelect{
+	border-radius: 5px;
+	padding: 3px 5px;
+}
+
+#exportButton{
+	padding: 3px 5px;
+	border-radius: 3px;
+	border: 1px solid darkgray;
+}
+.bxs-file-export:before {
+	content: "\eaa5";
+	color: darkgreen;
+}
+
 #content main .head-title .btn-download:hover{
 	opacity: 0.8;
+	color: rgb(51 106 19);
 }
+
+.pagination {
+	padding: 10px 0;
+	display: flex;
+	justify-content: end;
+}
+
+.pagination-button {
+  background-color: #007BFF; /* Background color */
+  color: #fff; /* Text color */
+  padding: 5px 10px; /* Padding */
+  border: none; /* Remove the button border */
+  border-radius: 4px; /* Add rounded corners */
+  cursor: pointer; /* Change the cursor to a pointer on hover */
+  margin: 0 2px; /* Add some margin between buttons */
+}
+
+.pagination-button:hover {
+  background-color: #0056b3; /* Darker background color on hover */
+}
+
+.pagination-button:disabled {
+  background-color: #d3d3d3; /* Disabled button background color */
+  color: #7a7a7a; /* Disabled button text color */
+  cursor: not-allowed; /* Set cursor to not-allowed for disabled button */
+}
+
+.pagination-button {
+  background-color: #007BFF; /* Background color */
+  color: #fff; /* Text color */
+  padding: 5px 10px; /* Padding */
+  border: none; /* Remove the button border */
+  border-radius: 4px; /* Add rounded corners */
+  cursor: pointer; /* Change the cursor to a pointer on hover */
+  margin: 0 2px; /* Add some margin between buttons */
+}
+
+.pagination-button:hover {
+  background-color: #0056b3; /* Darker background color on hover */
+}
+
+.pagination-button.active {
+  background-color: #17a2b8; /* Active button background color */
+  color: #fff; /* Active button text color */
+  cursor: default; /* Default cursor for active button */
+}
+
+
 
 
 
@@ -732,23 +798,23 @@ border-top-left-radius: 10px;
 border-top-right-radius: 10px;
 }
 .pending-button{
-background-color: var(--orange);
+background-color: #f7aa8a;
 color: white;
 }
 .inreview-button{
-background-color: var(--yellow);
+background-color: #f6d872;
 color: white;
 }
 .qualified-button{
-background-color: #00d084;
+background-color: #6dccaa;
 color: white;
 }
 .accepted-button{
-background-color: #28a745;
+background-color: #61aa72;
 color: white;
 }
 .rejected-button{
-background-color: red;
+background-color: #ff7070;
 color: white;
 }
 
@@ -757,6 +823,14 @@ background-color: #d5d1defe;
 color: black;
 border: none;
 padding: 5px 15px;
+}
+.view-link{
+  background-color: #d5d1defe;
+  border-radius: 5px;
+  padding: 5px 15px;
+  color: #444;
+  font-weight: 600;
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.30);
 }
 
 

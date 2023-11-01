@@ -16,15 +16,50 @@ if (isset($_GET['logout'])) {
     exit();
 }
 
-// No need to include the connection.php again here
-$select = mysqli_query($dbConn, "SELECT * FROM tbl_userapp WHERE status = 'Pending'") or die('query failed');
+$select = mysqli_query($dbConn, "
+SELECT 
+    applicant_name, 
+    date_submitted AS userapp_date_submitted, 
+    status AS userapp_status,
+    image,
+    'tbl_userapp' AS source
+FROM tbl_userapp
+WHERE status = 'Pending'
 
-// Execute SQL queries to fetch counts for each status
-$pendingCount = mysqli_query($dbConn, "SELECT COUNT(*) as count FROM tbl_userapp WHERE status = 'Pending'")->fetch_assoc()['count'];
-$inReviewCount = mysqli_query($dbConn, "SELECT COUNT(*) as count FROM tbl_userapp WHERE status = 'In Review'")->fetch_assoc()['count'];
-$qualifiedCount = mysqli_query($dbConn, "SELECT COUNT(*) as count FROM tbl_userapp WHERE status = 'Qualified'")->fetch_assoc()['count'];
-$acceptedCount = mysqli_query($dbConn, "SELECT COUNT(*) as count FROM tbl_userapp WHERE status = 'Accepted'")->fetch_assoc()['count'];
-$rejectedCount = mysqli_query($dbConn, "SELECT COUNT(*) as count FROM tbl_userapp WHERE status = 'Rejected'")->fetch_assoc()['count'];
+UNION
+
+SELECT 
+    applicant_name, 
+    date_submitted AS scholarship_date_submitted, 
+    status AS scholarship_status,
+    image,
+    'tbl_scholarship_1_form' AS source
+FROM tbl_scholarship_1_form
+WHERE status = 'Pending'
+") or die(mysqli_error($dbConn));
+
+$query = "SELECT
+    (SELECT COUNT(*) FROM tbl_userapp WHERE status = 'Pending') +
+    (SELECT COUNT(*) FROM tbl_scholarship_1_form WHERE status = 'Pending') AS pendingCount,
+    (SELECT COUNT(*) FROM tbl_userapp WHERE status = 'In Review') +
+    (SELECT COUNT(*) FROM tbl_scholarship_1_form WHERE status = 'In Review') AS inReviewCount,
+    (SELECT COUNT(*) FROM tbl_userapp WHERE status = 'Qualified') +
+    (SELECT COUNT(*) FROM tbl_scholarship_1_form WHERE status = 'Qualified') AS qualifiedCount,
+    (SELECT COUNT(*) FROM tbl_userapp WHERE status = 'Accepted') +
+    (SELECT COUNT(*) FROM tbl_scholarship_1_form WHERE status = 'Accepted') AS acceptedCount,
+    (SELECT COUNT(*) FROM tbl_userapp WHERE status = 'Rejected') +
+    (SELECT COUNT(*) FROM tbl_scholarship_1_form WHERE status = 'Rejected') AS rejectedCount
+";
+
+$result = mysqli_query($dbConn, $query);
+$row = mysqli_fetch_assoc($result);
+
+$pendingCount = $row['pendingCount'];
+$inReviewCount = $row['inReviewCount'];
+$qualifiedCount = $row['qualifiedCount'];
+$acceptedCount = $row['acceptedCount'];
+$rejectedCount = $row['rejectedCount'];
+
 ?>
 
 
@@ -43,119 +78,7 @@ $rejectedCount = mysqli_query($dbConn, "SELECT COUNT(*) as count FROM tbl_userap
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.18/dist/sweetalert2.all.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
 
-
     <title>adminModule</title>
-    <style>
-        .notification .bxs-bell {
-            cursor: pointer;
-        }
-
-        .dropdown {
-            width: 350px;
-            height: auto;
-            background: whitesmoke;
-            border-radius: 5px;
-            box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.125);
-            margin: 15px auto 0;
-            padding: 15px;
-            position: absolute;
-            top: 40px;
-            /* Adjust the distance from the notification icon as needed */
-            right: 0;
-            /* To align it with the notification icon */
-            display: none;
-        }
-
-        .dropdown .notify_item {
-            display: flex;
-            align-items: center;
-            padding: 10px 0;
-            border-bottom: 1px solid #dbdaff;
-        }
-
-        .dropdown .notify_item:last-child {
-            border-bottom: 0px;
-        }
-
-        .dropdown .notify_item .notify_img {
-            margin-right: 15px;
-        }
-
-        .dropdown .notify_item .notify_info p {
-            margin-bottom: 5px;
-        }
-
-        .dropdown .notify_item .notify_info p span {
-            color: #605dff;
-            margin-left: 5px;
-        }
-
-        .dropdown .notify_item .notify_info .notify_time {
-            color: #c5c5e6;
-            font-size: 12px;
-        }
-
-        .dropdown:before {
-            content: "";
-            position: absolute;
-            top: -30px;
-            left: 50%;
-            transform: translateX(-50%);
-            border: 15px solid;
-            border-color: transparent transparent #fff transparent;
-        }
-
-        .dropdown.active {
-            display: block;
-        }
-
-        .scholar_image {
-            width: 50px;
-            height: 50px;
-            object-fit: cover;
-            border: 3px solid #28a745;
-            border-radius: 25px;
-            margin-right: 10px;
-        }
-
-        .bxs-message-square-check {
-            border: #28a745;
-        }
-
-        .donut-container {
-            width: 60%;
-            height: 30%;
-            background-color: white;
-            padding: 10px;
-            border-radius: 20px;
-        }
-        .scholarship-analytics{
-            flex-grow: 1;
-	        flex-basis: 300px;
-        }
-        td{
-            padding-left: 10px;
-            padding-top: 10px;
-
-        }
-        th{
-            text-align: left;
-        }
-        .head-analytics{
-            width: 20px;
-        }
-        .applicants-count{
-            text-align: center;
-        }
-        .num_applicants{
-            color: white;
-            padding: 0px 20px;
-            border-radius: 10px;
-            background-color: brown;
-            font-size: 20px;
-            font-weight: 600;
-        }
-    </style>
 
 </head>
 
@@ -165,10 +88,10 @@ $rejectedCount = mysqli_query($dbConn, "SELECT COUNT(*) as count FROM tbl_userap
 
 
     <!-- SIDEBAR -->
-    <section id="sidebar" class="hide">
+    <section id="sidebar">
         <a href="#" class="brand">
             <img src="../img/isulogo.png">
-            <span class="text">ISU Santiago Extension</span>
+            <span class="admin-hub">ADMIN</span>
         </a>
         <ul class="side-menu top">
             <li class="active">
@@ -186,36 +109,24 @@ $rejectedCount = mysqli_query($dbConn, "SELECT COUNT(*) as count FROM tbl_userap
             <li>
                 <a href="manage_users.php">
                     <i class='bx bxs-group'></i>
-                    <span class="text">Applicants</span>
+                    <span class="text">Manage Users</span>
                 </a>
             </li>
             <li>
-                <a href="applicant_list.php">
+                <a href="application_list.php">
                     <i class='bx bxs-file'></i>
                     <span class="text">Application List</span>
                 </a>
             </li>
-            <li>
-                <a href="#">
-                    <i class='bx bxs-message-dots'></i>
-                    <span class="text">Message</span>
-                </a>
-            </li>
         </ul>
         <ul class="side-menu">
-            <li>
-                <a href="#">
-                    <i class='bx bxs-cog'></i>
-                    <span class="text">Settings</span>
-                </a>
-            </li>
-            <li>
-                <a href="#" class="logout">
-                    <i class='bx bxs-log-out-circle'></i>
-                    <span class="text" onclick="confirmLogout()">Logout</span>
-                </a>
-            </li>
-        </ul>
+			<li>
+				<a href="#" class="logout">
+					<i class='bx bxs-log-out-circle' ></i>
+					<span class="text">Logout</span>
+				</a>
+			</li>
+		</ul>
     </section>
     <!-- SIDEBAR -->
 
@@ -227,76 +138,29 @@ $rejectedCount = mysqli_query($dbConn, "SELECT COUNT(*) as count FROM tbl_userap
         <nav>
             <div class="menu">
                 <i class='bx bx-menu'></i>
+                <span class="school-name">ISABELA STATE UNIVERSITY SANTIAGO</span>
             </div>
             <div class="right-section">
-                <div class="notif">
-                    <div class="notification">
-                        <?php
-                        $getNotificationCountQuery = mysqli_query($dbConn, "SELECT COUNT(*) as count FROM tbl_admin_notif WHERE is_read = 'unread'") or die('query failed');
-                        $notificationCountData = mysqli_fetch_assoc($getNotificationCountQuery);
-                        $notificationCount = $notificationCountData['count'];
-
-
-                        // Show the notification count only if there are new messages
-                        if ($notificationCount > 0) {
-                            echo '<i id="bellIcon" class="bx bxs-bell"></i>';
-                            echo '<span class="num">' . $notificationCount . '</span>';
-                        } else {
-                            echo '<i id="bellIcon" class="bx bxs-bell"></i>';
-                            echo '<span class="num" style="display: none;">' . $notificationCount . '</span>';
-                        }
-                        ?>
-                    </div>
-
-                    <?php
-                    function formatCreatedAt($dbCreatedAt)
-                    {
-                        $dateTimeObject = new DateTime($dbCreatedAt);
-                        return $dateTimeObject->format('Y-m-d, g:i A');
-                    }
-                    ?>
-
-                    <!-- Inside the "notif" div, add the following code: -->
-                    <div class="dropdown">
-                        <?php
-                        $notifications = mysqli_query($dbConn, "SELECT * FROM tbl_admin_notif WHERE is_read = 'unread'") or die('query failed');
-                        ?>
-                        <?php while ($row = mysqli_fetch_assoc($notifications)) { ?>
-                            <div class="notify_item">
-                                <div class="notify_img">
-                                    <img src='../user_profiles/<?php echo $row['image']; ?>' alt="" style="width: 50px">
-                                </div>
-                                <div class="notify_info">
-                                    <p><?php echo $row['message']; ?></p>
-                                    <span class="notify_time"><?php echo formatCreatedAt($row['created_at']); ?></span>
-                                </div>
-                                <div class="notify_options">
-                                    <i class="bx bx-dots-vertical-rounded"></i>
-                                    <!-- Add the ellipsis (three-dots) icon and the options menu -->
-                                    <div class="options_menu">
-                                        <span class="delete_option" data-notification-id="<?php echo $row['notification_id']; ?>">Delete</span>
-                                        <span class="cancel_option">Cancel</span>
-                                    </div>
-                                </div>
-                            </div>
-                        <?php } ?>
-                    </div>
-
-                </div>
                 <div class="profile">
                     <a href="admin_profile.php" class="profile">
                         <?php
                         $select_admin = mysqli_query($dbConn, "SELECT * FROM `tbl_super_admin` WHERE super_admin_id = '$super_admin_id'") or die('query failed');
-                        if (mysqli_num_rows($select_admin) > 0) {
-                            $fetch_admin = mysqli_fetch_assoc($select_admin);
-                        }
-                        if ($fetch_admin['profile'] == '') {
-                            echo '<img src="../img/isulogo.png">';
+                        $fetch = mysqli_fetch_assoc($select_admin);
+                        if ($fetch && $fetch['profile'] != '') {
+
+                            $imagePath = $_SERVER['DOCUMENT_ROOT'] . '/EASE-CHOLAR/user_profiles/' . $fetch['profile'];
+
+                            if (file_exists($imagePath)) {
+                                echo '<img src="../user_profiles/' . $fetch['profile'] . '">';
+                            } else {
+                                echo '<img src="../user_profiles/isulogo.png">';
+                            }
                         } else {
-                            echo '<img src="../img/' . $fetch_admin['profile'] . '">';
+                            echo '<img src="../user_profiles/isulogo.png">';
                         }
                         ?>
                     </a>
+
                 </div>
             </div>
         </nav>
@@ -319,38 +183,84 @@ $rejectedCount = mysqli_query($dbConn, "SELECT COUNT(*) as count FROM tbl_userap
             </div>
 
             <ul class="box-info">
-                <li>
+            <li>
                     <i class='bx bxs-calendar-check'></i>
                     <?php include('../include/connection.php'); ?>
 
                     <?php
-                    $result = mysqli_query($dbConn, "SELECT * FROM tbl_scholarship");
+                    $result = mysqli_query($dbConn, "SELECT * FROM tbl_scholarship WHERE scholarship_status = 'Ongoing'");
                     $num_rows = mysqli_num_rows($result);
                     ?>
-                    <span class="text">
-                        <h3><?php echo $num_rows; ?></h3>
-                        <p>Available Scholarships </p>
-                    </span>
+                    <a href="scholarships.php">
+                        <span class="text">
+                            <h3><?php echo $num_rows; ?></h3>
+                            <p>Available Scholarships </p>
+                        </span>
+                    </a>
                 </li>
                 <li>
+                    <?php
+                    include('../include/connection.php');
+
+                    $sql = "
+                    SELECT SUM(total_count) AS total FROM (
+                        SELECT COUNT(*) AS total_count FROM tbl_user
+                        UNION ALL
+                        SELECT COUNT(*) AS total_count FROM tbl_admin
+                        UNION ALL
+                        SELECT COUNT(*) AS total_count FROM tbl_super_admin
+                    ) AS combined";
+
+                    $result = mysqli_query($dbConn, $sql);
+
+                    if ($result) {
+                        $row = mysqli_fetch_assoc($result);
+
+                        $total_count = $row['total'];
+                    } else {
+                        echo "Error: " . mysqli_error($dbConn);
+                    }
+                    ?>
+
                     <i class='bx bxs-group'></i>
+                    <a href="manage_all_users.php">
+                        <span class="text">
+                            <h3><?php echo $total_count; ?></h3>
+                            <p>Total Users</p>
+                        </span>
+                    </a>
+                </li>
+
+                <li>
+                    <i class='bx bxs-receipt'></i>
+                    <?php include('../include/connection.php'); ?>
+
                     <?php include('../include/connection.php'); ?>
 
                     <?php
-                    $result = mysqli_query($dbConn, "SELECT * FROM tbl_userapp");
-                    $num_rows = mysqli_num_rows($result);
+                    $sql = "
+                    SELECT SUM(num_rows) AS total FROM (
+                        SELECT COUNT(*) AS num_rows FROM tbl_userapp
+                        UNION ALL
+                        SELECT COUNT(*) AS num_rows FROM tbl_scholarship_1_form
+                    ) AS combined";
+
+                    $result = mysqli_query($dbConn, $sql);
+
+                    if ($result) {
+                        $row = mysqli_fetch_assoc($result);
+
+                        $num_rows = $row['total'];
+                    } else {
+                        echo "Error: " . mysqli_error($dbConn);
+                    }
                     ?>
-                    <span class="text">
-                        <h3><?php echo $num_rows; ?></h3>
-                        <p>Applicants</p>
-                    </span>
-                </li>
-                <li>
-                    <i class='bx bxs-receipt'></i>
-                    <span class="text">
-                        <h3><?php echo $num_rows; ?></h3>
-                        <p>Total Applications Received</p>
-                    </span>
+                    <a href="application_list.php">
+                        <span class="text">
+                            <h3><?php echo $num_rows; ?></h3>
+                            <p>Total Applications Received</p>
+                        </span>
+                    </a>
                 </li>
             </ul>
 
@@ -362,10 +272,16 @@ $rejectedCount = mysqli_query($dbConn, "SELECT COUNT(*) as count FROM tbl_userap
                     <canvas id="applicationStatusChart"></canvas>
                 </div>
 
-                <!-- Scholarship Analytics table -->
                 <div class="scholarship-analytics">
                     <div class="head">
                         <h3>Scholarship Analytics</h3>
+                        <div class="export-button-container">
+                            <select id="exportFormatSelect">
+                                <option value="pdf">PDF</option>
+                                <option value="excel">Excel</option>
+                            </select>
+                            <button id="exportButton">Export</button>
+                        </div>
                     </div>
                     <table>
                         <thead>
@@ -376,24 +292,26 @@ $rejectedCount = mysqli_query($dbConn, "SELECT COUNT(*) as count FROM tbl_userap
                         </thead>
                         <tbody>
                             <?php
-                            // SQL query to retrieve scholarship names and count of applicants
-                            $sql = "SELECT s.scholarship, COUNT(ua.user_id) AS num_applicants
-                            FROM tbl_scholarship s
-                            LEFT JOIN tbl_userapp ua ON s.scholarship_id = ua.scholarship_id
-                            GROUP BY s.scholarship";
-
-                            $listResult = mysqli_query($dbConn, $sql);
-
-                            if ($listResult) {
-                                while ($row = mysqli_fetch_assoc($listResult)) {
-                                    echo '<tr>';
-                                    echo '<td>' . $row['scholarship'] . '</td>';
-                                    echo '<td class = "applicants-count"> <span class="num_applicants">'  . $row['num_applicants'] . '</span></td>';
-                                    echo '</tr>';
-                                }
-                            } else {
-                                echo '<tr><td colspan="2">Error executing the query: ' . mysqli_error($dbConn) . '</td></tr>';
-                            }
+                           $sql = "SELECT s.scholarship, 
+                           (COUNT(ua.user_id) + COUNT(sf.user_id)) AS num_applicants
+                   FROM tbl_scholarship s
+                   LEFT JOIN tbl_userapp ua ON s.scholarship_id = ua.scholarship_id
+                   LEFT JOIN tbl_scholarship_1_form sf ON s.scholarship_id = sf.scholarship_id
+                   GROUP BY s.scholarship";
+           
+           $listResult = mysqli_query($dbConn, $sql);
+           
+           if ($listResult) {
+               while ($row = mysqli_fetch_assoc($listResult)) {
+                   echo '<tr>';
+                   echo '<td>' . $row['scholarship'] . '</td>';
+                   echo '<td class="applicants-count"> <span class="num_applicants">'  . $row['num_applicants'] . '</span></td>';
+                   echo '</tr>';
+               }
+           } else {
+               echo '<tr><td colspan="2">Error executing the query: ' . mysqli_error($dbConn) . '</td></tr>';
+           }
+           
                             ?>
                         </tbody>
                     </table>
@@ -422,39 +340,52 @@ $rejectedCount = mysqli_query($dbConn, "SELECT COUNT(*) as count FROM tbl_userap
                             </tr>
                         </thead>
                         <tbody>
-
                             <?php
                             while ($row = mysqli_fetch_array($select)) {
                                 $statusClass = '';
-                                switch ($row['status']) {
-                                    case 'Pending':
-                                        $statusClass = 'pending';
-                                        break;
-                                    case 'In Review':
-                                        $statusClass = 'inreview';
-                                        break;
-                                    case 'Incomplete':
-                                        $statusClass = 'incomplete';
-                                        break;
-                                    case 'Qualified':
-                                        $statusClass = 'qualified';
-                                        break;
-                                    case 'Accepted':
-                                        $statusClass = 'accepted';
-                                        break;
-                                    case 'Rejected':
-                                        $statusClass = 'rejected';
-                                        break;
-                                    default:
-                                        break;
+
+                                if (isset($row['userapp_status'])) {
+                                    switch ($row['userapp_status']) {
+                                        case 'Pending':
+                                            $statusClass = 'pending';
+                                            break;
+                                        case 'In Review':
+                                            $statusClass = 'inreview';
+                                            break;
+                                        case 'Incomplete':
+                                            $statusClass = 'incomplete';
+                                            break;
+                                        case 'Qualified':
+                                            $statusClass = 'qualified';
+                                            break;
+                                        case 'Accepted':
+                                            $statusClass = 'accepted';
+                                            break;
+                                        case 'Rejected':
+                                            $statusClass = 'rejected';
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                } else if (isset($row['scholarship_status'])) {
+                                    switch ($row['scholarship_status']) {
+                                    }
                                 }
+
+                                if ($row['source'] === 'tbl_userapp' && isset($row['userapp_status'])) {
+                                    $statusText = $row['userapp_status'];
+                                    $dateSubmitted = $row['userapp_date_submitted'];
+                                } elseif ($row['source'] === 'tbl_scholarship_1_form' && isset($row['scholarship_status'])) {
+                                    $statusText = $row['scholarship_status'];
+                                    $dateSubmitted = $row['scholarship_date_submitted'];
+                                }
+
                                 echo '
-                            <tr>
-                                <td><img src="/EASE-CHOLAR/user_profiles/' . $row['image'] . '" alt="">' . $row['applicant_name'] . '</td>
-                                <td>' . formatDateSubmitted($row['date_submitted']) . '</td>
-                                <td><p class="status ' . $statusClass . '">' . $row['status'] . '</td>
-                            </tr>
-                                ';
+                                <tr>
+                                    <td><img src="../user_profiles/' . $row['image'] . '" alt="">' . $row['applicant_name'] . '</td>
+                                    <td>' . formatDateSubmitted($dateSubmitted) . '</td>
+                                    <td><p class="status ' . $statusClass . '">' . $statusText . '</td>
+                                </tr>';
                             }
                             ?>
                         </tbody>
@@ -487,8 +418,31 @@ $rejectedCount = mysqli_query($dbConn, "SELECT COUNT(*) as count FROM tbl_userap
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // Fetch data from your PHP code (you can use AJAX)
-        // For demonstration purposes, let's assume you have fetched the counts as follows:
+         $(document).ready(function() {
+            function confirmLogout() {
+                Swal.fire({
+                    title: "Logout",
+                    text: "Are you sure you want to log out?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Yes, log out",
+                    cancelButtonText: "Cancel"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // If the user confirms, redirect to the logout script
+                        window.location.href = "admin_logout.php";
+                    }
+                });
+            }
+
+            // Attach the click event to the "Logout" link
+            document.querySelector(".logout").addEventListener("click", function(event) {
+                event.preventDefault(); // Prevent the link from navigating directly
+                confirmLogout();
+            });
+
         const statusCounts = {
             'Pending': <?php echo $pendingCount; ?>,
             'In Review': <?php echo $inReviewCount; ?>,
@@ -497,7 +451,6 @@ $rejectedCount = mysqli_query($dbConn, "SELECT COUNT(*) as count FROM tbl_userap
             'Rejected': <?php echo $rejectedCount; ?>,
         };
 
-        // Create a Donut Chart
         const ctx = document.getElementById('applicationStatusChart').getContext('2d');
         new Chart(ctx, {
             type: 'doughnut',
@@ -523,84 +476,77 @@ $rejectedCount = mysqli_query($dbConn, "SELECT COUNT(*) as count FROM tbl_userap
                         position: 'bottom'
                     },
                     title: {
-                        display: true, // Display the title
-                        text: 'Application Statistics', // Set the title text here
-                        fontSize: 16, // Adjust the font size as needed
+                        display: true,
+                        text: 'Application Statistics',
+                        fontSize: 16,
                     },
                 },
             },
         });
 
-        $(document).ready(function() {
-            // Function to confirm logout
-            function confirmLogout() {
-                Swal.fire({
-                    title: "Logout",
-                    text: "Are you sure you want to log out?",
-                    icon: "warning",
-                    showCancelButton: true,
-                    confirmButtonColor: "#3085d6",
-                    cancelButtonColor: "#d33",
-                    confirmButtonText: "Yes, log out",
-                    cancelButtonText: "Cancel"
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        // If the user confirms, redirect to the logout script
-                        window.location.href = "admin_logout.php";
-                    }
-                });
+
+            document.getElementById("exportButton").addEventListener("click", function() {
+    var exportFormatSelect = document.getElementById("exportFormatSelect");
+    var selectedFormat = exportFormatSelect.value;
+
+    var exportURL = "generate_pdf.php"; // Default to PDF export URL
+
+    if (selectedFormat === "excel") {
+        exportURL = "generate_excel.php"; // Use Excel export URL if selected format is "excel"
+    }
+
+    window.location.href = exportURL;
+});
+
+            const menuBar = document.querySelector('#content nav .bx.bx-menu');
+            const sidebar = document.getElementById('sidebar');
+
+            function toggleSidebar() {
+                sidebar.classList.toggle('hide');
             }
 
-            // Attach the click event to the "Logout" link
-            document.querySelector(".logout").addEventListener("click", function(event) {
-                event.preventDefault(); // Prevent the link from navigating directly
-                confirmLogout();
-            });
+            menuBar.addEventListener('click', toggleSidebar);
 
-            // TOGGLE SIDEBAR
-            const menuBar = document.querySelector("#content nav .bx.bx-menu");
-            const sidebar = document.getElementById("sidebar");
+            function handleResize() {
+                const screenWidth = window.innerWidth;
 
-            menuBar.addEventListener("click", function() {
-                sidebar.classList.toggle("hide");
-            });
+                if (screenWidth <= 768) {
+                    sidebar.classList.add('hide');
+                } else {
+                    sidebar.classList.remove('hide');
+                }
+            }
 
-            // Function to toggle the dropdown
+            window.addEventListener('resize', handleResize);
+
+            handleResize();
+
             function toggleDropdown() {
-                $(".num").hide(); // Hide the notification count when the dropdown is toggled
+                $(".num").hide();
             }
 
-            // Add click event listener to the bell icon to mark all notifications as read
             $(".notification .bxs-bell").on("click", function(event) {
                 event.stopPropagation();
-                // Toggle the dropdown
                 $(".dropdown").toggleClass("active");
                 toggleDropdown();
-                // If the dropdown is being opened, mark all notifications as read
                 if ($(".dropdown").hasClass("active")) {
                     markAllNotificationsAsRead();
-                } else {
-                    // If the dropdown is being closed, perform any other actions (if needed)
-                }
+                } else {}
             });
 
-            // Close the dropdown when clicking outside of it
             $(document).on("click", function() {
                 $(".dropdown").removeClass("active");
             });
 
-            // Function to mark all notifications as read
             function markAllNotificationsAsRead() {
                 $.ajax({
-                    url: "mark_notification_as_read.php", // Replace with the correct path to your "mark_notification_as_read.php" file
+                    url: "mark_notification_as_read.php",
                     type: "POST",
                     data: {
-                        read_message: "all" // Pass "all" as a parameter to mark all notifications as read
+                        read_message: "all"
                     },
                     success: function() {
-                        // On successful marking as read, remove the "unread" class from all notification items
                         $(".notify_item").removeClass("unread");
-                        // Fetch and update the notification count on the bell icon (if needed)
                         fetchNotificationCount();
                     },
                     error: function() {
@@ -609,39 +555,30 @@ $rejectedCount = mysqli_query($dbConn, "SELECT COUNT(*) as count FROM tbl_userap
                 });
             }
 
-            // Add click event listener to the notifications to mark them as read
             $(".notify_item").on("click", function() {
                 var notificationId = $(this).data("notification-id");
                 markNotificationAsRead(notificationId);
             });
 
-            // Function to handle delete option click
             $(".notify_options .delete_option").on("click", function(event) {
                 event.stopPropagation();
                 const notificationId = $(this).data("notification-id");
-                // Send an AJAX request to delete the notification from the database
                 $.ajax({
-                    url: "delete_notification.php", // Replace with the PHP file to handle the delete operation
+                    url: "delete_notification.php",
                     type: "POST",
                     data: {
                         notification_id: notificationId
                     },
                     success: function() {
-                        // If deletion is successful, remove the notification from the dropdown
                         $(".notify_item[data-notification-id='" + notificationId + "']").remove();
-                        // Fetch and update the notification count on the bell icon
                         fetchNotificationCount();
                     },
-                    error: function() {
-                        // Handle error if deletion fails
-                    }
+                    error: function() {}
                 });
             });
 
-            // Function to handle cancel option click
             $(".notify_options .cancel_option").on("click", function(event) {
                 event.stopPropagation();
-                // Hide the options menu
                 $(this).closest(".options_menu").removeClass("active");
             });
         });

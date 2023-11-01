@@ -70,9 +70,6 @@ const toPDF = function (customers_table) {
     }, 400);
 }
 
-pdf_btn.onclick = () => {
-    toPDF(customers_table);
-}
 
 // 4. Converting HTML table to JSON
 

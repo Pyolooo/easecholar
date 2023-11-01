@@ -1,3 +1,4 @@
+
 .background {
   position: fixed;
   top: 0;
@@ -119,7 +120,10 @@
   background-color: rgb(220, 215, 215);
   padding: 6px;
   border-radius: 2px;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
   border: none;
+  font-size: 23px;
 }
 
 .log-in form .input-container .input-container-addon .fa {
@@ -140,9 +144,16 @@
   padding: 10px;
   border: 2px solid #dedede;
   border-radius: 2px;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
   color: #555;
   border-left: none;
   width: 150%;
+}
+.show-password {
+  display: flex;
+  color: white;
+  margin-bottom: 10px;
 }
 
 /* Media Queries */

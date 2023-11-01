@@ -22,7 +22,7 @@ if (!$dbConn) {
 }
 
 // Retrieve regular users (tbl_user)
-$sqlUser = "SELECT * FROM tbl_user WHERE acc_status = 'verified'";
+$sqlUser = "SELECT * FROM tbl_user";
 $resultUser = mysqli_query($dbConn, $sqlUser);
 
 if (!$resultUser) {
@@ -37,11 +37,18 @@ if (!$resultAdmin) {
   die("Query failed: " . mysqli_error($dbConn));
 }
 
-$sqlRegistrar = "SELECT * FROM tbl_registrar WHERE role = 'Registrar'";
-$resultRegistrar = mysqli_query($dbConn, $sqlRegistrar);
+$sqlsuperAdmin = "SELECT * FROM tbl_super_admin";
+$resultsuperAdmin = mysqli_query($dbConn, $sqlsuperAdmin);
 
-if (!$resultRegistrar) {
+if (!$resultsuperAdmin) {
   die("Query failed: " . mysqli_error($dbConn));
+}
+
+function formatExpireDate($dbExpireDate)
+{
+    $dateTimeObject = new DateTime($dbExpireDate);
+    $formatted_date = $dateTimeObject->format('F j, Y');
+    return $formatted_date;
 }
 ?>
 
@@ -54,23 +61,21 @@ if (!$resultRegistrar) {
 
   <!-- Boxicons -->
   <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.18/dist/sweetalert2.all.min.js"></script>
 
   <!-- My CSS -->
   <link rel="stylesheet" href="css/manage_users.css">
 
   <title>AdminModule</title>
-  <style>
-  </style>
 </head>
 
 <body>
   <!-- SIDEBAR -->
-  <section id="sidebar" class="hide">
+  <section id="sidebar">
     <a href="#" class="brand">
       <img src="../img/isulogo.png">
-      <span class="text">ISU Santiago Extension</span>
+      <span class="admin-hub">ADMIN</span>
     </a>
     <ul class="side-menu top">
       <li>
@@ -86,31 +91,19 @@ if (!$resultRegistrar) {
         </a>
       </li>
       <li class="active">
-        <a href="applicants.php">
+        <a href="#">
           <i class='bx bxs-group'></i>
-          <span class="text">Applicants</span>
+          <span class="text">Manage Users</span>
         </a>
       </li>
       <li>
-        <a href="#">
-          <i class='bx bxs-message-dots'></i>
-          <span class="text">Message</span>
-        </a>
-      </li>
-      <li>
-        <a href="#">
-          <i class='bx bxs-group'></i>
-          <span class="text">Team</span>
-        </a>
-      </li>
+				<a href="application_list.php">
+					<i class='bx bxs-file' ></i>
+					<span class="text">Application List</span>
+				</a>
+			</li>
     </ul>
     <ul class="side-menu">
-      <li>
-        <a href="#">
-          <i class='bx bxs-cog'></i>
-          <span class="text">Settings</span>
-        </a>
-      </li>
       <li>
         <a href="#" class="logout">
           <i class='bx bxs-log-out-circle'></i>
@@ -127,76 +120,28 @@ if (!$resultRegistrar) {
     <nav>
       <div class="menu">
         <i class='bx bx-menu'></i>
+        <span class="school-name">ISABELA STATE UNIVERSITY SANTIAGO</span>
       </div>
       <div class="right-section">
-        <div class="notif">
-          <div class="notification">
-            <?php
-            $getNotificationCountQuery = mysqli_query($dbConn, "SELECT COUNT(*) as count FROM tbl_admin_notif WHERE is_read = 'unread'") or die('query failed');
-            $notificationCountData = mysqli_fetch_assoc($getNotificationCountQuery);
-            $notificationCount = $notificationCountData['count'];
-
-
-            // Show the notification count only if there are new messages
-            if ($notificationCount > 0) {
-              echo '<i id="bellIcon" class="bx bxs-bell"></i>';
-              echo '<span class="num">' . $notificationCount . '</span>';
-            } else {
-              echo '<i id="bellIcon" class="bx bxs-bell"></i>';
-              echo '<span class="num" style="display: none;">' . $notificationCount . '</span>';
-            }
-            ?>
-          </div>
-
-          <?php
-          function formatCreatedAt($dbCreatedAt)
-          {
-            $dateTimeObject = new DateTime($dbCreatedAt);
-            return $dateTimeObject->format('Y-m-d, g:i A');
-          }
-          ?>
-
-          <!-- Inside the "notif" div, add the following code: -->
-          <div class="dropdown">
-            <?php
-            $notifications = mysqli_query($dbConn, "SELECT * FROM tbl_admin_notif WHERE is_read = 'unread'") or die('query failed');
-            ?>
-            <?php while ($row = mysqli_fetch_assoc($notifications)) { ?>
-              <div class="notify_item">
-                <div class="notify_img">
-                  <img src='../user_profiles/<?php echo $row['image']; ?>' alt="" style="width: 50px">
-                </div>
-                <div class="notify_info">
-                  <p><?php echo $row['message']; ?></p>
-                  <span class="notify_time"><?php echo formatCreatedAt($row['created_at']); ?></span>
-                </div>
-                <div class="notify_options">
-                  <i class="bx bx-dots-vertical-rounded"></i>
-                  <!-- Add the ellipsis (three-dots) icon and the options menu -->
-                  <div class="options_menu">
-                    <span class="delete_option" data-notification-id="<?php echo $row['notification_id']; ?>">Delete</span>
-                    <span class="cancel_option">Cancel</span>
-                  </div>
-                </div>
-              </div>
-            <?php } ?>
-          </div>
-
-        </div>
         <div class="profile">
-          <a href="admin_profile.php" class="profile">
-            <?php
-            $select_admin = mysqli_query($dbConn, "SELECT * FROM `tbl_super_admin` WHERE super_admin_id = '$super_admin_id'") or die('query failed');
-            if (mysqli_num_rows($select_admin) > 0) {
-              $fetch_admin = mysqli_fetch_assoc($select_admin);
-            }
-            if ($fetch_admin['profile'] == '') {
-              echo '<img src="../user_profiles/isulogo.png">';
-            } else {
-              echo '<img src="../user_profiles/' . $fetch_admin['profile'] . '">';
-            }
-            ?>
-          </a>
+        <a href="admin_profile.php" class="profile">
+                        <?php
+                        $select_admin = mysqli_query($dbConn, "SELECT * FROM `tbl_super_admin` WHERE super_admin_id = '$super_admin_id'") or die('query failed');
+                        $fetch = mysqli_fetch_assoc($select_admin);
+                        if ($fetch && $fetch['profile'] != '') {
+            
+                            $imagePath = $_SERVER['DOCUMENT_ROOT'] . '/EASE-CHOLAR/user_profiles/' . $fetch['profile'];
+
+                            if (file_exists($imagePath)) {
+                                echo '<img src="../user_profiles/' . $fetch['profile'] . '">';
+                            } else {
+                                echo '<img src="../user_profiles/isulogo.png">';
+                            }
+                        } else {
+                            echo '<img src="../user_profiles/isulogo.png">';
+                        }
+                        ?>
+                    </a>
         </div>
       </div>
     </nav>
@@ -217,25 +162,18 @@ if (!$resultRegistrar) {
             </li>
           </ul>
         </div>
-        <a href="create_user.php" class="btn-download">
-					<i class='bx bx-plus'></i>
-					<span class="text">Create User</span>
-				</a>
+        <a href="create_user.php" class="btn-download" id="createUserButton">
+          <i class='bx bxs-user-plus'></i>
+        </a>
+
       </div>
     </main>
 
-    <?php
-    function formatDateSubmitted($dbDateSubmitted)
-    {
-      $dateTimeObject = new DateTime($dbDateSubmitted);
-      return $dateTimeObject->format('F d, Y');
-    }
-    ?>
 
 
     <main class="table">
       <section class="table__header">
-      <h3>Manage Users</h3>
+      <h3>Manage System Users</h3>
         <div class="input-group">
           <input type="search" placeholder="Search Data...">
           <img src="../img/search.png" alt="">
@@ -245,19 +183,19 @@ if (!$resultRegistrar) {
 
       <section class="table__body filterable">
         <div class="filter-buttons">
-          <div class="filter-button active" data-filter="applicants">Applicants</div>
+          <div class="filter-button active" data-filter="applicants">Students</div>
           <div class="filter-button" data-filter="osa">OSA</div>
-          <div class="filter-button" data-filter="registrar">Registrar</div>
+          <div class="filter-button" data-filter="superAdmin">Admin</div>
         </div>
 
         <div id="applicantsSection">
           <table>
             <thead>
               <tr>
-                <th>Id <span class="icon-arrow">&UpArrow;</span></th>
-                <th>Full Name <span class="icon-arrow">&UpArrow;</span></th>
-                <th>Email <span class="icon-arrow">&UpArrow;</span></th>
-                <th>Manage <span class="icon-arrow">&UpArrow;</span></th>
+                <th>Id</th>
+                <th>Full Name</th>
+                <th>Email</th>
+                <th>Manage</th>
               </tr>
             </thead>
             <tbody>
@@ -272,6 +210,8 @@ if (!$resultRegistrar) {
                 echo '<td>' . $customId . '</td>';
                 echo '<td><img src="../user_profiles/' . $image . '" alt="">' . $fullName . '</td>';
                 echo '<td>' . $email . '</td>';
+                echo '<td><a class= "view-link" href="student_details.php?id=' . $customId . '">View</a></td>';
+
                 echo '</tr>';
               }
               ?>
@@ -283,12 +223,12 @@ if (!$resultRegistrar) {
           <table>
             <thead>
               <tr>
-                <th>Id <span class="icon-arrow">&UpArrow;</span></th>
-                <th>Full Name <span class="icon-arrow">&UpArrow;</span></th>
-                <th>Email <span class="icon-arrow">&UpArrow;</span></th>
-                <th>Role <span class="icon-arrow">&UpArrow;</span></th>
-                <th>Status <span class="icon-arrow">&UpArrow;</span></th>
-                <th>Manage <span class="icon-arrow">&UpArrow;</span></th>
+                <th>Id</th>
+                <th>Full Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Manage</th>
               </tr>
             </thead>
             <tbody>
@@ -299,7 +239,7 @@ if (!$resultRegistrar) {
                 $email = $row['email'];
                 $profile = $row['profile'];
                 $role = $row['role'];
-                $status = $row['is_active']; // Add this line to retrieve the status
+                $status = $row['is_active']; 
               
                 echo '<tr>';
                 echo '<td>' . $osaId . '</td>';
@@ -307,12 +247,12 @@ if (!$resultRegistrar) {
                 echo '<td>' . $email . '</td>';
                 echo '<td>' . $role . '</td>';
                 
-                // Add "Activate" or "Deactivate" button based on the user's status
                 if ($status == 0) {
-                  echo '<td><button class="osa-status-button" data-id="' . $osaId . '" data-status="0">Activate</button></td>';
+                  echo '<td> <span class="active-status">Active</span> </td>';
                 } else {
-                  echo '<td><button class="osa-status-button" data-id="' . $osaId . '" data-status="1" style="background-color: red; border: none;">Deactivate</button></td>';
+                  echo '<td> <span class="deactivated-status">Deactivated</span> </td>';
                 }
+                echo '<td><a class= "view-link" href="osa_details.php?id=' . $osaId . '">View</a></td>';
                 
                 echo '</tr>';
               }
@@ -322,41 +262,32 @@ if (!$resultRegistrar) {
           </table>
         </div>
 
-        <div id="registrarSection" style="display: none;">
+        <div id="superAdminSection" style="display: none;">
           <table>
             <thead>
               <tr>
-                <th>Id <span class="icon-arrow">&UpArrow;</span></th>
-                <th>Full Name <span class="icon-arrow">&UpArrow;</span></th>
-                <th>Email <span class="icon-arrow">&UpArrow;</span></th>
-                <th>Role <span class="icon-arrow">&UpArrow;</span></th>
-                <th>Status <span class="icon-arrow">&UpArrow;</span></th>
-                <th>Manage <span class="icon-arrow">&UpArrow;</span></th>
+                <th>Id</th>
+                <th>Username</th>
+                <th>Password</th>
+                <th>Created At</th>
               </tr>
             </thead>
             <tbody>
               <?php
-              while ($row = mysqli_fetch_assoc($resultRegistrar)) {
-                $registrarId = $row['registrar_id'];
-                $fullName = $row['full_name'];
-                $email = $row['email'];
+              while ($row = mysqli_fetch_assoc($resultsuperAdmin)) {
+                $superAdminId = $row['super_admin_id'];
+                $userName = $row['username'];
+                $password = $row['password'];
                 $profile = $row['profile'];
-                $role = $row['role'];
-                $status = $row['is_active'];
+                $createdAt = $row['created_at'];
+                
 
 
                 echo '<tr>';
-                echo '<td>' . $registrarId . '</td>';
-                echo '<td><img src="../user_profiles/' . $profile . '" alt="">' . $fullName . '</td>';
-                echo '<td>' . $email . '</td>';
-                echo '<td>' . $role . '</td>';
-                // Add "Activate" or "Deactivate" button based on the user's status
-                if ($status == 0) {
-                  echo '<td><button class="reg-status-button" data-id="' . $registrarId . '" data-status="0">Activate</button></td>';
-                } else {
-                  echo '<td><button class="reg-status-button" data-id="' . $registrarId . '" data-status="1" style="background-color: red; border: none;">Deactivate</button></td>';
-                }
-
+                echo '<td>' . $superAdminId . '</td>';
+                echo '<td><img src="../user_profiles/' . $profile . '" alt="">' . $userName . '</td>';
+                echo '<td>' . $password . '</td>';
+                echo '<td>' . formatExpireDate($createdAt) . '</td>';
                 echo '</tr>';
                 }
               ?>
@@ -366,70 +297,18 @@ if (!$resultRegistrar) {
       </section>
     </main>
 
-    <script src="applicants.js"></script>
+    <script src="js/applicants.js"></script>
     <script>
-// Add an event listener for button clicks using event delegation
-document.addEventListener("click", function(event) {
-  if (event.target.classList.contains("osa-status-button")) {
-    const button = event.target;
-    const osaId = button.getAttribute("data-id");
-    const currentStatus = parseInt(button.getAttribute("data-status"));
-
-    // Display a confirmation dialog
-    Swal.fire({
-      title: currentStatus === 1 ? "Activate Account" : "Deactivate Account",
-      text: currentStatus === 1 ? "Are you sure you want to activate this OSA user's account?" : "Are you sure you want to deactivate this OSA user's account?",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: currentStatus === 1 ? "Yes, activate" : "Yes, deactivate",
-      cancelButtonText: "Cancel"
-    }).then((result) => {
-      if (result.isConfirmed) {
-        // Send an AJAX request to update the user's status
-        $.ajax({
-          url: "update_osa_status.php", // Replace with the PHP file to handle status updates
-          type: "POST",
-          data: {
-            osaId: osaId,
-            status: currentStatus === 1 ? 0 : 1
-          },
-          success: function(response) {
-            if (response === "success") {
-              // Update the button text and data-status attribute
-              button.textContent = currentStatus === 1 ? "Activate" : "Deactivate";
-              button.setAttribute("data-status", currentStatus === 1 ? 0 : 1);
-              // Change the background color of the button based on the new status
-              button.style.backgroundColor = currentStatus === 1 ? "green" : "red";
-              // Show a success message
-              Swal.fire("Account Updated", "The OSA user's account has been updated.", "success");
-            } else {
-              // Show an error message
-              Swal.fire("Error", "Failed to update the account. Please try again.", "error");
-            }
-          },
-          error: function() {
-            // Handle errors if the AJAX request fails
-            Swal.fire("Error", "An error occurred while processing your request.", "error");
-          }
-        });
-      }
-    });
-  }
-});
-
-// Add an event listener for button clicks using event delegation
 document.addEventListener("click", function(event) {
   if (event.target.classList.contains("reg-status-button")) {
     const button = event.target;
-    const registrarId = button.getAttribute("data-id");
+    const superAdminId = button.getAttribute("data-id");
     const currentStatus = parseInt(button.getAttribute("data-status"));
 
     // Display a confirmation dialog
     Swal.fire({
       title: currentStatus === 1 ? "Activate Account" : "Deactivate Account",
-      text: currentStatus === 1 ? "Are you sure you want to activate this registrar user's account?" : "Are you sure you want to deactivate this registrar user's account?",
+      text: currentStatus === 1 ? "Are you sure you want to activate this superAdmin user's account?" : "Are you sure you want to deactivate this superAdmin user's account?",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
@@ -440,10 +319,10 @@ document.addEventListener("click", function(event) {
       if (result.isConfirmed) {
         // Send an AJAX request to update the user's status
         $.ajax({
-          url: "update_reg_status.php", // Replace with the PHP file to handle status updates for Registrar users
+          url: "update_reg_status.php", // Replace with the PHP file to handle status updates for superAdmin users
           type: "POST",
           data: {
-            registrarId: registrarId,
+            superAdminId: superAdminId,
             status: currentStatus === 1 ? 0 : 1
           },
           success: function(response) {
@@ -454,7 +333,7 @@ document.addEventListener("click", function(event) {
               // Change the background color of the button based on the new status
               button.style.backgroundColor = currentStatus === 1 ? "green" : "red";
               // Show a success message
-              Swal.fire("Account Updated", "The registrar user's account has been updated.", "success");
+              Swal.fire("Account Updated", "The superAdmin user's account has been updated.", "success");
             } else {
               // Show an error message
               Swal.fire("Error", "Failed to update the account. Please try again.", "error");
@@ -472,40 +351,46 @@ document.addEventListener("click", function(event) {
 
 
 
-      document.addEventListener("DOMContentLoaded", function() {
-      const filterButtons = document.querySelectorAll(".filter-button");
-      const applicantsSection = document.getElementById("applicantsSection");
-      const osaSection = document.getElementById("osaSection");
-      const registrarSection = document.getElementById("registrarSection");
+document.addEventListener("DOMContentLoaded", function() {
+    const filterButtons = document.querySelectorAll(".filter-button");
+    const applicantsSection = document.getElementById("applicantsSection");
+    const osaSection = document.getElementById("osaSection");
+    const superAdminSection = document.getElementById("superAdminSection");
+    const createUserButton = document.getElementById("createUserButton"); // Get the "Create User" button
 
-      // Initially, show Applicants section by default
-      applicantsSection.style.display = "block";
+    // Initially, show Applicants section by default
+    applicantsSection.style.display = "block";
+    createUserButton.style.display = "none"; // Hide the button by default
 
-      filterButtons.forEach(button => {
+    filterButtons.forEach(button => {
         button.addEventListener("click", function() {
-          // Remove active class from all buttons
-          filterButtons.forEach(btn => btn.classList.remove("active"));
-          // Add active class to the clicked button
-          button.classList.add("active");
+            // Remove active class from all buttons
+            filterButtons.forEach(btn => btn.classList.remove("active"));
+            // Add active class to the clicked button
+            button.classList.add("active");
 
-          // Hide all sections
-          applicantsSection.style.display = "none";
-          osaSection.style.display = "none";
-          registrarSection.style.display = "none";
+            // Hide all sections
+            applicantsSection.style.display = "none";
+            osaSection.style.display = "none";
+            superAdminSection.style.display = "none";
 
-          const selectedFilter = button.getAttribute("data-filter");
+            const selectedFilter = button.getAttribute("data-filter");
 
-          // Show the selected section based on the filter
-          if (selectedFilter === "applicants") {
-            applicantsSection.style.display = "block";
-          } else if (selectedFilter === "osa") {
-            osaSection.style.display = "block";
-          } else if (selectedFilter === "registrar") {
-            registrarSection.style.display = "block";
-          }
+            // Show the selected section based on the filter
+            if (selectedFilter === "applicants") {
+                applicantsSection.style.display = "block";
+                createUserButton.style.display = "none"; // Hide the button for applicants
+            } else if (selectedFilter === "osa") {
+                osaSection.style.display = "block";
+                createUserButton.style.display = ""; // Show the button for OSA
+            } else if (selectedFilter === "superAdmin") {
+                superAdminSection.style.display = "block";
+                createUserButton.style.display = "none"; // Hide the button for superAdmin
+            }
         });
-      });
     });
+});
+
 
 
       
@@ -535,13 +420,32 @@ document.addEventListener("click", function(event) {
           confirmLogout();
         });
 
-        // TOGGLE SIDEBAR
-        const menuBar = document.querySelector("#content nav .bx.bx-menu");
-        const sidebar = document.getElementById("sidebar");
+         // TOGGLE SIDEBAR
+         const menuBar = document.querySelector('#content nav .bx.bx-menu');
+        const sidebar = document.getElementById('sidebar');
 
-        menuBar.addEventListener("click", function() {
-          sidebar.classList.toggle("hide");
-        });
+        function toggleSidebar() {
+            sidebar.classList.toggle('hide');
+        }
+
+        menuBar.addEventListener('click', toggleSidebar);
+
+        // Function to handle window resize and toggle sidebar based on screen width
+        function handleResize() {
+            const screenWidth = window.innerWidth;
+
+            if (screenWidth <= 768) {
+                sidebar.classList.add('hide');
+            } else {
+                sidebar.classList.remove('hide');
+            }
+        }
+
+        // Add a window resize event listener
+        window.addEventListener('resize', handleResize);
+
+        // Initial check and toggle based on current screen width
+        handleResize();
 
         // Function to toggle the dropdown
         function toggleDropdown() {

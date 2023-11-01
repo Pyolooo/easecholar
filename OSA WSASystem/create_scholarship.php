@@ -19,8 +19,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   $benefits = explode("\n", htmlspecialchars($_POST["benefits"]));
   $scholarship_status = $_POST["scholarship_status"];
   $expire_date = $_POST["expire_date"];
+  $application_form_table = $_POST["application_form_table"];
 
-  if (!empty($expire_date) && strtotime($expire_date) <= time()) {
+
+    date_default_timezone_set('Asia/Manila');
+
+    $currentTimestamp = strtotime('now');
+    $expireTimestamp = strtotime($expire_date);
+
+  if (empty($expire_date)) {
+    $error_message = "Expiration date is required.";
+  } elseif ($expireTimestamp <= $currentTimestamp) {
     $error_message = "Expiration date must be in the future.";
   } else {
     $requiredFields = [$scholarship, $details, $requirements, $benefits, $scholarship_status, $expire_date];
@@ -40,9 +49,9 @@ if (!$isEmptyField) {
   $requirementsString = implode("\n", $requirements);
   $benefitsString = implode("\n", $benefits);
 
-  $sql = "INSERT INTO `tbl_scholarship` (scholarship, details, requirements, benefits, scholarship_status, expire_date) VALUES (?, ?, ?, ?, ?, ?)";
+  $sql = "INSERT INTO `tbl_scholarship` (scholarship, details, requirements, benefits, scholarship_status, expire_date, application_form_table) VALUES (?, ?, ?, ?, ?, ?, ?)";
   $stmt = $dbConn->prepare($sql);
-  $stmt->bind_param("ssssss", $scholarship, $details, $requirementsString, $benefitsString, $scholarship_status, $expire_date);
+  $stmt->bind_param("sssssss", $scholarship, $details, $requirementsString, $benefitsString, $scholarship_status, $expire_date, $application_form_table);
 
   if ($stmt->execute()) {
     // Database insertion successful
@@ -73,46 +82,58 @@ if (!$isEmptyField) {
   <section class="container">
     <div class="header">Add Scholarship</div>
     <?php
-    if ($_SERVER["REQUEST_METHOD"] == "POST") {
-      if (isset($error_message)) {
-        echo '<script>
-              Swal.fire({
-                  icon: "error",
-                  title: "Invalid Date",
-                  text: "' . $error_message . '",
-                  showConfirmButton: false,
-                  timer: 2000
-              })
-          </script>';
-      }
-      if (isset($error_input)) {
-        echo '<script>
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+  if (empty($expire_date)) {
+      // Show the error message for an empty expiration date
+      echo '<script>
+          Swal.fire({
+              icon: "error",
+              title: "Empty Field",
+              text: "Expiration date is required.",
+              showConfirmButton: false,
+              timer: 2000
+          })
+      </script>';
+  } elseif (!empty($error_message) && strtotime($expire_date) <= time()) {
+
+      // Show the error message for an invalid date
+      echo '<script>
             Swal.fire({
                 icon: "error",
-                title: "Empty Field",
-                text: "' . $error_input . '",
+                title: "Invalid Date",
+                text: "' . $error_message . '",
                 showConfirmButton: false,
                 timer: 2000
             })
         </script>';
+  } elseif (isset($error_input)) {
+      // Show the error message related to the empty field
+      echo '<script>
+          Swal.fire({
+              icon: "error",
+              title: "Empty Field",
+              text: "' . $error_input . '",
+              showConfirmButton: false,
+              timer: 2000
+          })
+      </script>';
+        }
       }
-
-      if (isset($successMessage)) {
-        echo '<script>
-              Swal.fire({
-                  position: "center",
-                  icon: "success",
-                  title: "' . $successMessage . '",
-                  showConfirmButton: false,
-                  timer: 1500
-              }).then((result) => {
-                  if (result.dismiss === Swal.DismissReason.timer) {
-                      window.location.href = "scholarships.php";
-                  }
-              });
-              </script>';
-      }
-    }
+    if (!empty($successMessage)) { 
+      echo '<script>
+            Swal.fire({
+                position: "center",
+                icon: "success",
+                title: "' . $successMessage . '",
+                showConfirmButton: false,
+                timer: 1500
+            }).then((result) => {
+                if (result.dismiss === Swal.DismissReason.timer) {
+                    window.location.href = "scholarships.php";
+                }
+            });
+            </script>';
+}
     ?>
     <form method="POST" action="" class="form">
       <div class="input-box">
@@ -143,9 +164,21 @@ if (!$isEmptyField) {
         </div>
 
         <div class="input-class">
-          <label>Deadline:</label>
-          <input type="date" name="expire_date">
-        </div>
+  <label>Deadline:</label>
+  <input type="date" name="expire_date" value="<?php echo date('Y-m-d'); ?>" required>
+</div>
+
+<div class="input-box">
+    <label>Choose Application Form:</label>
+    <select name="application_form_table" required>
+        <option value="tbl_scholarship_1_form">Application Form 1</option>
+        <option value="tbl_scholarship_2_form">Application Form 2</option>
+        <!-- Add options for different application forms (tables) -->
+    </select>
+</div>
+
+        <button type="button" id="previewButton">Preview</button>
+
         <button type="submit">Submit</button>
       </div>
 
@@ -153,6 +186,15 @@ if (!$isEmptyField) {
     </form>
   </section>
 
+  <script>
+    document.getElementById("previewButton").addEventListener("click", function() {
+        // Get the selected application form table name
+        var selectedFormTable = document.querySelector("select[name=application_form_table]").value;
+
+        // Redirect to a preview page with the selected form table as a parameter
+        window.location.href = "preview_form.php?form=" + selectedFormTable;
+    });
+</script>
 </body>
 
 </html>

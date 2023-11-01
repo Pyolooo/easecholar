@@ -16,25 +16,39 @@ if (isset($_GET['logout'])) {
     exit();
 }
 
-    // Query the database to check if the user has seen the pop-up
-    $checkPopupSeenQuery = mysqli_query($dbConn, "SELECT seen FROM tbl_admin WHERE admin_id = '$admin_id'");
-    $userData = mysqli_fetch_assoc($checkPopupSeenQuery);
-    $popupSeen = $userData['seen'];
+$checkPopupSeenQuery = mysqli_query($dbConn, "SELECT seen FROM tbl_admin WHERE admin_id = '$admin_id'");
+$userData = mysqli_fetch_assoc($checkPopupSeenQuery);
+$popupSeen = $userData['seen'];
+
+if (!$popupSeen) {
+    $showPopupReminder = true;
+    mysqli_query($dbConn, "UPDATE tbl_admin SET seen = 1 WHERE admin_id = '$admin_id'");
+} else {
+    $showPopupReminder = false;
+}
+
+$select = mysqli_query($dbConn, "
+    SELECT 
+        applicant_name, 
+        date_submitted AS userapp_date_submitted, 
+        status AS userapp_status,
+        image,
+        'tbl_userapp' AS source
+    FROM tbl_userapp
+    WHERE status = 'Pending'
     
-    if (!$popupSeen) {
-        // The user has not seen the pop-up, so show it
-        $showPopupReminder = true;
+    UNION
+    
+    SELECT 
+        applicant_name, 
+        date_submitted AS scholarship_date_submitted, 
+        status AS scholarship_status,
+        image,
+        'tbl_scholarship_1_form' AS source
+    FROM tbl_scholarship_1_form
+    WHERE status = 'Pending'
+") or die(mysqli_error($dbConn));
 
-        // Update the database to mark the pop-up as seen for this user
-        mysqli_query($dbConn, "UPDATE tbl_admin SET seen = 1 WHERE admin_id = '$admin_id'");
-    } else {
-        // The user has already seen the pop-up, so don't show it
-        $showPopupReminder = false;
-    }
-
-
-// No need to include the connection.php again here
-$select = mysqli_query($dbConn, "SELECT * FROM tbl_userapp WHERE status = 'Pending'") or die('query failed');
 
 ?>
 
@@ -55,35 +69,32 @@ $select = mysqli_query($dbConn, "SELECT * FROM tbl_userapp WHERE status = 'Pendi
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.18/dist/sweetalert2.all.min.js"></script>
 
     <title>OSAModule</title>
-    <style>
-
-    </style>
 
 </head>
 
 <body>
 
- <!--Pop up -->
- <?php if ($showPopupReminder) { ?>
- <div class="modal" id="reminderModal" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Profile Completion Reminder</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <p>Please complete or update your profile information.</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" id="laterButton">Later</button>
-                    <button type="button" class="btn btn-primary" id="completeNowButton">Complete Now</button>
+    <!--Pop up -->
+    <?php if ($showPopupReminder) { ?>
+        <div class="modal" id="reminderModal" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Profile Completion Reminder</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Please complete or update your profile information.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" id="laterButton">Later</button>
+                        <button type="button" class="btn btn-primary" id="completeNowButton">Complete Now</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
     <?php } ?>
 
 
@@ -110,20 +121,8 @@ $select = mysqli_query($dbConn, "SELECT * FROM tbl_userapp WHERE status = 'Pendi
             </li>
             <li>
                 <a href="applicants.php">
-                    <i class='bx bxs-group'></i>
-                    <span class="text">Applicants</span>
-                </a>
-            </li>
-            <li>
-                <a href="applicant_list.php">
                     <i class='bx bxs-file'></i>
-                    <span class="text">Application List</span>
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <i class='bx bxs-message-dots'></i>
-                    <span class="text">Message</span>
+                    <span class="text">Applications</span>
                 </a>
             </li>
         </ul>
@@ -190,14 +189,6 @@ $select = mysqli_query($dbConn, "SELECT * FROM tbl_userapp WHERE status = 'Pendi
                                     <p><?php echo $row['message']; ?></p>
                                     <span class="notify_time"><?php echo formatCreatedAt($row['created_at']); ?></span>
                                 </div>
-                                <div class="notify_options">
-                                    <i class="bx bx-dots-vertical-rounded"></i>
-                                    <!-- Add the ellipsis (three-dots) icon and the options menu -->
-                                    <div class="options_menu">
-                                        <span class="delete_option" data-notification-id="<?php echo $row['notification_id']; ?>">Delete</span>
-                                        <span class="cancel_option">Cancel</span>
-                                    </div>
-                                </div>
                             </div>
                         <?php } ?>
                     </div>
@@ -249,33 +240,54 @@ $select = mysqli_query($dbConn, "SELECT * FROM tbl_userapp WHERE status = 'Pendi
                     <?php include('../include/connection.php'); ?>
 
                     <?php
-                    $result = mysqli_query($dbConn, "SELECT * FROM tbl_scholarship");
+                    $result = mysqli_query($dbConn, "SELECT * FROM tbl_scholarship WHERE scholarship_status = 'Ongoing'");
                     $num_rows = mysqli_num_rows($result);
                     ?>
-                    <span class="text">
-                        <h3><?php echo $num_rows; ?></h3>
-                        <p>Available Scholarships </p>
-                    </span>
+                    <a href="scholarships.php">
+                        <span class="text">
+                            <h3><?php echo $num_rows; ?></h3>
+                            <p>Available Scholarships </p>
+                        </span>
+                    </a>
                 </li>
                 <li>
                     <i class='bx bxs-group'></i>
                     <?php include('../include/connection.php'); ?>
 
                     <?php
-                    $result = mysqli_query($dbConn, "SELECT * FROM tbl_userapp");
-                    $num_rows = mysqli_num_rows($result);
+                    $sql = "
+                    SELECT SUM(total_count) AS total FROM (
+                        SELECT COUNT(*) AS total_count FROM tbl_userapp
+                        UNION ALL
+                        SELECT COUNT(*) AS total_count FROM tbl_scholarship_1_form
+                    ) AS combined";
+
+                    $result = mysqli_query($dbConn, $sql);
+
+                    if ($result) {
+                        $row = mysqli_fetch_assoc($result);
+
+                        $total_count = $row['total'];
+                    } else {
+                        echo "Error: " . mysqli_error($dbConn);
+                    }
                     ?>
-                    <span class="text">
-                        <h3><?php echo $num_rows; ?></h3>
-                        <p>Applicants</p>
-                    </span>
+
+                    <a href="applicants.php">
+                        <span class="text">
+                            <h3><?php echo $total_count; ?></h3>
+                            <p>Applicants</p>
+                        </span>
+                    </a>
                 </li>
                 <li>
                     <i class='bx bxs-receipt'></i>
-                    <span class="text">
-                        <h3><?php echo $num_rows; ?></h3>
-                        <p>Total Applications Received</p>
-                    </span>
+                    <a href="applicants.php">
+                        <span class="text">
+                            <h3><?php echo $total_count; ?></h3>
+                            <p>Total Applications Received</p>
+                        </span>
+                    </a>
                 </li>
             </ul>
 
@@ -300,48 +312,62 @@ $select = mysqli_query($dbConn, "SELECT * FROM tbl_userapp WHERE status = 'Pendi
                             </tr>
                         </thead>
                         <tbody>
-
                             <?php
                             while ($row = mysqli_fetch_array($select)) {
                                 $statusClass = '';
-                                switch ($row['status']) {
-                                    case 'Pending':
-                                        $statusClass = 'pending';
-                                        break;
-                                    case 'In Review':
-                                        $statusClass = 'inreview';
-                                        break;
-                                    case 'Incomplete':
-                                        $statusClass = 'incomplete';
-                                        break;
-                                    case 'Qualified':
-                                        $statusClass = 'qualified';
-                                        break;
-                                    case 'Accepted':
-                                        $statusClass = 'accepted';
-                                        break;
-                                    case 'Rejected':
-                                        $statusClass = 'rejected';
-                                        break;
-                                    default:
-                                        break;
+
+                                if (isset($row['userapp_status'])) {
+                                    switch ($row['userapp_status']) {
+                                        case 'Pending':
+                                            $statusClass = 'pending';
+                                            break;
+                                        case 'In Review':
+                                            $statusClass = 'inreview';
+                                            break;
+                                        case 'Incomplete':
+                                            $statusClass = 'incomplete';
+                                            break;
+                                        case 'Qualified':
+                                            $statusClass = 'qualified';
+                                            break;
+                                        case 'Accepted':
+                                            $statusClass = 'accepted';
+                                            break;
+                                        case 'Rejected':
+                                            $statusClass = 'rejected';
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                } else if (isset($row['scholarship_status'])) {
+                                    switch ($row['scholarship_status']) {
+                                    }
                                 }
+
+                                if ($row['source'] === 'tbl_userapp' && isset($row['userapp_status'])) {
+                                    $statusText = $row['userapp_status'];
+                                    $dateSubmitted = $row['userapp_date_submitted'];
+                                } elseif ($row['source'] === 'tbl_scholarship_1_form' && isset($row['scholarship_status'])) {
+                                    $statusText = $row['scholarship_status'];
+                                    $dateSubmitted = $row['scholarship_date_submitted'];
+                                }
+
                                 echo '
-                            <tr>
-                                <td><img src="../user_profiles/' . $row['image'] . '" alt="">' . $row['applicant_name'] . '</td>
-                                <td>' . formatDateSubmitted($row['date_submitted']) . '</td>
-                                <td><p class="status ' . $statusClass . '">' . $row['status'] . '</td>
-                            </tr>
-                                ';
+                                <tr>
+                                    <td><img src="../user_profiles/' . $row['image'] . '" alt="">' . $row['applicant_name'] . '</td>
+                                    <td>' . formatDateSubmitted($dateSubmitted) . '</td>
+                                    <td><p class="status ' . $statusClass . '">' . $statusText . '</td>
+                                </tr>';
                             }
                             ?>
                         </tbody>
+
                     </table>
                 </div>
 
 
                 <?php
-                $newScholarsQuery = "SELECT * FROM tbl_userapp WHERE status = 'Accepted' ORDER BY application_id DESC LIMIT 10";
+                $newScholarsQuery = "(SELECT DISTINCT applicant_name, image, application_id FROM tbl_userapp WHERE status = 'Accepted') UNION (SELECT DISTINCT applicant_name, image, application_id FROM tbl_scholarship_1_form WHERE status = 'Accepted') ORDER BY application_id DESC LIMIT 10";
                 $result = $dbConn->query($newScholarsQuery);
                 ?>
                 <div class="todo">
@@ -366,25 +392,19 @@ $select = mysqli_query($dbConn, "SELECT * FROM tbl_userapp WHERE status = 'Pendi
     </section>
 
     <script>
-         $(document).ready(function() {
-            // Show the pop-up message
+        $(document).ready(function() {
             $("#reminderModal").modal("show");
 
-            // Handle "Complete Now" button click
             $("#completeNowButton").click(function() {
-                // Redirect to update_profile.php
                 window.location.href = "osa_profile.php";
             });
 
-            // Handle "Later" button click
             $("#laterButton").click(function() {
-                // Close the pop-up message
                 $("#reminderModal").modal("hide");
             });
         });
 
         $(document).ready(function() {
-            // Function to confirm logout
             function confirmLogout() {
                 Swal.fire({
                     title: "Logout",
@@ -397,81 +417,67 @@ $select = mysqli_query($dbConn, "SELECT * FROM tbl_userapp WHERE status = 'Pendi
                     cancelButtonText: "Cancel"
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        // If the user confirms, redirect to the logout script
                         window.location.href = "osa_logout.php";
                     }
                 });
             }
 
-            // Attach the click event to the "Logout" link
             document.querySelector(".logout").addEventListener("click", function(event) {
-                event.preventDefault(); // Prevent the link from navigating directly
+                event.preventDefault();
                 confirmLogout();
             });
 
-                // TOGGLE SIDEBAR
-        const menuBar = document.querySelector('#content nav .bx.bx-menu');
-        const sidebar = document.getElementById('sidebar');
+            const menuBar = document.querySelector('#content nav .bx.bx-menu');
+            const sidebar = document.getElementById('sidebar');
 
-        function toggleSidebar() {
-            sidebar.classList.toggle('hide');
-        }
-
-        menuBar.addEventListener('click', toggleSidebar);
-
-        // Function to handle window resize and toggle sidebar based on screen width
-        function handleResize() {
-            const screenWidth = window.innerWidth;
-
-            if (screenWidth <= 768) {
-                sidebar.classList.add('hide');
-            } else {
-                sidebar.classList.remove('hide');
+            function toggleSidebar() {
+                sidebar.classList.toggle('hide');
             }
-        }
 
-        // Add a window resize event listener
-        window.addEventListener('resize', handleResize);
+            menuBar.addEventListener('click', toggleSidebar);
 
-        // Initial check and toggle based on current screen width
-        handleResize();
+            function handleResize() {
+                const screenWidth = window.innerWidth;
 
-            // Function to toggle the dropdown
+                if (screenWidth <= 768) {
+                    sidebar.classList.add('hide');
+                } else {
+                    sidebar.classList.remove('hide');
+                }
+            }
+
+            window.addEventListener('resize', handleResize);
+            handleResize();
+
+
             function toggleDropdown() {
-                $(".num").hide(); // Hide the notification count when the dropdown is toggled
+                $(".num").hide();
             }
 
-            // Add click event listener to the bell icon to mark all notifications as read
             $(".notification .bxs-bell").on("click", function(event) {
                 event.stopPropagation();
-                // Toggle the dropdown
                 $(".dropdown").toggleClass("active");
                 toggleDropdown();
-                // If the dropdown is being opened, mark all notifications as read
                 if ($(".dropdown").hasClass("active")) {
                     markAllNotificationsAsRead();
                 } else {
-                    // If the dropdown is being closed, perform any other actions (if needed)
                 }
             });
 
-            // Close the dropdown when clicking outside of it
             $(document).on("click", function() {
                 $(".dropdown").removeClass("active");
             });
 
-            // Function to mark all notifications as read
+
             function markAllNotificationsAsRead() {
                 $.ajax({
-                    url: "mark_notification_as_read.php", // Replace with the correct path to your "mark_notification_as_read.php" file
+                    url: "mark_notification_as_read.php",
                     type: "POST",
                     data: {
-                        read_message: "all" // Pass "all" as a parameter to mark all notifications as read
+                        read_message: "all"
                     },
                     success: function() {
-                        // On successful marking as read, remove the "unread" class from all notification items
                         $(".notify_item").removeClass("unread");
-                        // Fetch and update the notification count on the bell icon (if needed)
                         fetchNotificationCount();
                     },
                     error: function() {
@@ -480,39 +486,31 @@ $select = mysqli_query($dbConn, "SELECT * FROM tbl_userapp WHERE status = 'Pendi
                 });
             }
 
-            // Add click event listener to the notifications to mark them as read
             $(".notify_item").on("click", function() {
                 var notificationId = $(this).data("notification-id");
                 markNotificationAsRead(notificationId);
             });
 
-            // Function to handle delete option click
             $(".notify_options .delete_option").on("click", function(event) {
                 event.stopPropagation();
                 const notificationId = $(this).data("notification-id");
-                // Send an AJAX request to delete the notification from the database
                 $.ajax({
-                    url: "delete_notification.php", // Replace with the PHP file to handle the delete operation
+                    url: "delete_notification.php",
                     type: "POST",
                     data: {
                         notification_id: notificationId
                     },
                     success: function() {
-                        // If deletion is successful, remove the notification from the dropdown
                         $(".notify_item[data-notification-id='" + notificationId + "']").remove();
-                        // Fetch and update the notification count on the bell icon
                         fetchNotificationCount();
                     },
                     error: function() {
-                        // Handle error if deletion fails
                     }
                 });
             });
 
-            // Function to handle cancel option click
             $(".notify_options .cancel_option").on("click", function(event) {
                 event.stopPropagation();
-                // Hide the options menu
                 $(this).closest(".options_menu").removeClass("active");
             });
         });

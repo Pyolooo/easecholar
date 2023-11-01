@@ -46,9 +46,23 @@ body {
 	overflow-x: hidden;
 }
 
+.swal2-container.swal2-bottom, .swal2-container.swal2-center, .swal2-container.swal2-top {
+	grid-template-columns: auto minmax(0,1fr) auto;
+	z-index: 2000;
+}
 
-
-
+.modal {
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	z-index: 2000;
+	display: none;
+	overflow: hidden;
+	outline: 0;
+	background-color: #0000004f;
+}
 
 /* SIDEBAR */
 #sidebar {
@@ -77,7 +91,7 @@ body {
 	height: 56px;
 	display: flex;
 	align-items: center;
-	color: rgb(41, 162, 41);
+	color: rgb(36 95 36);
 	position: sticky;
 	top: 0;
 	left: 0;
@@ -189,6 +203,16 @@ body {
 
 
 /* NAVBAR */
+.school-name{
+	margin-left: 30px;
+	font-weight: 600;
+	font-size: x-large;
+	letter-spacing: 5px;
+	word-spacing: 5px;
+	color: #066606;
+	text-shadow: 0 0 1px darkgoldenrod;
+}
+
 nav {
 	height: 56px;
 	background: var(--light);
@@ -367,17 +391,24 @@ nav .profile img {
 	font-weight: 600px;
 	text-shadow: 0 0 1px black;
 }
-.school-name{
-	margin-left: 30px;
-	font-weight: 600;
-	font-size: 20px;
-	letter-spacing: 5px;
-	word-spacing: 5px;
-	color: green;
-	text-shadow: 0 0 2px darkgoldenrod;
-}
 .export-img{
 	width: 30px;
+}
+.name-hub {
+	text-align: center;
+	color: green;
+	font-weight: 600px;
+	text-shadow: 0 0 1px black;
+}
+.notif-label{
+	display: flex;
+	align-items: center;
+	font-size: 18px;
+	border-bottom: 1px solid grey;
+	margin-bottom: 20px;
+	padding: 10px;
+	font-weight: bold;
+	color: rgba(0, 0, 0, 0.65);
 }
 /* NAVBAR */
 
@@ -758,6 +789,12 @@ color: black;
 border: none;
 padding: 5px 15px;
 }
+.application-label{
+	margin-right: auto;
+    font-size: 24px;
+    font-weight: 600;
+		color: #565656;
+}
 
 
 
@@ -831,11 +868,38 @@ padding: 5px 15px;
 	#content main .table-data .todo .todo-list {
 		min-width: 420px;
 	}
+	.h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6{
+		font-size: 1rem;
+		margin-bottom: .5rem;
+    font-family: inherit;
+    font-weight: 600;
+    line-height: 1.2;
+    color: inherit;
+	}
+	.dropdown {
+		width: 300px;
+		height: auto;
+		background: var(--grey);
+		border-radius: 5px;
+		box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.125);
+		margin: 15px auto 0;
+		padding: 0;
+		position: absolute;
+		top: 41px;
+		right: 0;
+		display: none;
+	}
+
+	.school-name {
+    margin-left: 20px;
+		font-size: 7px;
+    font-weight: 600;
+		letter-spacing: 0px;
+    word-spacing: 5px;
+    color: #066606;
+    text-shadow: 0 0 1px darkgoldenrod;
+	}
 }
-
-
-
-
 
 
 * {
@@ -995,7 +1059,7 @@ tbody tr.hide td img {
 }
 
 .status {
-    padding: 2px 0;
+    padding: 1px 0;
     border-radius: 2rem;
     text-align: center;
 }
@@ -1016,6 +1080,14 @@ tbody tr.hide td img {
 
 .status.shipped {
     background-color: #6fcaea;
+}
+.view-link{
+	background-color: #d5d1defe;
+	border-radius: 5px;
+	padding: 5px 15px;
+	color: #444;
+	font-weight: 600;
+	box-shadow: 0 0 2px rgba(0, 0, 0, 0.30);
 }
 
 

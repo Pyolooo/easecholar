@@ -1,6 +1,5 @@
 const search = document.querySelector('.input-group input'),
-    table_rows = document.querySelectorAll('tbody tr'),
-    table_headings = document.querySelectorAll('thead th');
+    table_rows = document.querySelectorAll('tbody tr');
 
 // 1. Searching for specific data of HTML table
 search.addEventListener('input', searchTable);
@@ -82,7 +81,7 @@ const toJSON = function (table) {
     let table_data = [],
         t_head = [],
 
-        t_headings = table.querySelectorAll('th'),
+        t_headings = table.querySelectorAll(''),
         t_rows = table.querySelectorAll('tbody tr');
 
     for (let t_heading of t_headings) {

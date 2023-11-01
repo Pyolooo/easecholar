@@ -33,6 +33,7 @@ function formatExpireDate($dbExpireDate)
     <!-- Boxicons -->
     <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.18/dist/sweetalert2.all.min.js"></script>
     <!-- My CSS -->
     <link rel="stylesheet" href="css/scholarships.css">
 
@@ -65,26 +66,8 @@ function formatExpireDate($dbExpireDate)
             </li>
             <li>
                 <a href="applicants.php">
-                    <i class='bx bxs-group'></i>
-                    <span class="text">Applicants</span>
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <i class='bx bxs-file'></i>
-                    <span class="text">Application List</span>
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <i class='bx bxs-message-dots'></i>
-                    <span class="text">Message</span>
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <i class='bx bxs-group'></i>
-                    <span class="text">Team</span>
+                <i class='bx bxs-file' ></i>
+                    <span class="text">Applications</span>
                 </a>
             </li>
         </ul>
@@ -92,7 +75,7 @@ function formatExpireDate($dbExpireDate)
             <li>
                 <a href="#" class="logout">
                     <i class='bx bxs-log-out-circle'></i>
-                    <span class="text">Logout</span>
+                    <span class="text" onclick="confirmLogout()">Logout</span>
                 </a>
             </li>
         </ul>
@@ -200,9 +183,9 @@ function formatExpireDate($dbExpireDate)
                         </li>
                     </ul>
                 </div>
-                <a href="create_scholarship.php" class="btn-download">
-                    <i class='bx bx-plus'></i>
-                    <span class="text">Scholarship</span>
+                
+                <a href="create_scholarship.php" class="btn-download" title="Create Scholarship">
+                <i class='bx bxs-file-plus'></i>
                 </a>
             </div>
 
@@ -247,7 +230,6 @@ function formatExpireDate($dbExpireDate)
                                     if (!$updateResult) {
                                         echo "Error updating scholarship status for ID: $scholarshipId<br>";
                                     } else {
-                                        echo "Scholarship ID: $scholarshipId marked as 'Closed'<br>";
                                         $scholarshipStatus = 'Closed';
                                     }
                                 }

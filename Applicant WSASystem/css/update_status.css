@@ -26,6 +26,45 @@ body{
 	font-size: 16px;
 	position: relative;
 }
+.form-label{
+	color: darkgreen;
+	margin-top: 0;
+	margin-bottom: .5rem;
+	font-weight: 600;
+	font-size: 20px;
+	line-height: 1.2;
+}
+
+.attachments-container{
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	column-gap: 20px;
+}
+
+.files-label{
+	font-size: 17px;
+	font-weight: 600;
+}
+.files-column{
+	border: 1px solid #aaa;
+	padding: 15px;
+	border-radius: 3px;
+}
+.attachments-column{
+	border: 1px solid #aaa;
+	padding: 15px;
+	border-radius: 3px;
+}
+
+.attach-label{
+	margin-top: 20px;
+	font-size: 15px;
+	font-style: italic;
+}
+
+#new_attachment{
+	font-size: 10px;
+}
 
 .wrapper{
 	background: rgb(246, 245, 245);
@@ -88,11 +127,6 @@ body{
 }
 
   
-  /* Style the buttons */
-  .wrapper .btns_wrap .common_btns button {
-	margin-right: 10px;
-  }
-  
   /* Adjust the modal icon size */
   .modal_wrapper .success_wrap .modal_icon {
 	margin-right: 15px;
@@ -102,14 +136,14 @@ body{
   }
 
 .wrapper .btns_wrap{
-	width: 350px;
+	width: 100%;
 	max-width: 100%;
 	margin: 0 auto;
 }
 
 .wrapper .btns_wrap .common_btns{
 	display: flex;
-	justify-content: space-between;
+	justify-content: space-evenly;
 	margin-top: 50px;
 }
 
@@ -117,19 +151,25 @@ body{
 	justify-content: flex-end;
 }
 
-.wrapper .btns_wrap .common_btns button{
+.wrapper .btns_wrap .common_btns .update-button{
 	border: 0;
-	padding: 12px 15px;
+	padding: 5px 15px;
 	background: var(--primary);
 	color: var(--white);
-	width: 135px;
+	width: 200px;
 	justify-content: center;
 	display: flex;
 	align-items: center;
-	font-size: 16px;
+	font-size: 20px;
+  font-weight: 600;
 	border-radius: 3px;
 	transition: 0.5s ease;
 	cursor: pointer;
+	transition: opacity 0.15s;
+}
+
+.wrapper .btns_wrap .common_btns .update-button:hover{
+	opacity: 0.8;
 }
 
 .wrapper .btns_wrap .common_btns button.btn_back{
@@ -266,9 +306,10 @@ form.secActive .form.first{
 }
 .container .title{
     font-size: 16px;
-    font-weight: 500;
+    font-weight: 600;
     margin: 6px 60px;
     color: #333;
+		text-align: center;
 }
 .container .fields-info .form{
 	border: 1px solid #aaa;
@@ -283,6 +324,7 @@ form.secActive .form.first{
 	display: grid;
 	grid-template-columns: repeat(2, 1fr);
 	grid-gap: 20px;
+	margin-bottom: 20px;
   }
   
   .container .input-field {
@@ -290,6 +332,13 @@ form.secActive .form.first{
 	flex-direction: column;
 	margin-bottom: 8px;
   }
+.container .select-input-field {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	column-gap: 20px;
+	margin-bottom: 8px;
+}
+
 	.container .input-file{
 		display: flex;    
 		margin-bottom: 10px;
@@ -352,8 +401,7 @@ margin-right: 20px;
   .container .input-field .address-inputs input:last-child {
 	margin-right: 0;
   }
-  
-  
+    
   .input-field input:focus,
   input[type="date"]:focus,
   select:focus {
@@ -403,6 +451,22 @@ form .buttons{
 }
 form .buttons button , .backBtn{
     margin-right: 14px;
+}
+.cancel-button{
+  cursor: pointer;
+  text-align: center;
+  border: darkgreen;
+  background-color: rgb(167, 167, 167);
+  color: white;
+  width: 150px;
+  border-radius: 5px;
+  padding: 6px 10px;
+  font-size: 20px;
+  font-weight: 600;
+  transition: background-color 0.15s;
+}
+.cancel-button:hover{
+  background-color: rgb(198, 197, 197);
 }
 
 @media (max-width: 750px) {

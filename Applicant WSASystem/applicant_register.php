@@ -1,9 +1,6 @@
 <?php
 require '../include/connection.php';
 
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
-
 if (isset($_POST['submit'])) {
     $full_name = mysqli_real_escape_string($dbConn, $_POST['full_name']);
     $email = mysqli_real_escape_string($dbConn, $_POST['email']);
@@ -15,96 +12,63 @@ if (isset($_POST['submit'])) {
     $image_type = $_FILES['image']['type'];
     $maxImageSize = 1024 * 1024;
 
-    $query = mysqli_prepare($dbConn, "SELECT * FROM `tbl_user` WHERE email = ? OR student_num = ?");
-    mysqli_stmt_bind_param($query, "ss", $email, $student_num);
-    mysqli_stmt_execute($query);
-    $result = mysqli_stmt_get_result($query);
-
-    if (mysqli_num_rows($result) > 0) {
-        $userExistsMessage = 'Email or student number already exists!';
-    } elseif (!in_array($image_type, array('image/jpeg', 'image/jpg', 'image/png'))) {
-        $imageTypeMessage = 'Only JPEG, JPG, and PNG images are allowed.';
-    } elseif ($image_size > $maxImageSize) {
-        $largeImageMessage = 'Image size is too large!';
+    if (!strpos($student_num, "-")) {
+        $invalidStudentNumMessage = 'Student number must contain a "-" character (e.g., \'20-00022\').';
     } else {
-        $filename = uniqid() . '_' . $image;
+        $query = mysqli_prepare($dbConn, "SELECT * FROM `tbl_user` WHERE email = ? OR student_num = ?");
+        mysqli_stmt_bind_param($query, "ss", $email, $student_num);
+        mysqli_stmt_execute($query);
+        $result = mysqli_stmt_get_result($query);
 
-        $targetDirectory = $_SERVER['DOCUMENT_ROOT'] . '/EASE-CHOLAR/user_profiles/';
+        if (mysqli_num_rows($result) > 0) {
+            $userExistsMessage = 'Email or student number already exists!';
 
-        $targetPath = $targetDirectory . $filename;
+            if (!empty($_FILES['image']['name'])) {
+        if (!in_array($image_type, array('image/jpeg', 'image/jpg', 'image/png'))) {
+            $imageTypeMessage = 'Only JPEG, JPG, and PNG images are allowed.';
+        } elseif ($image_size > $maxImageSize) {
+            $largeImageMessage = 'Image size is too large!';
+        } else {
+            $filename = uniqid() . '_' . $image;
 
-        if (move_uploaded_file($image_tmp_name, $targetPath)) {
-            if (file_exists($targetPath)) {
+            $targetDirectory = $_SERVER['DOCUMENT_ROOT'] . '/EASE-CHOLAR/user_profiles/';
+            $targetPath = $targetDirectory . $filename;
 
+            if (move_uploaded_file($image_tmp_name, $targetPath)) {
+                if (file_exists($targetPath)) {
+                    // Insert user data into the database with the selected image
+                    $custom_id = 'ISU_' . sprintf("%03d", rand(1, 999));
+                    $insert = mysqli_prepare($dbConn, "INSERT INTO `tbl_user` (custom_id, full_name, student_num, email, password, image) VALUES(?, ?, ?, ?, ?, ?)");
+                    mysqli_stmt_bind_param($insert, "ssssss", $custom_id, $full_name, $student_num, $email, $password, $filename);
+
+                    if (mysqli_stmt_execute($insert)) {
+                        $successMessage = 'Registered successfully!';
+                    } else {
+                        error_log("Error executing insert query: " . mysqli_error($dbConn)); // Log the SQL error
+                        $registrationFailedMessage = 'Registration failed!';
+                    }
+                }
+            }
+        }
+    }
+            } else {
+                // User did not select an image, use the default avatar
+                $filename = 'default-avatar.png'; // Set to the default avatar filename
+                // Insert user data into the database with the default image
                 $custom_id = 'ISU_' . sprintf("%03d", rand(1, 999));
-
-                // Generate a verification token
-                $verification_token = bin2hex(random_bytes(16));
-
-                $insert = mysqli_prepare($dbConn, "INSERT INTO `tbl_user` (custom_id, full_name, student_num, email, password, image, verification_token) VALUES(?, ?, ?, ?, ?, ?, ?)");
-                mysqli_stmt_bind_param($insert, "sssssss", $custom_id, $full_name, $student_num, $email, $password, $filename, $verification_token);
+                $insert = mysqli_prepare($dbConn, "INSERT INTO `tbl_user` (custom_id, full_name, student_num, email, password, image) VALUES(?, ?, ?, ?, ?, ?)");
+                mysqli_stmt_bind_param($insert, "ssssss", $custom_id, $full_name, $student_num, $email, $password, $filename);
 
                 if (mysqli_stmt_execute($insert)) {
-                    $base_url = '';
-
-                    if ($_SERVER['HTTP_HOST'] === 'localhost') {
-
-                        $base_url = 'http://localhost/EASE-CHOLAR/Applicant%20WSASystem/';
-                    } else {
-
-                        $base_url = 'https://easecholarship.me/';
-                    }
-
-                    $verification_link = $base_url . 'verify.php?email=' . urlencode($email) . '&token=' . $verification_token;
-
-
-                    require_once 'PHPMailer-master/src/Exception.php';
-                    require_once 'PHPMailer-master/src/PHPMailer.php';
-                    require_once 'PHPMailer-master/src/SMTP.php';
-
-
-                    $mail = new PHPMailer(true);
-
-                    try {
-                        // SMTP server settings
-                        $mail->SMTPDebug = 0;
-                        $mail->isSMTP();
-                        $mail->Host = 'smtp.gmail.com';
-                        $mail->SMTPAuth = true;
-                        $mail->Username = 'easecholar@gmail.com';
-                        $mail->Password = 'benz pupq lkxj amje';
-                        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; 
-                        $mail->Port = 587;
-        
-        
-
-                        // Sender and recipient
-                        $mail->setFrom('easecholar@gmail.com', 'EASE-CHOLAR');
-                        $mail->addAddress($email, $full_name);
-
-                        // Email content
-                        $mail->isHTML(true);
-                        $mail->Subject = 'Verify Your Email';
-                        $mail->Body = "Click the following link to verify your email: $verification_link";
-
-                        // Send the email
-                        $mail->send();
-
-                        $successMessage = 'Registered successfully! Please check your email to verify your account.';
-                    } catch (Exception $e) {
-                        unlink($targetPath);
-                        $registrationFailedMessage = 'Registration succeeded, but the email could not be sent. Please contact support.';
-                    }
+                    $successMessage = 'Registered successfully!';
                 } else {
-                    unlink($targetPath);
+                    error_log("Error executing insert query: " . mysqli_error($dbConn)); // Log the SQL error
                     $registrationFailedMessage = 'Registration failed!';
                 }
             }
         }
     }
-}
 ?>
-
 
 
 <!DOCTYPE html>
@@ -123,33 +87,6 @@ if (isset($_POST['submit'])) {
     <title>ApplicantModule</title>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
-    <style>
-        .selected-image-container {
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .image-container {
-            display: flex;
-            justify-content: center;
-
-        }
-
-        #image-label {
-            display: block;
-            color: white;
-            font-style: italic;
-
-        }
-
-        #selected-image {
-            width: 60px;
-            height: 60px;
-            border-radius: 30px;
-        }
-    </style>
 </head>
 
 <body>
@@ -204,6 +141,17 @@ if (isset($_POST['submit'])) {
                 })
             </script>';
             }
+            if (isset($invalidStudentNumMessage)) {
+                echo '<script>
+                Swal.fire({
+                    icon: "error",
+                    title: "Invalid Student Id Number",
+                    text: "' . $invalidStudentNumMessage . '",
+                    showConfirmButton: false,
+                    timer: 2000
+                })
+            </script>';
+            }
 
             if (isset($successMessage)) {
                 echo '<script>
@@ -234,45 +182,41 @@ if (isset($_POST['submit'])) {
             }
             ?>
             <div class="page-links">
-                <a href="applicant_login.php">Login </a>
                 <a href="applicant_register.php" class="active">Register</a>
             </div>
 
             <div class="selected-image-container">
                 <div class="image-container">
-                    <img id="selected-image" src="../img/default-avatar.png" alt="Selected Image">
+                    <img id="selected-image" src="../user_profiles/default-avatar.png" alt="Selected Image">
                 </div>
-                <label id="image-label">*Select your profile picture</label>
+                <div class="round">
+                    <input class="input-style" id="image-input" type="file" name="image" placeholder="Profile" accept="image/jpg, image/jpeg, image/png">
+                    <i class='bx bxs-camera'></i>
+                </div>
             </div>
-
-            <div class="input-container">
-                <span class="input-container-addon">
-                    <i class="fa fa-image"></i>
-                </span>
-                <input class="input-style" id="image-input" type="file" name="image" placeholder="Profile" accept="image/jpg, image/jpeg, image/png" required>
-            </div>
+            <label id="image-label">*Select your profile picture</label>
 
             <div class="input-container">
                 <span class="input-container-addon">
                     <i class="fa fa-user"></i>
                 </span>
-                <input class="input-style" id="full_name" type="text" name="full_name" placeholder="First Name |  Middle Initial | Last Name" required>
+                <input class="input-style" id="full_name" type="text" name="full_name" placeholder="First Name |  Middle Initial | Last Name" required <?php if (isset($_POST['full_name'])) echo 'value="' . htmlspecialchars($_POST['full_name']) . '"'; ?>>
+            </div>
+
+            <div class="input-container">
+                <span class="input-container-addon">
+                    <i class="fa fa-envelope-square"></i>
+                </span>
+                <input class="input-style" id="email" type="email" name="email" placeholder="Enter your email" required <?php if (isset($_POST['email'])) echo 'value="' . htmlspecialchars($_POST['email']) . '"'; ?>>
             </div>
 
             <div class="input-container">
                 <span class="input-container-addon">
                     <i class="fa fa-address-card"></i>
                 </span>
-                <input class="input-style" id="student_num" type="number" name="student_num" placeholder="Student ID number (2000XXX)" required>
+                <input class="input-style" id="student_num" type="text" name="student_num" placeholder="Student ID number (20-00XXX)" required>
             </div>
 
-
-            <div class="input-container">
-                <span class="input-container-addon">
-                    <i class="fa fa-envelope-square"></i>
-                </span>
-                <input class="input-style" id="email" type="email" name="email" placeholder="Enter your email" required>
-            </div>
 
             <div class="input-container">
                 <span class="input-container-addon">
@@ -280,6 +224,10 @@ if (isset($_POST['submit'])) {
                 </span>
                 <input class="input-style" id="password" type="password" name="password" placeholder="LRN's number" required>
             </div>
+            
+            <label class="show-password" for="show-password">
+                <input type="checkbox" id="show-password"> Show Password
+            </label>
 
             <div class="button">
                 <button type="submit" name="submit" class="submit">Submit</button>
@@ -292,10 +240,11 @@ if (isset($_POST['submit'])) {
             var studentNum = document.getElementById('student_num').value;
             var lrnNumber = document.getElementById('password').value;
 
-            if (studentNum.length !== 7 || isNaN(studentNum)) {
-                event.preventDefault(); // Prevent form submission
-                swal("Invalid Student ID", "Student ID number must be exactly 7 digits long.", "error");
-            }
+            if (studentNum.length !== 8 || studentNum.indexOf('-') !== 2 || isNaN(studentNum.replace('-', ''))) {
+    event.preventDefault(); // Prevent form submission
+    swal("Invalid Student ID", "Student ID number must be exactly 8 characters long and formatted as 'XX-XXXXX', where X represents digits.", "error");
+}
+
             // Check if the LRN number is exactly 12 digits long and contains only digits
             if (lrnNumber.length !== 12 || isNaN(lrnNumber)) {
                 event.preventDefault(); // Prevent form submission
@@ -314,7 +263,7 @@ if (isset($_POST['submit'])) {
 
                     reader.onload = function(e) {
                         selectedImage.src = e.target.result;
-                        selectedImage.style.display = 'block'; // Show the selected image
+                        selectedImage.style.display = ''; // Show the selected image
                         imageLabel.style.display = 'none'; // Hide the label
                     };
 
@@ -329,6 +278,15 @@ if (isset($_POST['submit'])) {
 
         // Call the function to display the selected image
         displaySelectedImage();
+
+        document.getElementById("show-password").addEventListener("change", function() {
+            var passwordInput = document.getElementById("password");
+            if (this.checked) {
+                passwordInput.type = "text";
+            } else {
+                passwordInput.type = "password";
+            }
+        });
     </script>
 
 </body>

@@ -59,6 +59,9 @@ if (isset($_GET['id']) && isset($_SESSION['user_id'])) {
         $details = $row['details'];
         $requirements = explode("\n", $row['requirements']);
         $benefits = explode("\n", $row['benefits']);
+        $selectedFormTable = $row['application_form_table'];
+    }
+}
 ?>
 
         <!DOCTYPE html>
@@ -70,143 +73,40 @@ if (isset($_GET['id']) && isset($_SESSION['user_id'])) {
             <link rel="stylesheet" href="css/scholarship_details.css">
 
             <title>Scholarship Details</title>
-            <style>
-                h2{
-                    text-align: center;
-                }
-                .status-row {
-                    display: flex;
-                }
-
-                .status-label {
-                    flex: 0.3;
-                    text-align: center;
-                    align-items: center;
-                    display: flex;
-                    justify-content: center;
-                    border-radius: 80px;
-                    margin: 50px;
-                }
-
-                .status-description {
-                    flex: 3;
-                    font-size: 15px;
-                    margin: 20px;
-                    text-align: justify;
-                    display: flex;
-                    align-items: center;
-                }
-
-                .status-pending {
-                    padding: 2px 0px;
-                    background-color: var(--orange);
-                    font-weight: 600;
-                    color: #fff;
-                    font-size: 15px;
-                }
-
-                .status-inreview {
-                    background-color: var(--yellow);
-                    font-weight: 600;
-                    color: #fff;
-                    font-size: 15px;
-                }
-
-                .status-qualified {
-                    background-color: #00d084;
-                    font-weight: 600;
-                    color: #fff;
-                    font-size: 15px;
-                }
-
-                .status-accepted {
-                    background-color: #28a745;
-                    font-weight: 600;
-                    color: #fff;
-                    font-size: 15px;
-                }
-
-                .status-rejected {
-                    background-color: red;
-                    font-weight: 600;
-                    color: #fff;
-                    font-size: 15px;
-                }
-
-                .status-details {
-                    cursor: pointer;
-                    font-weight: 600;
-                    color: blue;
-                }
-
-                /* Modal */
-                .modal {
-                    display: none;
-                    /* Hide the modal by default */
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    background-color: rgba(0, 0, 0, 0.7);
-                    /* Semi-transparent background overlay */
-                    z-index: 1000;
-                    /* Ensure the modal is on top of other elements */
-                    overflow: auto;
-                }
-
-                /* Modal Content */
-                .modal-content {
-                    background-color: #fff;
-                    margin: 15% auto;
-                    /* Center the modal vertically */
-                    padding: 20px;
-                    border-radius: 5px;
-                    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
-                    max-width: 80%;
-                    /* Adjust the maximum width as needed */
-                }
-
-                /* Close Button */
-                .close {
-                    position: absolute;
-                    top: 10px;
-                    right: 15px;
-                    font-size: 20px;
-                    font-weight: bold;
-                    cursor: pointer;
-                }
-
-                /* Add any additional styling as needed */
-            </style>
         </head>
         <?php include('../include/header.php') ?>
 
         <body>
             <div class="table-data">
-                <h1><?php echo $row['scholarship']; ?></h1>
+                <h1 class="scholarship-title"><?php echo $row['scholarship']; ?></h1>
                 <hr>
                 <div class="scholarship-details"> <?php echo $row['details']; ?></div>
-                <h3>Requirements:</h3>
-                <ul>
-                    <?php
-                    foreach ($requirements as $requirement) {
-                        echo "<li>$requirement</li>";
-                    }
-                    ?>
-                </ul>
-                <h3>Benefits:</h3>
-                <ul>
-                    <?php
-                    foreach ($benefits as $benefit) {
-                        echo "<li>$benefit</li>";
-                    }
-                    ?>
-                </ul>
+                <div class="details-container">
+                    <h4 class="details-label">Requirements:</h4>
+
+                    <ul>
+                        <?php
+                        foreach ($requirements as $requirement) {
+                            echo "<li>$requirement</li>";
+                        }
+                        ?>
+                    </ul>
+                </div>
+                <div class="details-container">
+                    <h4 class="details-label">Benefits:</h4>
+
+                    <ul>
+                        <?php
+                        foreach ($benefits as $benefit) {
+                            echo "<li>$benefit</li>";
+                        }
+                        ?>
+                    </ul>
+                </div>
 
                 <div class="faq-content">
                     <label class="how-to-apply">How to apply for the Scholarship? </label>
-                    <p class="guidelines">All applicants should fill up the application form. Provide a clear information and details. Upon submitting the Application Form wait for the OSA or committee to process your application. You can track your application status here <a class="aplication-status" href="application_status.php">Application Status</a> </p>
+                    <p class="guidelines">All applicants should fill up the application form. Provide a clear information and details. Upon submitting the Application Form wait for the OSA or committee to process your application.</p>
                 </div>
 
                 <div class="faq-content">
@@ -244,20 +144,11 @@ if (isset($_GET['id']) && isset($_SESSION['user_id'])) {
 
                 <p class="alert-message"><?php echo $applicationStatus; ?></p>
                 <?php if ($showApplyButton) { ?>
-                    <a class="button" href="apply.php?id=<?php echo $scholarshipId; ?>&user_id=<?php echo $_SESSION['user_id']; ?>">APPLY</a>
+                    <button class="button" onclick="redirectToApplicationForm()">Apply</button>
                 <?php } ?>
             </div>
 
-    <?php
-    } else {
-        echo "No scholarship found with the specified ID.";
-    }
-} else {
-    echo "Invalid request or not logged in.";
-}
-    ?>
     <script>
-        // JavaScript function to show the status information modal
         function showStatusInfo() {
             var statusInfoModal = document.getElementById('statusInfoModal');
             statusInfoModal.style.display = 'block';
@@ -269,6 +160,17 @@ if (isset($_GET['id']) && isset($_SESSION['user_id'])) {
                 }
             };
         }
+
+        function redirectToApplicationForm() {
+        var applyPage = 'apply.php';
+
+        if ('<?php echo $selectedFormTable; ?>' === 'tbl_scholarship_1_form') {
+            applyPage = 'apply1.php';
+        }
+        // Add more conditions for other application forms if needed
+
+        location.href = applyPage + '?id=<?php echo $scholarshipId; ?>&user_id=<?php echo $_SESSION['user_id']; ?>';
+    }
     </script>
         </body>
 

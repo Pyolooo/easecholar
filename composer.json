@@ -1,0 +1,6 @@
+{
+    "require": {
+        "phpoffice/phpspreadsheet": "^1.29",
+        "kickstartph/semaphore-client": "^0.5.0"
+    }
+}

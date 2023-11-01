@@ -9,6 +9,7 @@
 a {
 	text-decoration: none;
 }
+a:hover{text-decoration: none;}
 
 li {
 	list-style: none;
@@ -44,6 +45,11 @@ body.dark {
 body {
 	background: var(--grey);
 	overflow-x: hidden;
+}
+
+.swal2-container.swal2-bottom, .swal2-container.swal2-center, .swal2-container.swal2-top {
+	grid-template-columns: auto minmax(0,1fr) auto;
+	z-index: 2000;
 }
 
 
@@ -254,13 +260,12 @@ body {
 .school-name{
 	margin-left: 30px;
 	font-weight: 600;
-	font-size: 20px;
+	font-size: x-large;
 	letter-spacing: 5px;
 	word-spacing: 5px;
-	color: green;
-	text-shadow: 0 0 2px darkgoldenrod;
+	color: #066606;
+	text-shadow: 0 0 1px darkgoldenrod;
 }
-/* SIDEBAR */
 
 
 
@@ -468,6 +473,26 @@ nav .profile img {
 
 
 /* MAIN */
+.modal-content {
+	position: absolute;
+	top: 10rem;
+	left: 10rem;
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+	justify-content: center;
+	-webkit-box-orient: vertical;
+	-webkit-box-direction: normal;
+	-ms-flex-direction: column;
+	flex-direction: column;
+	width: 100%;
+	/* pointer-events: auto; */
+	background-color: #fff;
+	background-clip: padding-box;
+	border: 1px solid rgba(0,0,0,.2);
+	border-radius: .3rem;
+	outline: 0;
+}
 #content main {
 	width: 100%;
 	padding: 36px 24px;

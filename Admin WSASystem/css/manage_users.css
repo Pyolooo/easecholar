@@ -46,11 +46,24 @@ body {
 	overflow-x: hidden;
 }
 
+.swal2-container.swal2-bottom, .swal2-container.swal2-center, .swal2-container.swal2-top {
+	grid-template-columns: auto minmax(0,1fr) auto;
+	z-index: 2000;
+}
 
 
 
 
 /* SIDEBAR */
+.admin-hub {
+	text-align: center;
+	flex: 0.7;
+	color: green;
+	font-size: 20px;
+	font-weight: 600px;
+	text-shadow: 0 0 1px black;
+}
+
 #sidebar {
 	position: fixed;
 	top: 0;
@@ -83,9 +96,11 @@ body {
 	left: 0;
 	background: var(--light);
 	z-index: 500;
-	padding-bottom: 20px;
+	padding-bottom: 10px;
+	padding-top: 5px;
 	box-sizing: content-box;
 }
+
 #sidebar .brand img {
 	margin: 10px 1em 0 0;
 	width: 60px;
@@ -188,6 +203,16 @@ body {
 
 
 /* NAVBAR */
+.school-name{
+	margin-left: 30px;
+	font-weight: 600;
+	font-size: x-large;
+	letter-spacing: 5px;
+	word-spacing: 5px;
+	color: #066606;
+	text-shadow: 0 0 1px darkgoldenrod;
+}
+
 nav {
 	height: 56px;
 	background: var(--light);
@@ -362,8 +387,6 @@ nav .profile img {
 
 
 
-
-
 /* MAIN */
 #content main {
 	width: 100%;
@@ -402,16 +425,15 @@ nav .profile img {
 	pointer-events: unset;
 }
 #content main .head-title .btn-download {
-	height: 36px;
 	padding: 0 16px;
-	border-radius: 36px;
-	background: var(--blue);
-	color: var(--light);
+	color: rgb(51 106 19);
+	border-radius: 5px;
 	display: flex;
 	justify-content: center;
 	align-items: center;
 	grid-gap: 10px;
 	font-weight: 500;
+	font-size: 50px;
 }
 
 
@@ -604,18 +626,7 @@ nav .profile img {
 
 /* MAIN */
 /* CONTENT */
-.btn-download {
-	height: 36px;
-	padding: 0 16px;
-	border-radius: 36px;
-	background: var(--blue);
-	color: var(--light);
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	grid-gap: 10px;
-	font-weight: 500;
-}
+
     .filter-buttons {
       display: flex;
       background-color: #a5a3a8;
@@ -636,27 +647,21 @@ nav .profile img {
       color: black;
       background-color: #d5d1defe;
     }
-    .osa-status-button{
+    .active-status{
       padding: 5px 15px;
-      background-color: green;
-      border: 1px solid green;
+      background-color: rgb(6 146 6);
       border-radius: 3px;
       font-size: 15px;
       font-weight: 500;
       color: white;
-      cursor: pointer;
-      transition: opacity 0.15s;
     }
-    .reg-status-button{
+    .deactivated-status{
       padding: 5px 15px;
-      background-color: green;
-      border: 1px solid green;
+      background-color: rgb(194, 24, 24);
       border-radius: 3px;
       font-size: 15px;
       font-weight: 500;
       color: white;
-      cursor: pointer;
-      transition: opacity 0.15s;
     }
     .status-button:hover{
       opacity: 0.8;
@@ -664,6 +669,14 @@ nav .profile img {
     .status-button::after{
       opacity: 0.4;
     }
+    .view-link{
+      background-color: #d5d1defe;
+      border-radius: 5px;
+      padding: 5px 15px;
+      color: #444;
+      font-weight: 600;
+      box-shadow: 0 0 2px rgba(0, 0, 0, 0.30);
+		}
 
 
 

@@ -11,6 +11,7 @@ $dob = $_POST['dob'] ?? '';
 $pob = $_POST['pob'] ?? '';
 $gender = $_POST['gender'] ?? '';
 $email = $_POST['email'] ?? '';
+$course = $_POST['course'] ?? '';
 $mobile_num = $_POST['mobile_num'] ?? '';
 $citizenship = $_POST['citizenship'] ?? '';
 $barangay = $_POST['barangay'] ?? '';
@@ -131,7 +132,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $isValid = true;
 
     // Server-side validation for required fields
-    if (empty($last_name) || empty($first_name) || empty($middle_name) || empty($dob) || empty($pob) || empty($gender) || empty($email) || empty($mobile_num) || empty($citizenship) || empty($barangay) || empty($town_city) || empty($province) || empty($zip_code) || empty($id_number) || empty($father_name) || empty($father_address) || empty($father_work) || empty($mother_name) || empty($mother_address) || empty($mother_work)) {
+    if (empty($last_name) || empty($first_name) || empty($middle_name) || empty($dob) || empty($pob) || empty($gender) || empty($email) || empty($course) || empty($mobile_num) || empty($citizenship) || empty($barangay) || empty($town_city) || empty($province) || empty($zip_code) || empty($id_number) || empty($father_name) || empty($father_address) || empty($father_work) || empty($mother_name) || empty($mother_address) || empty($mother_work)) {
         $isValid = false;
         echo "<script>alert('Please fill in all required fields.')</script>";
     }
@@ -140,7 +141,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Data is valid, proceed with database insertion
 
         // Insert into Database
-        $sql = "INSERT INTO `tbl_userapp` (user_id, image, applicant_name, scholarship_name, last_name, first_name, middle_name, dob, pob, gender, email, mobile_num, citizenship, barangay, town_city, province, zip_code, id_number, father_name, father_address, father_work, mother_name, mother_address, mother_work, file, scholarship_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO `tbl_userapp` (user_id, image, applicant_name, scholarship_name, last_name, first_name, middle_name, dob, pob, gender, email, course,mobile_num, citizenship, barangay, town_city, province, zip_code, id_number, father_name, father_address, father_work, mother_name, mother_address, mother_work, file, scholarship_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?)";
 
         $stmt = $dbConn->prepare($sql);
 
@@ -149,7 +150,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $stmt->bind_param(
-            "issssssssssssssssssssssssi", // 'i' for integer variables
+            "isssssssssssssssssssssssssi", // 'i' for integer variables
             $user_id, // 'i' because user_id is an integer
             $image,
             $full_name,
@@ -161,6 +162,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $pob,
             $gender,
             $email,
+            $course,
             $mobile_num,
             $citizenship,
             $barangay,
@@ -180,7 +182,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if (!$stmt->execute()) {
             $errorMessage = "Failed to insert application.";
-            
         } else {
             // Get the image from 'tbl_user' table
             $sql = "SELECT image FROM tbl_user WHERE user_id = ?";
@@ -204,17 +205,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->bind_param("ssss", $user_id, $notificationMessage, $userImage, $is_read);
             $stmt->execute();
 
-            // Insert notification with the image into tbl_reg_notifications
-            $regNotificationMessage = "New application has been submitted"; // Change this message if needed
-            $sqlRegNotifications = "INSERT INTO tbl_reg_notifications (user_id, message, image, is_read) VALUES (?, ?, ?, ?)";
-            $stmtRegNotifications = $dbConn->prepare($sqlRegNotifications);
-            $stmtRegNotifications->bind_param("ssss", $user_id, $regNotificationMessage, $userImage, $is_read);
-            $stmtRegNotifications->execute();
-                 // Trigger a SweetAlert2 modal based on success
-                 $successMessage = "Application submitted successfully!";
-                 
-             }
-         }
+            $successMessage = "Application submitted successfully!";
+        }
+    }
 }
 ?>
 
@@ -230,19 +223,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 
     <title>Application Form</title>
+    <style>
+        .select-option {
+            display: grid;
+            grid-template-columns: 1fr;
+        }
+    </style>
 </head>
 
 
 <body>
     <?php include('../include/header.php') ?>
     <div class="wrapper">
-    <?php
-    if (isset($alreadyApplied)) {
-        echo '<script>
+        <?php
+        if (isset($alreadyApplied)) {
+            echo '<script>
              Swal.fire({
                  icon: "success",
                  title: "Success",
-                 text: "'.$alreadyApplied.'",
+                 text: "' . $alreadyApplied . '",
                  confirmButtonText: "OK"
              }).then((result) => {
                  if (result.isConfirmed) {
@@ -250,13 +249,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                  }
              });
          </script>';
-    }
-            if (isset($successMessage)) {
-                echo '<script>
+        }
+        if (isset($successMessage)) {
+            echo '<script>
     Swal.fire({
         position: "center",
         icon: "success",
-        title: "'.$successMessage.'",
+        title: "' . $successMessage . '",
         showConfirmButton: false,
         timer: 1500
     }).then((result) => {
@@ -265,14 +264,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     });
 </script>';
-            }
+        }
 
-            if (isset($errorMessage)) {
-                echo '<script>
+        if (isset($errorMessage)) {
+            echo '<script>
                 Swal.fire({
                     icon: "error",
                     title: "Error",
-                    text: "'.$errorMessage.'",
+                    text: "' . $errorMessage . '",
                     confirmButtonText: "OK"
                 }).then((result) => {
                     if (result.isConfirmed) {
@@ -280,36 +279,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                 });
             </script>';
-            }
-            ?>
+        }
+        ?>
 
-        <div class="header">
-            <ul>
-                <li class="active form_1_progessbar">
-                    <div>
-                        <p><i class="fa fa-user"></i></p>
-                        <span class="label">Personal Information</span>
-                    </div>
-                </li>
-                <li class="form_2_progessbar">
-                    <div>
-                        <p><i class="fa fa-users" aria-hidden="true"></i></p>
-                        <span class="label">Family Background</span>
-                    </div>
-                </li>
-                <li class="form_3_progessbar">
-                    <div>
-                        <p><i class="fa fa-file" aria-hidden="true"></i></p>
-                        <span class="label">File Upload</span>
-                    </div>
-                </li>
-            </ul>
-        </div>
 
         <form action="" method="POST" enctype="multipart/form-data">
             <div class="container">
                 <div class="form first">
-                    <h3 style="color:darkgreen">PERSONAL INFORMATION:</h3>
+                    <h4 class="label1">PERSONAL INFORMATION:</h4>
                     <br>
                     <div class="details personal">
                         <div class="fields">
@@ -339,9 +316,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <div class="validation-message" id="pob-error"></div>
                             </div>
                             <div class="input-field">
-                                <label>Gender</label>
+                                <label>Sex</label>
                                 <select id="gender" name="gender" required>
-                                    <option disabled selected>Select gender</option>
+                                    <option disabled selected>Select sex</option>
                                     <option value="Male">Male</option>
                                     <option value="Female">Female</option>
                                 </select>
@@ -349,11 +326,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             </div>
                         </div>
 
-                        <div class="input-field">
-                            <label>Email</label>
-                            <input type="email" id="email" name="email" placeholder="Enter your email" value="<?php echo $email; ?>" required>
-                            <div class="validation-message" id="email-error"></div>
+                        <div class="select-input-field">
+                            <div class="input-field">
+                                <label>Email</label>
+                                <input type="email" id="email" name="email" placeholder="Enter your email" value="<?php echo $email; ?>" required>
+                                <div class="validation-message" id="email-error"></div>
+                            </div>
+                            <div class="input-field">
+                                
+                            <label>Mobile Number</label>
+                                <input type="number" id="mobile_num" name="mobile_num" placeholder="09XXXXXXXXX" value="<?php echo $mobile_num; ?>" required pattern="[0-9]{11}">
+                                <div class="validation-message" id="mobile_num-error"></div>
+                            </div>
                         </div>
+
+
+
                         <div class="fields">
                             <div class="input-field">
                                 <label>School ID Number</label>
@@ -361,9 +349,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <div class="validation-message" id="id_number-error"></div>
                             </div>
                             <div class="input-field">
-                                <label>Mobile Number</label>
-                                <input type="number" id="mobile_num" name="mobile_num" placeholder="09XXXXXXXXX" value="<?php echo $mobile_num; ?>" required pattern="[0-9]{11}">
-                                <div class="validation-message" id="mobile_num-error"></div>
+
+                            <label>Course</label>
+                                <select id="course" name="course" required>
+                                    <option disabled selected>Select course</option>
+                                    <option value="BSIT">BSIT</option>
+                                    <option value="BSA">BSA</option>
+                                </select>
+                                <div class="validation-message" id="course-error"></div>
+
+                                
                             </div>
                             <div class="input-field">
                                 <label>Citizenship</label>
@@ -373,39 +368,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </div>
                         <hr>
                         <div class="input-field">
-                            <h4>Permanent Address</h4>
+                            <h4 class="label1">Permanent Address</h4>
                             <div class="address-inputs">
-                                <div class="address-container">
-                                    <input type="text" id="barangay" name="barangay" placeholder="Street & Barangay" value="<?php echo $barangay; ?>" required>
-                                    <div class="validation-message" id="barangay-error"></div>
+                            <div class="address-container">
+                                    <label for="region">Region</label>
+                                    <select id="region" name="region" required></select>
+                                    <div class="validation-message" id="region-error"></div>
                                 </div>
 
                                 <div class="address-container">
-                                    <input type="text" id="town_city" name="town_city" placeholder="Town/City/Municipality" value="<?php echo $town_city; ?>" required>
-                                    <div class="validation-message" id="town_city-error"></div>
-                                </div>
-
-                                <div class="address-container">
-                                    <input type="text" id="province" name="province" placeholder="Province" value="<?php echo $province; ?>" required>
+                                    <label for="province">Province</label>
+                                    <select id="province" name="province" required></select>
                                     <div class="validation-message" id="province-error"></div>
                                 </div>
 
                                 <div class="address-container">
+                                    <label for="town_city">Town City</label>
+                                    <select id="town_city" name="town_city" required></select>
+                                    <div class="validation-message" id="town_city-error"></div>
+                                </div>
+
+                                <div class="address-container">
+                                    <label for="barangay">Barangay</label>
+                                    <select id="barangay" name="barangay" required></select>
+                                    <div class="validation-message" id="barangay-error"></div>
+                                </div>
+
+                                <div class="address-container">
+
+                                    <label for="zip_code">Zip Code</label>
                                     <input type="number" id="zip_code" name="zip_code" placeholder="Zip Code" value="<?php echo $zip_code; ?>" required>
                                     <div class="validation-message" id="zip_code-error"></div>
                                 </div>
                             </div>
                         </div>
-                        <div class="btns_wrap">
-                            <div class="common_btns form_1_btns">
-                                <button type="button" class="btn_next">Next <span class="icon"><ion-icon name="arrow-forward-sharp"></ion-icon></span></button>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
-                <div class="form_2 data_info" style="display: none;">
-                    <h3 style="color:darkgreen">FAMILY BACKGROUND:</h3>
+                <div class="form_2 data_info">
+                    <h4 class="label1">FAMILY BACKGROUND:</h4>
+                    <br>
                     <div class="details family">
                         <div class="fields-info">
                             <div class="form">
@@ -439,19 +441,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <div class="validation-message" id="mother_work-error"></div>
                                 </div>
                             </div>
-                            <div class="btns_wrap">
-                                <div class="common_btns form_2_btns" style="display: none;">
-                                    <button type="button" class="btn_back"><span class="icon"><ion-icon name="arrow-back-sharp"></ion-icon></span>Back</button>
-                                    <button type="button" class="btn_next">Next <span class="icon"><ion-icon name="arrow-forward-sharp"></ion-icon></span></button>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="form_3 data_info" style="display: none;">
-                    <h3 style="color: darkgreen">Requirements Upload:</h3>
-                    <hr>
+                <div class="form_3 data_info">
+                    <h4 class="label1">Requirements Upload:</h4>
+                    <hr><br>
                     <div class="details requirements">
                         <?php foreach ($requirements as $index => $requirement) { ?>
                             <div class="input-file">
@@ -463,7 +459,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <?php } ?>
                     </div>
                     <div class="btns_wrap">
-                        <div class="common_btns form_3_btns" style="display: none;">
+                        <div class="common_btns form_3_btns">
                             <button type="button" class="btn_back"><span class="icon"><ion-icon name="arrow-back-sharp"></ion-icon></span>Back</button>
                             <button type="submit" class="btn_done" name="submit">Done</button>
                         </div>
@@ -476,302 +472,168 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     </div>
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            var form_1 = document.querySelector(".form.first");
-            var form_2 = document.querySelector(".form_2.data_info");
-            var form_3 = document.querySelector(".form_3.data_info");
+document.addEventListener("DOMContentLoaded", function () {
+    const form = document.querySelector("form");
+    const doneButton = document.querySelector(".btn_done");
 
-            var form_1_btns = document.querySelector(".form_1_btns");
-            var form_2_btns = document.querySelector(".form_2_btns");
-            var form_3_btns = document.querySelector(".form_3_btns");
+    doneButton.addEventListener("click", function (event) {
+        let isValid = true;
 
-            var form_1_next_btn = document.querySelector(".form_1_btns .btn_next");
-            var form_2_back_btn = document.querySelector(".form_2_btns .btn_back");
-            var form_2_next_btn = document.querySelector(".form_2_btns .btn_next");
-            var form_3_back_btn = document.querySelector(".form_3_btns .btn_back");
-
-            var form_2_progessbar = document.querySelector(".form_2_progessbar");
-            var form_3_progessbar = document.querySelector(".form_3_progessbar");
-
-            var btn_done = document.querySelector(".btn_done");
-            var modal_wrapper = document.querySelector(".modal_wrapper");
-            var shadow = document.querySelector(".shadow");
-
-            form_1_next_btn.addEventListener("click", function() {
-                if (validationForm1(form_1)) {
-                    form_1.style.display = "none";
-                    form_2.style.display = "block";
-
-                    form_1_btns.style.display = "none";
-                    form_2_btns.style.display = "flex";
-
-                    form_2_progessbar.classList.add("active");
-                } else {
-
-                }
-            });
-            form_2_back_btn.addEventListener("click", function() {
-                form_2.style.display = "none";
-                form_1.style.display = "block";
-
-                form_2_btns.style.display = "none";
-                form_1_btns.style.display = "flex";
-
-                form_2_progessbar.classList.remove("active");
-            });
-
-            form_2_next_btn.addEventListener("click", function() {
-                if (validationForm2(form_2)) {
-                    form_2.style.display = "none";
-                    form_3.style.display = "block";
-
-                    form_2_btns.style.display = "none";
-                    form_3_btns.style.display = "flex";
-
-                    form_3_progessbar.classList.add("active");
-                } else {
-
-                }
-            });
-
-            form_3_back_btn.addEventListener("click", function() {
-                form_3.style.display = "none";
-                form_2.style.display = "block";
-
-                form_3_btns.style.display = "none";
-                form_2_btns.style.display = "flex";
-
-                form_3_progessbar.classList.remove("active");
-            });
-
-            btn_done.addEventListener("click", function() {
-                if (validationForm3(form_3)) {
-                } else {
-
-                }
-            })
-
+        // Reset validation messages
+        const validationMessages = document.querySelectorAll(".validation-message");
+        validationMessages.forEach(function (message) {
+            message.textContent = "";
         });
 
-        function validationForm1(form) {
-            var last_name = document.getElementById('last_name');
-            var last_name_error = document.getElementById('last_name-error');
-            var first_name = document.getElementById('first_name');
-            var first_name_error = document.getElementById('first_name-error');
-            var middle_name = document.getElementById('middle_name');
-            var middle_name_error = document.getElementById('middle_name-error');
-            var pob = document.getElementById('pob');
-            var pob_error = document.getElementById('pob-error');
-            var gender = document.getElementById('gender');
-            var gender_error = document.getElementById('gender-error');
-            var email = document.getElementById('email');
-            var email_error = document.getElementById('email-error');
-            var id_number = document.getElementById('id_number');
-            var id_number_error = document.getElementById('id_number-error');
-            var mobile_num = document.getElementById('mobile_num');
-            var mobile_num_error = document.getElementById('mobile_num-error');
-            var citizenship = document.getElementById('citizenship');
-            var citizenship_error = document.getElementById('citizenship-error');
-            var barangay = document.getElementById('barangay');
-            var barangay_error = document.getElementById('barangay-error');
-            var province = document.getElementById('province');
-            var province_error = document.getElementById('province-error');
-            var town_city = document.getElementById('town_city');
-            var town_city_error = document.getElementById('town_city-error');
-            var zip_code = document.getElementById('zip_code');
-            var zip_code_error = document.getElementById('zip_code-error');
+        // Add validation logic here for each field
+        if (form.last_name.value.trim() === "") {
+            isValid = false;
+            document.getElementById("last_name-error").textContent = "Last Name is required.";
+        }
+        if (form.first_name.value.trim() === "") {
+            isValid = false;
+            document.getElementById("first_name-error").textContent = "First Name is required.";
+        }
+        if (form.middle_name.value.trim() === "") {
+            isValid = false;
+            document.getElementById("middle_name-error").textContent = 'Middle Name is required';
+        }
 
-            var dobInput = document.querySelector('input[name="dob"]');
-            var dobError = document.getElementById('date_birth-error');
+        var dobInput = document.querySelector('input[name="dob"]');
+        var dobError = document.getElementById('date_birth-error');
 
-            var emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
-            var mobileNumRegex = /^[0-9]{11}$/;
-            var idNumberRegex = /^[0-9]{7}$/;
-            var isValid = true;
+        var selectedDate = new Date(dobInput.value);
+        var currentDate = new Date();
 
-            if (last_name.value.trim() === '') {
-                last_name_error.textContent = 'Last Name is required';
-                isValid = false;
-            } else {
-                last_name_error.textContent = '';
-            }
+        if (isNaN(selectedDate)) {
+            dobError.textContent = 'Please enter a valid date of birth.';
+            isValid = false;
+        } else if (selectedDate > currentDate) {
+            dobError.textContent = 'Date of birth cannot be in the future.';
+            isValid = false;
+        } else {
+            dobError.textContent = '';
+        }
 
-            if (first_name.value.trim() === '') {
-                first_name_error.textContent = 'First Name is required';
-                isValid = false;
-            } else {
-                first_name_error.textContent = '';
-            }
-            if (middle_name.value.trim() === '') {
-                middle_name_error.textContent = 'Middle Name is required';
-                isValid = false;
-            } else {
-                middle_name_error.textContent = '';
-            }
+        if (form.pob.value.trim() === "") {
+            isValid = false;
+            document.getElementById("pob-error").textContent = "Place of birth is required.";
+        }
 
+        var gender = document.getElementById('gender');
+        var gender_error = document.getElementById('gender-error');
+        var selectedGender = gender.value;
 
-            var selectedDate = new Date(dobInput.value);
-            var currentDate = new Date();
-
-            if (isNaN(selectedDate)) {
-                dobError.textContent = 'Please enter a valid date of birth.';
-                isValid = false;
-            } else if (selectedDate > currentDate) {
-                dobError.textContent = 'Date of birth cannot be in the future.';
-                isValid = false;
-            } else {
-                dobError.textContent = '';
-            }
-
-            if (pob.value.trim() === '') {
-                pob_error.textContent = 'Place of birth is required';
-                isValid = false;
-            } else {
-                pob_error.textContent = '';
-            }
-
-            var gender = document.getElementById('gender');
-            var gender_error = document.getElementById('gender-error');
-            var selectedGender = gender.value;
-
-            if (selectedGender === 'Select gender') {
+        if (selectedGender === 'Select sex') {
                 gender_error.textContent = 'Please select a gender';
                 isValid = false;
-            } else {
+        } else {
                 gender_error.textContent = '';
-            }
+        }
+    
+        var emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+        var mobileNumRegex = /^[0-9]{11}$/;
+        var idNumberRegex = /^[0-9]{7}$/;
 
-            if (email.value.trim() === '') {
-                email_error.textContent = 'Email is required';
+        if (email.value.trim() === '') {
+            document.getElementById("email-error").textContent = 'Email is required';
+            isValid = false;
+        } else if (!emailRegex.test(email.value.trim())) {
+            document.getElementById("email-error").textContent = 'Please enter a valid email address';
+            isValid = false;
+        }
+
+        var course = document.getElementById('course');
+            var course_error = document.getElementById('course-error');
+            var selectedCourse = course.value;
+
+            if (selectedCourse === 'Select course') {
+                document.getElementById("course-error").textContent = 'Please select a course';
                 isValid = false;
-            } else if (!emailRegex.test(email.value.trim())) {
-                email_error.textContent = 'Please enter a valid email address';
-                isValid = false;
-            } else {
-                email_error.textContent = '';
             }
 
             if (id_number.value.trim() === '') {
-                id_number_error.textContent = 'Id Number is required';
+                document.getElementById("id_number-error").textContent = 'Id Number is required';
                 isValid = false;
             } else if (!idNumberRegex.test(id_number.value.trim())) {
-                id_number_error.textContent = 'Please enter a valid 7-digit ID number';
+                document.getElementById("id_number-error").textContent = 'Please enter a valid 7-digit ID number';
                 isValid = false;
-            } else {
-                id_number_error.textContent = '';
             }
 
-            if (citizenship.value.trim() === '') {
-                citizenship_error.textContent = 'Citizenship is required';
-                isValid = false;
-            } else {
-                citizenship_error.textContent = '';
-            }
+        if (form.citizenship.value.trim() === "") {
+            isValid = false;
+            document.getElementById("citizenship-error").textContent = "Citizenship is required.";
+        }
 
-            if (mobile_num.value.trim() === '') {
-                mobile_num_error.textContent = 'Mobile number is required';
+        if (form.mobile_num.value.trim() === '') {
+            document.getElementById("mobile_num-error").textContent = "Mobile number is required.";
                 isValid = false;
             } else if (!mobileNumRegex.test(mobile_num.value.trim())) {
-                mobile_num_error.textContent = 'Please enter a valid 11-digit mobile number';
+                document.getElementById("mobile_num-error").textContent = 'Please enter a valid 11-digit mobile number';
                 isValid = false;
-            } else {
-                mobile_num_error.textContent = '';
             }
 
-            if (barangay.value.trim() === '') {
-                barangay_error.textContent = 'Barangay is required';
-                isValid = false;
-            } else {
-                barangay_error.textContent = '';
-            }
-
-            if (province.value.trim() === '') {
-                province_error.textContent = 'Province is required';
-                isValid = false;
-            } else {
-                province_error.textContent = '';
-            }
-
-            if (town_city.value.trim() === '') {
-                town_city_error.textContent = 'Town City is required';
-                isValid = false;
-            } else {
-                town_city_error.textContent = '';
-            }
-
-            if (zip_code.value.trim() === '') {
-                zip_code_error.textContent = 'Zip code is required';
-                isValid = false;
-            } else {
-                zip_code_error.textContent = '';
-            }
-
-
-            return isValid;
+        if (form.region.value.trim() === "") {
+            isValid = false;
+            document.getElementById("region-error").textContent = "Region is required.";
         }
 
-
-        function validationForm2(form) {
-            var father_name = document.getElementById('father_name');
-            var father_name_error = document.getElementById('father_name-error');
-            var father_address = document.getElementById('father_address');
-            var father_address_error = document.getElementById('father_address-error');
-            var father_work = document.getElementById('father_work');
-            var father_work_error = document.getElementById('father_work-error');
-            var mother_name = document.getElementById('mother_name');
-            var mother_name_error = document.getElementById('mother_name-error');
-            var mother_address = document.getElementById('mother_address');
-            var mother_address_error = document.getElementById('mother_address-error');
-            var mother_work = document.getElementById('mother_work');
-            var mother_work_error = document.getElementById('mother_work-error');
-
-            var isValid = true;
-
-            if (father_name.value.trim() === '') {
-                father_name_error.textContent = 'Father name is required';
-                isValid = false;
-            } else {
-                father_name_error.textContent = '';
-            }
-
-            if (father_address.value.trim() === '') {
-                father_address_error.textContent = 'Address is required';
-                isValid = false;
-            } else {
-                father_address_error.textContent = '';
-            }
-            if (father_work.value.trim() === '') {
-                father_work_error.textContent = 'Occupation is required';
-                isValid = false;
-            } else {
-                father_work_error.textContent = '';
-            }
-            if (mother_name.value.trim() === '') {
-                mother_name_error.textContent = 'Mother Name is required';
-                isValid = false;
-            } else {
-                mother_name_error.textContent = '';
-            }
-            if (mother_address.value.trim() === '') {
-                mother_address_error.textContent = 'Address is required';
-                isValid = false;
-            } else {
-                mother_address_error.textContent = '';
-            }
-            if (mother_work.value.trim() === '') {
-                mother_work_error.textContent = 'Occupation is required';
-                isValid = false;
-            } else {
-                mother_work_error.textContent = '';
-            }
-
-            return isValid;
+        if (form.barangay.value.trim() === "") {
+            isValid = false;
+            document.getElementById("barangay-error").textContent = "Barangay is required.";
         }
 
-        function validationForm3(form) {
+        if (form.province.value.trim() === "") {
+            isValid = false;
+            document.getElementById("province-error").textContent = "Province is required.";
+        }
 
-            var fileInputs = form.querySelectorAll('.file-input');
-            var isValid = true;
+        if (form.town_city.value.trim() === "") {
+            isValid = false;
+            document.getElementById("town_city-error").textContent = "Town city is required.";
+        }
+
+        if (form.zip_code.value.trim() === "") {
+            isValid = false;
+            document.getElementById("zip_code-error").textContent = "Zip code is required.";
+        }
+
+        if (form.father_name.value.trim() === "") {
+            isValid = false;
+            document.getElementById("father_name-error").textContent = "Father name is required.";
+        }
+
+        if (form.father_address.value.trim() === "") {
+            isValid = false;
+            document.getElementById("father_address-error").textContent = "Address is required.";
+        }
+
+        if (form.father_work.value.trim() === "") {
+            isValid = false;
+            document.getElementById("father_work-error").textContent = "Occupation is required.";
+        }
+
+        if (form.mother_name.value.trim() === "") {
+            isValid = false;
+            document.getElementById("mother_name-error").textContent = "Mother name is required.";
+        }
+
+        if (form.mother_address.value.trim() === "") {
+            isValid = false;
+            document.getElementById("mother_address-error").textContent = "Address is required.";
+        }
+
+        if (form.mother_work.value.trim() === "") {
+            isValid = false;
+            document.getElementById("mother_work-error").textContent = "Occupation is required.";
+        }
+
+        if (form.zip_code.value.trim() === "") {
+            isValid = false;
+            document.getElementById("zip_code-error").textContent = "Zip code is required.";
+        }
+
+        var fileInputs = form.querySelectorAll('.file-input');
 
             for (var i = 0; i < fileInputs.length; i++) {
                 var fileInput = fileInputs[i];
@@ -801,12 +663,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
 
-            return isValid;
-        }
 
-
-        // Get all file input elements
-        const fileInputs = document.querySelectorAll('.file-input');
+            const checkboxes = form.querySelectorAll('.file-input-checkbox');
 
         fileInputs.forEach((fileInput, index) => {
             fileInput.addEventListener('change', () => {
@@ -815,6 +673,90 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 checkbox.checked = true;
             });
         });
+    
+
+        if (!isValid) {
+            event.preventDefault(); // Prevent form submission if validation fails
+        }
+    });
+});
+
+        document.addEventListener("DOMContentLoaded", function () {
+    // Your existing code...
+
+    fetch('philippine_provinces_cities_municipalities_and_barangays_2019v2.json')
+        .then(response => response.json())
+        .then(data => {
+            const regionDropdown = document.getElementById('region');
+            const provinceDropdown = document.getElementById('province');
+            const townCityDropdown = document.getElementById('town_city');
+            const barangayDropdown = document.getElementById('barangay');
+
+            for (const regionCode in data) {
+                const region = data[regionCode];
+                const option = document.createElement('option');
+                option.value = regionCode;
+                option.textContent = region.region_name + ' - ' + regionCode;
+                regionDropdown.appendChild(option);
+            }
+
+            regionDropdown.addEventListener('change', () => {
+                const selectedRegionCode = regionDropdown.value;
+                const provinceData = data[selectedRegionCode].province_list;
+
+                // Populate the province dropdown based on the selected region
+                provinceDropdown.innerHTML = '';
+                for (const provinceName in provinceData) {
+                    const option = document.createElement('option');
+                    option.value = provinceName;
+                    option.textContent = provinceName;
+                    provinceDropdown.appendChild(option);
+                }
+
+                // Clear the town/city and barangay dropdowns
+                townCityDropdown.innerHTML = '';
+                barangayDropdown.innerHTML = '';
+            });
+
+            provinceDropdown.addEventListener('change', () => {
+                const selectedRegionCode = regionDropdown.value;
+                const selectedProvince = provinceDropdown.value;
+                const townCityData = data[selectedRegionCode].province_list[selectedProvince].municipality_list;
+
+                // Populate the town/city dropdown based on the selected province
+                townCityDropdown.innerHTML = '';
+                for (const townCityName in townCityData) {
+                    const option = document.createElement('option');
+                    option.value = townCityName;
+                    option.textContent = townCityName;
+                    townCityDropdown.appendChild(option);
+                }
+
+                // Clear the barangay dropdown
+                barangayDropdown.innerHTML = '';
+            });
+
+            townCityDropdown.addEventListener('change', () => {
+                const selectedRegionCode = regionDropdown.value;
+                const selectedProvince = provinceDropdown.value;
+                const selectedTownCity = townCityDropdown.value;
+                const barangayData = data[selectedRegionCode].province_list[selectedProvince].municipality_list[selectedTownCity].barangay_list;
+
+                // Populate the barangay dropdown based on the selected town/city
+                barangayDropdown.innerHTML = '';
+                for (const barangayName of barangayData) {
+                    const option = document.createElement('option');
+                    option.value = barangayName;
+                    option.textContent = barangayName;
+                    barangayDropdown.appendChild(option);
+                }
+            });
+        })
+        .catch(error => {
+            console.error('Error loading JSON file:', error);
+        });
+});
+
     </script>
 </body>
 

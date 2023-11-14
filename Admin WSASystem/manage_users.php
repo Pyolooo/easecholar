@@ -46,9 +46,9 @@ if (!$resultsuperAdmin) {
 
 function formatExpireDate($dbExpireDate)
 {
-    $dateTimeObject = new DateTime($dbExpireDate);
-    $formatted_date = $dateTimeObject->format('F j, Y');
-    return $formatted_date;
+  $dateTimeObject = new DateTime($dbExpireDate);
+  $formatted_date = $dateTimeObject->format('F j, Y');
+  return $formatted_date;
 }
 ?>
 
@@ -62,7 +62,7 @@ function formatExpireDate($dbExpireDate)
   <!-- Boxicons -->
   <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
   <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.18/dist/sweetalert2.all.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.18/dist/sweetalert2.all.min.js"></script>
 
   <!-- My CSS -->
   <link rel="stylesheet" href="css/manage_users.css">
@@ -97,11 +97,11 @@ function formatExpireDate($dbExpireDate)
         </a>
       </li>
       <li>
-				<a href="application_list.php">
-					<i class='bx bxs-file' ></i>
-					<span class="text">Application List</span>
-				</a>
-			</li>
+        <a href="application_list.php">
+          <i class='bx bxs-file'></i>
+          <span class="text">Application List</span>
+        </a>
+      </li>
     </ul>
     <ul class="side-menu">
       <li>
@@ -124,24 +124,24 @@ function formatExpireDate($dbExpireDate)
       </div>
       <div class="right-section">
         <div class="profile">
-        <a href="admin_profile.php" class="profile">
-                        <?php
-                        $select_admin = mysqli_query($dbConn, "SELECT * FROM `tbl_super_admin` WHERE super_admin_id = '$super_admin_id'") or die('query failed');
-                        $fetch = mysqli_fetch_assoc($select_admin);
-                        if ($fetch && $fetch['profile'] != '') {
-            
-                            $imagePath = $_SERVER['DOCUMENT_ROOT'] . '/EASE-CHOLAR/user_profiles/' . $fetch['profile'];
+          <a href="admin_profile.php" class="profile">
+            <?php
+            $select_admin = mysqli_query($dbConn, "SELECT * FROM `tbl_super_admin` WHERE super_admin_id = '$super_admin_id'") or die('query failed');
+            $fetch = mysqli_fetch_assoc($select_admin);
+            if ($fetch && $fetch['profile'] != '') {
 
-                            if (file_exists($imagePath)) {
-                                echo '<img src="../user_profiles/' . $fetch['profile'] . '">';
-                            } else {
-                                echo '<img src="../user_profiles/isulogo.png">';
-                            }
-                        } else {
-                            echo '<img src="../user_profiles/isulogo.png">';
-                        }
-                        ?>
-                    </a>
+              $imagePath = $_SERVER['DOCUMENT_ROOT'] . '/EASE-CHOLAR/user_profiles/' . $fetch['profile'];
+
+              if (file_exists($imagePath)) {
+                echo '<img src="../user_profiles/' . $fetch['profile'] . '">';
+              } else {
+                echo '<img src="../user_profiles/isulogo.png">';
+              }
+            } else {
+              echo '<img src="../user_profiles/isulogo.png">';
+            }
+            ?>
+          </a>
         </div>
       </div>
     </nav>
@@ -165,205 +165,206 @@ function formatExpireDate($dbExpireDate)
         <a href="create_user.php" class="btn-download" id="createUserButton">
           <i class='bx bxs-user-plus'></i>
         </a>
-
       </div>
-    </main>
 
 
 
-    <main class="table">
-      <section class="table__header">
-      <h3>Manage System Users</h3>
-        <div class="input-group">
-          <input type="search" placeholder="Search Data...">
-          <img src="../img/search.png" alt="">
+      <div class="table-data">
+        <div class="order">
+          <section class="table__header">
+            <h3>Manage System Users</h3>
+            <div class="input-group">
+              <input type="search" placeholder="Search Data...">
+              <img src="../img/search.png" alt="">
+            </div>
+          </section>
+
+
+          <section class="table__body filterable">
+            <div class="filter-buttons">
+              <div class="filter-button active" data-filter="applicants">Students</div>
+              <div class="filter-button" data-filter="osa">OSA</div>
+              <div class="filter-button" data-filter="superAdmin">Admin</div>
+            </div>
+
+            <div id="applicantsSection">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Id</th>
+                    <th>Full Name</th>
+                    <th>Email</th>
+                    <th>Manage</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <?php
+                  while ($row = mysqli_fetch_assoc($resultUser)) {
+                    $customId = $row['custom_id'];
+                    $fullName = $row['full_name'];
+                    $email = $row['email'];
+                    $image = $row['image'];
+
+                    echo '<tr>';
+                    echo '<td>' . $customId . '</td>';
+                    echo '<td><img src="../user_profiles/' . $image . '" alt="">' . $fullName . '</td>';
+                    echo '<td>' . $email . '</td>';
+                    echo '<td><a class= "view-link" href="student_details.php?id=' . $customId . '">View</a></td>';
+
+                    echo '</tr>';
+                  }
+                  ?>
+                </tbody>
+              </table>
+              <div class="pagination"></div>
+            </div>
+
+            <div id="osaSection" style="display: none;">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Id</th>
+                    <th>Full Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Manage</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <?php
+                  while ($row = mysqli_fetch_assoc($resultAdmin)) {
+                    $osaId = $row['admin_id'];
+                    $fullName = $row['full_name'];
+                    $email = $row['email'];
+                    $profile = $row['profile'];
+                    $role = $row['role'];
+                    $status = $row['is_active'];
+
+                    echo '<tr>';
+                    echo '<td>' . $osaId . '</td>';
+                    echo '<td><img src="../user_profiles/' . $profile . '" alt="">' . $fullName . '</td>';
+                    echo '<td>' . $email . '</td>';
+                    echo '<td>' . $role . '</td>';
+
+                    if ($status == 0) {
+                      echo '<td> <span class="active-status">Active</span> </td>';
+                    } else {
+                      echo '<td> <span class="deactivated-status">Deactivated</span> </td>';
+                    }
+                    echo '<td><a class= "view-link" href="osa_details.php?id=' . $osaId . '">View</a></td>';
+
+                    echo '</tr>';
+                  }
+
+                  ?>
+                </tbody>
+              </table>
+            </div>
+
+            <div id="superAdminSection" style="display: none;">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Id</th>
+                    <th>Username</th>
+                    <th>Password</th>
+                    <th>Created At</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <?php
+                  while ($row = mysqli_fetch_assoc($resultsuperAdmin)) {
+                    $superAdminId = $row['super_admin_id'];
+                    $userName = $row['username'];
+                    $password = $row['password'];
+                    $profile = $row['profile'];
+                    $createdAt = $row['created_at'];
+
+
+
+                    echo '<tr>';
+                    echo '<td>' . $superAdminId . '</td>';
+                    echo '<td><img src="../user_profiles/' . $profile . '" alt="">' . $userName . '</td>';
+                    echo '<td>' . $password . '</td>';
+                    echo '<td>' . formatExpireDate($createdAt) . '</td>';
+                    echo '</tr>';
+                  }
+                  ?>
+                </tbody>
+              </table>
+            </div>
+          </section>
         </div>
-      </section>
-
-
-      <section class="table__body filterable">
-        <div class="filter-buttons">
-          <div class="filter-button active" data-filter="applicants">Students</div>
-          <div class="filter-button" data-filter="osa">OSA</div>
-          <div class="filter-button" data-filter="superAdmin">Admin</div>
-        </div>
-
-        <div id="applicantsSection">
-          <table>
-            <thead>
-              <tr>
-                <th>Id</th>
-                <th>Full Name</th>
-                <th>Email</th>
-                <th>Manage</th>
-              </tr>
-            </thead>
-            <tbody>
-              <?php
-              while ($row = mysqli_fetch_assoc($resultUser)) {
-                $customId = $row['custom_id'];
-                $fullName = $row['full_name'];
-                $email = $row['email'];
-                $image = $row['image'];
-
-                echo '<tr>';
-                echo '<td>' . $customId . '</td>';
-                echo '<td><img src="../user_profiles/' . $image . '" alt="">' . $fullName . '</td>';
-                echo '<td>' . $email . '</td>';
-                echo '<td><a class= "view-link" href="student_details.php?id=' . $customId . '">View</a></td>';
-
-                echo '</tr>';
-              }
-              ?>
-            </tbody>
-          </table>
-        </div>
-
-        <div id="osaSection" style="display: none;">
-          <table>
-            <thead>
-              <tr>
-                <th>Id</th>
-                <th>Full Name</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Status</th>
-                <th>Manage</th>
-              </tr>
-            </thead>
-            <tbody>
-              <?php
-              while ($row = mysqli_fetch_assoc($resultAdmin)) {
-                $osaId = $row['admin_id'];
-                $fullName = $row['full_name'];
-                $email = $row['email'];
-                $profile = $row['profile'];
-                $role = $row['role'];
-                $status = $row['is_active']; 
-              
-                echo '<tr>';
-                echo '<td>' . $osaId . '</td>';
-                echo '<td><img src="../user_profiles/' . $profile . '" alt="">' . $fullName . '</td>';
-                echo '<td>' . $email . '</td>';
-                echo '<td>' . $role . '</td>';
-                
-                if ($status == 0) {
-                  echo '<td> <span class="active-status">Active</span> </td>';
-                } else {
-                  echo '<td> <span class="deactivated-status">Deactivated</span> </td>';
-                }
-                echo '<td><a class= "view-link" href="osa_details.php?id=' . $osaId . '">View</a></td>';
-                
-                echo '</tr>';
-              }
-              
-              ?>
-            </tbody>
-          </table>
-        </div>
-
-        <div id="superAdminSection" style="display: none;">
-          <table>
-            <thead>
-              <tr>
-                <th>Id</th>
-                <th>Username</th>
-                <th>Password</th>
-                <th>Created At</th>
-              </tr>
-            </thead>
-            <tbody>
-              <?php
-              while ($row = mysqli_fetch_assoc($resultsuperAdmin)) {
-                $superAdminId = $row['super_admin_id'];
-                $userName = $row['username'];
-                $password = $row['password'];
-                $profile = $row['profile'];
-                $createdAt = $row['created_at'];
-                
-
-
-                echo '<tr>';
-                echo '<td>' . $superAdminId . '</td>';
-                echo '<td><img src="../user_profiles/' . $profile . '" alt="">' . $userName . '</td>';
-                echo '<td>' . $password . '</td>';
-                echo '<td>' . formatExpireDate($createdAt) . '</td>';
-                echo '</tr>';
-                }
-              ?>
-            </tbody>
-          </table>
-        </div>
-      </section>
     </main>
 
     <script src="js/applicants.js"></script>
     <script>
-document.addEventListener("click", function(event) {
-  if (event.target.classList.contains("reg-status-button")) {
-    const button = event.target;
-    const superAdminId = button.getAttribute("data-id");
-    const currentStatus = parseInt(button.getAttribute("data-status"));
+      document.addEventListener("click", function(event) {
+        if (event.target.classList.contains("reg-status-button")) {
+          const button = event.target;
+          const superAdminId = button.getAttribute("data-id");
+          const currentStatus = parseInt(button.getAttribute("data-status"));
 
-    // Display a confirmation dialog
-    Swal.fire({
-      title: currentStatus === 1 ? "Activate Account" : "Deactivate Account",
-      text: currentStatus === 1 ? "Are you sure you want to activate this superAdmin user's account?" : "Are you sure you want to deactivate this superAdmin user's account?",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: currentStatus === 1 ? "Yes, activate" : "Yes, deactivate",
-      cancelButtonText: "Cancel"
-    }).then((result) => {
-      if (result.isConfirmed) {
-        // Send an AJAX request to update the user's status
-        $.ajax({
-          url: "update_reg_status.php", // Replace with the PHP file to handle status updates for superAdmin users
-          type: "POST",
-          data: {
-            superAdminId: superAdminId,
-            status: currentStatus === 1 ? 0 : 1
-          },
-          success: function(response) {
-            if (response === "success") {
-              // Update the button text and data-status attribute
-              button.textContent = currentStatus === 1 ? "Activate" : "Deactivate";
-              button.setAttribute("data-status", currentStatus === 1 ? 0 : 1);
-              // Change the background color of the button based on the new status
-              button.style.backgroundColor = currentStatus === 1 ? "green" : "red";
-              // Show a success message
-              Swal.fire("Account Updated", "The superAdmin user's account has been updated.", "success");
-            } else {
-              // Show an error message
-              Swal.fire("Error", "Failed to update the account. Please try again.", "error");
+          // Display a confirmation dialog
+          Swal.fire({
+            title: currentStatus === 1 ? "Activate Account" : "Deactivate Account",
+            text: currentStatus === 1 ? "Are you sure you want to activate this superAdmin user's account?" : "Are you sure you want to deactivate this superAdmin user's account?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: currentStatus === 1 ? "Yes, activate" : "Yes, deactivate",
+            cancelButtonText: "Cancel"
+          }).then((result) => {
+            if (result.isConfirmed) {
+              // Send an AJAX request to update the user's status
+              $.ajax({
+                url: "update_reg_status.php", // Replace with the PHP file to handle status updates for superAdmin users
+                type: "POST",
+                data: {
+                  superAdminId: superAdminId,
+                  status: currentStatus === 1 ? 0 : 1
+                },
+                success: function(response) {
+                  if (response === "success") {
+                    // Update the button text and data-status attribute
+                    button.textContent = currentStatus === 1 ? "Activate" : "Deactivate";
+                    button.setAttribute("data-status", currentStatus === 1 ? 0 : 1);
+                    // Change the background color of the button based on the new status
+                    button.style.backgroundColor = currentStatus === 1 ? "green" : "red";
+                    // Show a success message
+                    Swal.fire("Account Updated", "The superAdmin user's account has been updated.", "success");
+                  } else {
+                    // Show an error message
+                    Swal.fire("Error", "Failed to update the account. Please try again.", "error");
+                  }
+                },
+                error: function() {
+                  // Handle errors if the AJAX request fails
+                  Swal.fire("Error", "An error occurred while processing your request.", "error");
+                }
+              });
             }
-          },
-          error: function() {
-            // Handle errors if the AJAX request fails
-            Swal.fire("Error", "An error occurred while processing your request.", "error");
-          }
-        });
-      }
-    });
-  }
-});
+          });
+        }
+      });
 
 
 
-document.addEventListener("DOMContentLoaded", function() {
-    const filterButtons = document.querySelectorAll(".filter-button");
-    const applicantsSection = document.getElementById("applicantsSection");
-    const osaSection = document.getElementById("osaSection");
-    const superAdminSection = document.getElementById("superAdminSection");
-    const createUserButton = document.getElementById("createUserButton"); // Get the "Create User" button
+      document.addEventListener("DOMContentLoaded", function() {
+        const filterButtons = document.querySelectorAll(".filter-button");
+        const applicantsSection = document.getElementById("applicantsSection");
+        const osaSection = document.getElementById("osaSection");
+        const superAdminSection = document.getElementById("superAdminSection");
+        const createUserButton = document.getElementById("createUserButton"); // Get the "Create User" button
 
-    // Initially, show Applicants section by default
-    applicantsSection.style.display = "block";
-    createUserButton.style.display = "none"; // Hide the button by default
+        // Initially, show Applicants section by default
+        applicantsSection.style.display = "block";
+        createUserButton.style.display = "none"; // Hide the button by default
 
-    filterButtons.forEach(button => {
-        button.addEventListener("click", function() {
+        filterButtons.forEach(button => {
+          button.addEventListener("click", function() {
             // Remove active class from all buttons
             filterButtons.forEach(btn => btn.classList.remove("active"));
             // Add active class to the clicked button
@@ -378,22 +379,22 @@ document.addEventListener("DOMContentLoaded", function() {
 
             // Show the selected section based on the filter
             if (selectedFilter === "applicants") {
-                applicantsSection.style.display = "block";
-                createUserButton.style.display = "none"; // Hide the button for applicants
+              applicantsSection.style.display = "block";
+              createUserButton.style.display = "none"; // Hide the button for applicants
             } else if (selectedFilter === "osa") {
-                osaSection.style.display = "block";
-                createUserButton.style.display = ""; // Show the button for OSA
+              osaSection.style.display = "block";
+              createUserButton.style.display = ""; // Show the button for OSA
             } else if (selectedFilter === "superAdmin") {
-                superAdminSection.style.display = "block";
-                createUserButton.style.display = "none"; // Hide the button for superAdmin
+              superAdminSection.style.display = "block";
+              createUserButton.style.display = "none"; // Hide the button for superAdmin
             }
+          });
         });
-    });
-});
+      });
 
 
 
-      
+
       $(document).ready(function() {
         // Function to confirm logout
         function confirmLogout() {
@@ -420,25 +421,25 @@ document.addEventListener("DOMContentLoaded", function() {
           confirmLogout();
         });
 
-         // TOGGLE SIDEBAR
-         const menuBar = document.querySelector('#content nav .bx.bx-menu');
+        // TOGGLE SIDEBAR
+        const menuBar = document.querySelector('#content nav .bx.bx-menu');
         const sidebar = document.getElementById('sidebar');
 
         function toggleSidebar() {
-            sidebar.classList.toggle('hide');
+          sidebar.classList.toggle('hide');
         }
 
         menuBar.addEventListener('click', toggleSidebar);
 
         // Function to handle window resize and toggle sidebar based on screen width
         function handleResize() {
-            const screenWidth = window.innerWidth;
+          const screenWidth = window.innerWidth;
 
-            if (screenWidth <= 768) {
-                sidebar.classList.add('hide');
-            } else {
-                sidebar.classList.remove('hide');
-            }
+          if (screenWidth <= 768) {
+            sidebar.classList.add('hide');
+          } else {
+            sidebar.classList.remove('hide');
+          }
         }
 
         // Add a window resize event listener
@@ -527,8 +528,6 @@ document.addEventListener("DOMContentLoaded", function() {
           $(this).closest(".options_menu").removeClass("active");
         });
       });
-
- 
     </script>
 </body>
 

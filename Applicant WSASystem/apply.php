@@ -12,6 +12,7 @@ $pob = $_POST['pob'] ?? '';
 $gender = $_POST['gender'] ?? '';
 $email = $_POST['email'] ?? '';
 $course = $_POST['course'] ?? '';
+$year_lvl = $_POST['year_lvl'] ?? '';
 $mobile_num = $_POST['mobile_num'] ?? '';
 $citizenship = $_POST['citizenship'] ?? '';
 $barangay = $_POST['barangay'] ?? '';
@@ -25,9 +26,10 @@ $father_work = $_POST['father_work'] ?? '';
 $mother_name = $_POST['mother_name'] ?? '';
 $mother_address = $_POST['mother_address'] ?? '';
 $mother_work = $_POST['mother_work'] ?? '';
+$gross_income = $_POST['gross_income'] ?? '';
+$num_siblings = $_POST['num_siblings'] ?? '';
 $date_submitted = date('Y-m-d');
 
-// Variables for fetching scholarship requirements
 $requirements = '';
 $scholarshipId = '';
 
@@ -49,10 +51,8 @@ if (isset($_GET['id'])) {
 $requirements = explode("\n", $requirements);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Retrieve the user ID from the session
     $user_id = $_SESSION['user_id'];
 
-    // Fetch the selected scholarship's ID based on the scholarship name
     $sql = "SELECT scholarship_id FROM tbl_scholarship WHERE scholarship = ?";
     $stmt = $dbConn->prepare($sql);
     $stmt->bind_param("s", $scholarship);
@@ -63,11 +63,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $row = $result->fetch_assoc();
         $scholarship_id = $row['scholarship_id'];
     } else {
-        // Handle the case when the scholarship is not found
         die('Scholarship not found');
     }
 
-    // Fetch the full name and image from the tbl_user table
     $sql = "SELECT full_name, image FROM tbl_user WHERE user_id = ?";
     $stmt = $dbConn->prepare($sql);
     $stmt->bind_param("s", $user_id);
@@ -79,12 +77,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $full_name = $row['full_name'];
         $image = $row['image'];
     } else {
-        // Handle the case when user ID is not found in tbl_user table
-        // You can display an error message or redirect the user to an error page
         die('User ID not found in tbl_user table');
     }
 
-    // Check if the user has already applied for the selected scholarship
+
     $sql = "SELECT * FROM tbl_userapp WHERE applicant_name = ? AND scholarship_name = ?";
     $stmt = $dbConn->prepare($sql);
     $stmt->bind_param("ss", $full_name, $scholarship);
@@ -103,7 +99,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $validImageExtension = ['jpg', 'jpeg', 'png', 'pdf'];
         $uploadedFiles = array();
 
-        // Specify the target directory using $_SERVER['DOCUMENT_ROOT']
         $targetDirectory = $_SERVER['DOCUMENT_ROOT'] . '/EASE-CHOLAR/file_uploads/';
 
         for ($i = 0; $i < $fileCount; $i++) {
@@ -124,24 +119,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
-        // Convert the uploaded file names array to a comma-separated string
         $fileNamesString = implode(',', $uploadedFiles);
     }
 
-    // Validate data on the server
     $isValid = true;
 
     // Server-side validation for required fields
-    if (empty($last_name) || empty($first_name) || empty($middle_name) || empty($dob) || empty($pob) || empty($gender) || empty($email) || empty($course) || empty($mobile_num) || empty($citizenship) || empty($barangay) || empty($town_city) || empty($province) || empty($zip_code) || empty($id_number) || empty($father_name) || empty($father_address) || empty($father_work) || empty($mother_name) || empty($mother_address) || empty($mother_work)) {
+    if (empty($last_name) || empty($first_name) || empty($middle_name) || empty($dob) || empty($pob) || empty($gender) || empty($email) || empty($course) || empty($year_lvl) || empty($mobile_num) || empty($citizenship) || empty($barangay) || empty($town_city) || empty($province) || empty($zip_code) || empty($id_number) || empty($father_name) || empty($father_address) || empty($father_work) || empty($mother_name) || empty($mother_address) || empty($mother_work) || empty($gross_income) || empty($num_siblings)) {
         $isValid = false;
         echo "<script>alert('Please fill in all required fields.')</script>";
     }
 
     if ($isValid) {
-        // Data is valid, proceed with database insertion
-
-        // Insert into Database
-        $sql = "INSERT INTO `tbl_userapp` (user_id, image, applicant_name, scholarship_name, last_name, first_name, middle_name, dob, pob, gender, email, course,mobile_num, citizenship, barangay, town_city, province, zip_code, id_number, father_name, father_address, father_work, mother_name, mother_address, mother_work, file, scholarship_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO `tbl_userapp` (user_id, image, applicant_name, scholarship_name, last_name, first_name, middle_name, dob, pob, gender, email, course, year_lvl, mobile_num, citizenship, barangay, town_city, province, zip_code, id_number, father_name, father_address, father_work, mother_name, mother_address, mother_work, gross_income, num_siblings, file, scholarship_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?)";
 
         $stmt = $dbConn->prepare($sql);
 
@@ -150,7 +140,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $stmt->bind_param(
-            "isssssssssssssssssssssssssi", // 'i' for integer variables
+            "issssssssssssssssssssssssssssi", // 'i' for integer variables
             $user_id, // 'i' because user_id is an integer
             $image,
             $full_name,
@@ -163,6 +153,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $gender,
             $email,
             $course,
+            $year_lvl,
             $mobile_num,
             $citizenship,
             $barangay,
@@ -176,6 +167,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $mother_name,
             $mother_address,
             $mother_work,
+            $gross_income,
+            $num_siblings,
             $fileNamesString,
             $scholarship_id
         );
@@ -183,7 +176,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!$stmt->execute()) {
             $errorMessage = "Failed to insert application.";
         } else {
-            // Get the image from 'tbl_user' table
+
+            $application_id = $stmt->insert_id;
             $sql = "SELECT image FROM tbl_user WHERE user_id = ?";
             $stmt = $dbConn->prepare($sql);
             $stmt->bind_param("s", $user_id);
@@ -197,13 +191,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $userImage = 'default.jpg';
             }
             $is_read = 'unread';
+            $source = 'tbl_userapp';
 
-            // Insert notification with the image
             $notificationMessage = "New application has been submitted";
-            $sql = "INSERT INTO tbl_notifications (user_id, message, image, is_read) VALUES (?, ?, ?, ?)";
+            $sql = "INSERT INTO tbl_notifications (user_id, message, image, is_read, source, application_id) VALUES (?, ?, ?, ?, ?, ?)";
             $stmt = $dbConn->prepare($sql);
-            $stmt->bind_param("ssss", $user_id, $notificationMessage, $userImage, $is_read);
+            $stmt->bind_param("issssi", $user_id, $notificationMessage, $userImage, $is_read, $source, $application_id);
             $stmt->execute();
+
 
             $successMessage = "Application submitted successfully!";
         }
@@ -324,41 +319,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 </select>
                                 <div class="validation-message" id="gender-error"></div>
                             </div>
-                        </div>
 
-                        <div class="select-input-field">
                             <div class="input-field">
                                 <label>Email</label>
                                 <input type="email" id="email" name="email" placeholder="Enter your email" value="<?php echo $email; ?>" required>
                                 <div class="validation-message" id="email-error"></div>
                             </div>
                             <div class="input-field">
-                                
-                            <label>Mobile Number</label>
+
+                                <label>Mobile Number</label>
                                 <input type="number" id="mobile_num" name="mobile_num" placeholder="09XXXXXXXXX" value="<?php echo $mobile_num; ?>" required pattern="[0-9]{11}">
                                 <div class="validation-message" id="mobile_num-error"></div>
-                            </div>
-                        </div>
-
-
-
-                        <div class="fields">
-                            <div class="input-field">
-                                <label>School ID Number</label>
-                                <input type="number" id="id_number" name="id_number" placeholder="2XXXX21" value="<?php echo $id_number; ?>" required>
-                                <div class="validation-message" id="id_number-error"></div>
-                            </div>
-                            <div class="input-field">
-
-                            <label>Course</label>
-                                <select id="course" name="course" required>
-                                    <option disabled selected>Select course</option>
-                                    <option value="BSIT">BSIT</option>
-                                    <option value="BSA">BSA</option>
-                                </select>
-                                <div class="validation-message" id="course-error"></div>
-
-                                
                             </div>
                             <div class="input-field">
                                 <label>Citizenship</label>
@@ -366,11 +337,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <div class="validation-message" id="citizenship-error"></div>
                             </div>
                         </div>
+
+
+                        <div class="fields">
+                            <div class="input-field">
+                                <label>School ID Number</label>
+                                <input type="text" id="id_number" name="id_number" placeholder="2XXXXX1" value="<?php echo $id_number; ?>" oninput="formatIdNumber(this)" required>
+                                <div class="validation-message" id="id_number-error"></div>
+                            </div>
+
+                            <div class="input-field">
+                                <label>Course</label>
+                                <select id="course" name="course" required>
+                                    <option disabled selected>Select course</option>
+                                    <option value="BSIT">BSIT</option>
+                                    <option value="BSA">BSA</option>
+                                </select>
+                                <div class="validation-message" id="course-error"></div>
+                            </div>
+
+                            <div class="input-field">
+                                <label>Year level</label>
+                                <select id="year_lvl" name="year_lvl" required>
+                                    <option disabled selected>Select year</option>
+                                    <option value="1st">1st Year</option>
+                                    <option value="2nd">2nd Year</option>
+                                    <option value="3rd">3rd Year</option>
+                                    <option value="4th">4th Year</option>
+                                </select>
+                                <div class="validation-message" id="year_lvl-error"></div>
+                            </div>
+                        </div>
                         <hr>
                         <div class="input-field">
                             <h4 class="label1">Permanent Address</h4>
                             <div class="address-inputs">
-                            <div class="address-container">
+                                <div class="address-container">
                                     <label for="region">Region</label>
                                     <select id="region" name="region" required></select>
                                     <div class="validation-message" id="region-error"></div>
@@ -443,6 +445,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             </div>
                         </div>
                     </div>
+
+                    <hr>
+                    <div class="select-input-field">
+                        <div class="input-field">
+                            <label>Total Gross Income</label>
+                            <input type="number" id="gross_income" name="gross_income" placeholder="Gross income" value="<?php echo $gross_income; ?>" required>
+                            <div class="validation-message" id="gross_income-error"></div>
+                        </div>
+                        <div class="input-field">
+                            <label>No. of Siblings in the family</label>
+                            <input type="number" id="num_siblings" name="num_siblings" placeholder="Number of siblings" value="<?php echo $num_siblings; ?>" required>
+                            <div class="validation-message" id="num_siblings-error"></div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="form_3 data_info">
@@ -472,291 +488,511 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     </div>
     <script>
-document.addEventListener("DOMContentLoaded", function () {
-    const form = document.querySelector("form");
-    const doneButton = document.querySelector(".btn_done");
+        function formatIdNumber(input) {
+            let formattedValue = input.value.replace(/-/g, '');
 
-    doneButton.addEventListener("click", function (event) {
-        let isValid = true;
-
-        // Reset validation messages
-        const validationMessages = document.querySelectorAll(".validation-message");
-        validationMessages.forEach(function (message) {
-            message.textContent = "";
-        });
-
-        // Add validation logic here for each field
-        if (form.last_name.value.trim() === "") {
-            isValid = false;
-            document.getElementById("last_name-error").textContent = "Last Name is required.";
-        }
-        if (form.first_name.value.trim() === "") {
-            isValid = false;
-            document.getElementById("first_name-error").textContent = "First Name is required.";
-        }
-        if (form.middle_name.value.trim() === "") {
-            isValid = false;
-            document.getElementById("middle_name-error").textContent = 'Middle Name is required';
-        }
-
-        var dobInput = document.querySelector('input[name="dob"]');
-        var dobError = document.getElementById('date_birth-error');
-
-        var selectedDate = new Date(dobInput.value);
-        var currentDate = new Date();
-
-        if (isNaN(selectedDate)) {
-            dobError.textContent = 'Please enter a valid date of birth.';
-            isValid = false;
-        } else if (selectedDate > currentDate) {
-            dobError.textContent = 'Date of birth cannot be in the future.';
-            isValid = false;
-        } else {
-            dobError.textContent = '';
-        }
-
-        if (form.pob.value.trim() === "") {
-            isValid = false;
-            document.getElementById("pob-error").textContent = "Place of birth is required.";
-        }
-
-        var gender = document.getElementById('gender');
-        var gender_error = document.getElementById('gender-error');
-        var selectedGender = gender.value;
-
-        if (selectedGender === 'Select sex') {
-                gender_error.textContent = 'Please select a gender';
-                isValid = false;
-        } else {
-                gender_error.textContent = '';
-        }
-    
-        var emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
-        var mobileNumRegex = /^[0-9]{11}$/;
-        var idNumberRegex = /^[0-9]{7}$/;
-
-        if (email.value.trim() === '') {
-            document.getElementById("email-error").textContent = 'Email is required';
-            isValid = false;
-        } else if (!emailRegex.test(email.value.trim())) {
-            document.getElementById("email-error").textContent = 'Please enter a valid email address';
-            isValid = false;
-        }
-
-        var course = document.getElementById('course');
-            var course_error = document.getElementById('course-error');
-            var selectedCourse = course.value;
-
-            if (selectedCourse === 'Select course') {
-                document.getElementById("course-error").textContent = 'Please select a course';
-                isValid = false;
+            if (formattedValue.length >= 2) {
+                formattedValue = formattedValue.slice(0, 2) + '-' + formattedValue.slice(2);
             }
-
-            if (id_number.value.trim() === '') {
-                document.getElementById("id_number-error").textContent = 'Id Number is required';
-                isValid = false;
-            } else if (!idNumberRegex.test(id_number.value.trim())) {
-                document.getElementById("id_number-error").textContent = 'Please enter a valid 7-digit ID number';
-                isValid = false;
-            }
-
-        if (form.citizenship.value.trim() === "") {
-            isValid = false;
-            document.getElementById("citizenship-error").textContent = "Citizenship is required.";
+            input.value = formattedValue;
         }
 
-        if (form.mobile_num.value.trim() === '') {
-            document.getElementById("mobile_num-error").textContent = "Mobile number is required.";
-                isValid = false;
-            } else if (!mobileNumRegex.test(mobile_num.value.trim())) {
-                document.getElementById("mobile_num-error").textContent = 'Please enter a valid 11-digit mobile number';
-                isValid = false;
-            }
+        document.addEventListener("DOMContentLoaded", function() {
+            const form = document.querySelector("form");
+            const lastNameInput = form.last_name;
+            const firstNameInput = form.first_name;
+            const middleNameInput = form.middle_name;
+            const pobInput = form.pob;
+            const provinceInput = form.province;
+            const townCityInput = form.town_city;
+            const barangayInput = form.barangay;
+            const zipCodeInput = form.zip_code;
+            const citizenshipInput = form.citizenship;
+            const fatherNameInput = form.father_name;
+            const fatherAddressInput = form.father_address;
+            const fatherWorkInput = form.father_work;
+            const motherNameInput = form.mother_name;
+            const motherAddressInput = form.mother_address;
+            const motherWorkInput = form.mother_work;
+            const grossIncomeInput = form.gross_income;
+            const noSiblingsInput = form.num_siblings;
+            const courseDropdown = document.getElementById('course');
+            const yearLevelDropdown = document.getElementById('year_lvl');
+            const doneButton = document.querySelector(".btn_done");
 
-        if (form.region.value.trim() === "") {
-            isValid = false;
-            document.getElementById("region-error").textContent = "Region is required.";
-        }
+            courseDropdown.addEventListener('change', function() {
+                document.getElementById("course-error").textContent = '';
 
-        if (form.barangay.value.trim() === "") {
-            isValid = false;
-            document.getElementById("barangay-error").textContent = "Barangay is required.";
-        }
+                const selectedCourse = courseDropdown.value;
 
-        if (form.province.value.trim() === "") {
-            isValid = false;
-            document.getElementById("province-error").textContent = "Province is required.";
-        }
+                yearLevelDropdown.innerHTML = '<option disabled selected>Select year</option>';
 
-        if (form.town_city.value.trim() === "") {
-            isValid = false;
-            document.getElementById("town_city-error").textContent = "Town city is required.";
-        }
+                if (selectedCourse === 'BSA') {
+                    yearLevelDropdown.innerHTML += '<option value="1st">1st Year</option>';
+                    yearLevelDropdown.innerHTML += '<option value="2nd">2nd Year</option>';
+                } else if (selectedCourse === 'BSIT') {
+                    yearLevelDropdown.innerHTML += '<option value="1st">1st Year</option>';
+                    yearLevelDropdown.innerHTML += '<option value="2nd">2nd Year</option>';
+                    yearLevelDropdown.innerHTML += '<option value="3rd">3rd Year</option>';
+                    yearLevelDropdown.innerHTML += '<option value="4th">4th Year</option>';
+                }
+            });
 
-        if (form.zip_code.value.trim() === "") {
-            isValid = false;
-            document.getElementById("zip_code-error").textContent = "Zip code is required.";
-        }
+            yearLevelDropdown.addEventListener('change', function() {
+                const selectedYear = yearLevelDropdown.value;
+                const year_lvl_error = document.getElementById('year_lvl-error');
 
-        if (form.father_name.value.trim() === "") {
-            isValid = false;
-            document.getElementById("father_name-error").textContent = "Father name is required.";
-        }
+                if (selectedYear === 'Select year') {
+                    year_lvl_error.textContent = 'Please select a year';
+                    isValid = false;
+                } else {
+                    year_lvl_error.textContent = '';
+                }
+            });
 
-        if (form.father_address.value.trim() === "") {
-            isValid = false;
-            document.getElementById("father_address-error").textContent = "Address is required.";
-        }
+            doneButton.addEventListener("click", function(event) {
+                let isValid = true;
 
-        if (form.father_work.value.trim() === "") {
-            isValid = false;
-            document.getElementById("father_work-error").textContent = "Occupation is required.";
-        }
+                const validationMessages = document.querySelectorAll(".validation-message");
+                validationMessages.forEach(function(message) {
+                    message.textContent = "";
+                });
 
-        if (form.mother_name.value.trim() === "") {
-            isValid = false;
-            document.getElementById("mother_name-error").textContent = "Mother name is required.";
-        }
 
-        if (form.mother_address.value.trim() === "") {
-            isValid = false;
-            document.getElementById("mother_address-error").textContent = "Address is required.";
-        }
+                if (lastNameInput.value.trim() === "") {
+                    isValid = false;
+                    document.getElementById("last_name-error").textContent = "Last Name is required.";
 
-        if (form.mother_work.value.trim() === "") {
-            isValid = false;
-            document.getElementById("mother_work-error").textContent = "Occupation is required.";
-        }
+                    lastNameInput.addEventListener('input', function() {
+                        document.getElementById("last_name-error").textContent = "";
+                    });
+                }
 
-        if (form.zip_code.value.trim() === "") {
-            isValid = false;
-            document.getElementById("zip_code-error").textContent = "Zip code is required.";
-        }
+                if (firstNameInput.value.trim() === "") {
+                    isValid = false;
+                    document.getElementById("first_name-error").textContent = "First Name is required.";
 
-        var fileInputs = form.querySelectorAll('.file-input');
+                    firstNameInput.addEventListener('input', function() {
+                        document.getElementById("first_name-error").textContent = "";
+                    });
+                }
 
-            for (var i = 0; i < fileInputs.length; i++) {
-                var fileInput = fileInputs[i];
-                var requirementLabel = fileInput.previousElementSibling;
-                var checkbox = fileInput.previousElementSibling.previousElementSibling;
-                var requirementValidation = fileInput.parentElement.querySelector('.requirement-validation');
+                if (middleNameInput.value.trim() === "") {
+                    isValid = false;
+                    document.getElementById("middle_name-error").textContent = 'Middle Name is required';
 
-                fileInput.addEventListener('change', function() {
-                    if (fileInput.value.trim() !== '') {
-                        // Clear the validation message when a file is uploaded
-                        requirementValidation.textContent = '';
-                        requirementValidation.style.color = 'inherit';
+                    middleNameInput.addEventListener('input', function() {
+                        document.getElementById("middle_name-error").textContent = "";
+                    });
+                }
+
+                // Add validation logic for date of birth
+                var dobInput = document.querySelector('input[name="dob"]');
+                var dobError = document.getElementById('date_birth-error');
+
+                function validateDateOfBirth() {
+                    var selectedDate = new Date(dobInput.value);
+                    var currentDate = new Date();
+
+                    if (isNaN(selectedDate)) {
+                        dobError.textContent = 'Please enter a valid date of birth.';
+                        isValid = false;
+                    } else if (selectedDate > currentDate) {
+                        dobError.textContent = 'Date of birth cannot be in the future.';
+                        isValid = false;
+                    } else {
+                        dobError.textContent = '';
+                    }
+                }
+
+                validateDateOfBirth();
+
+                dobInput.addEventListener('input', function() {
+                    validateDateOfBirth();
+                });
+
+
+                if (pobInput.value.trim() === "") {
+                    isValid = false;
+                    document.getElementById("pob-error").textContent = "Place of birth is required.";
+
+                    pobInput.addEventListener('input', function() {
+                        document.getElementById("pob-error").textContent = "";
+                    });
+                }
+
+                // Add validation logic for gender
+                var gender = document.getElementById('gender');
+                var gender_error = document.getElementById('gender-error');
+
+                function validateGender() {
+                    var selectedGender = gender.value;
+
+                    if (selectedGender === 'Select sex') {
+                        gender_error.textContent = 'Please select a gender';
+                        isValid = false;
+                    } else {
+                        gender_error.textContent = '';
+                    }
+                }
+
+                // Initial validation
+                validateGender();
+
+                gender.addEventListener('change', function() {
+                    validateGender();
+                });
+
+                // Add validation logic for email
+                var emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+                var email = form.email; // Assuming form.email is the input element
+
+                function validateEmail() {
+                    if (email.value.trim() === '') {
+                        document.getElementById("email-error").textContent = 'Email is required';
+                        isValid = false;
+                    } else if (!emailRegex.test(email.value.trim())) {
+                        document.getElementById("email-error").textContent = 'Please enter a valid email address';
+                        isValid = false;
+                    } else {
+                        document.getElementById("email-error").textContent = ''; // Clear the validation message
+                    }
+                }
+
+                // Initial validation
+                validateEmail();
+
+                // Add an event listener to clear the validation message when the user types
+                email.addEventListener('input', function() {
+                    validateEmail();
+                });
+
+                var mobileNumRegex = /^[0-9]{11}$/;
+                var mobileNum = form.mobile_num;
+
+                function validateMobileNum() {
+                    if (form.mobile_num.value.trim() === '') {
+                        document.getElementById("mobile_num-error").textContent = "Mobile number is required.";
+                        isValid = false;
+                    } else if (!mobileNumRegex.test(mobile_num.value.trim())) {
+                        document.getElementById("mobile_num-error").textContent = 'Please enter a valid 11-digit mobile number';
+                        isValid = false;
+                    } else {
+                        document.getElementById("mobile_num-error").textContent = '';
+                    }
+                }
+
+                validateMobileNum();
+
+                // Add an event listener to clear the validation message when the user types
+                mobileNum.addEventListener('input', function() {
+                    validateMobileNum();
+                });
+
+
+                var course = document.getElementById('course');
+                var course_error = document.getElementById('course-error');
+                var selectedCourse = course.value;
+
+                if (selectedCourse === 'Select course') {
+                    document.getElementById("course-error").textContent = 'Please select a course';
+                    isValid = false;
+                }
+
+                const year_lvl = document.getElementById('year_lvl');
+                const year_lvl_error = document.getElementById('year_lvl-error');
+                const selectedYear = year_lvl.value;
+
+                if (selectedYear === 'Select year') {
+                    year_lvl_error.textContent = 'Please select a year';
+                    isValid = false;
+                } else {
+                    year_lvl_error.textContent = ''; // Clear the validation message
+                }
+
+                var idNumberRegex = /^\d+-\d{5}$/;
+                // Initial validation when the form is submitted or loaded
+                if (id_number.value.trim() === '') {
+                    document.getElementById("id_number-error").textContent = 'ID Number is required';
+                    isValid = false;
+                } else if (!idNumberRegex.test(id_number.value.trim())) {
+                    document.getElementById("id_number-error").textContent = 'Please enter a valid ID number in the format XX-XXXX';
+                    isValid = false;
+                }
+
+                // Attach the input event listener
+                document.getElementById('id_number').addEventListener('input', function() {
+                    formatIdNumber(this); // Format the ID number
+
+                    // Validate the formatted ID number
+                    if (this.value.trim() === '') {
+                        document.getElementById("id_number-error").textContent = 'ID Number is required';
+                        isValid = false;
+                    } else if (!idNumberRegex.test(this.value.trim())) {
+                        document.getElementById("id_number-error").textContent = 'Please enter a valid ID number in the format XX-XXXX';
+                        isValid = false;
+                    } else {
+                        document.getElementById("id_number-error").textContent = ''; // Clear the validation message
+                        isValid = true; // Update isValid when the input is valid
                     }
                 });
 
-                if (fileInput.value.trim() === '') {
+
+
+
+                if (citizenshipInput.value.trim() === "") {
                     isValid = false;
-                    // Display the validation message
-                    requirementValidation.textContent = '*Must upload the photo'
-                    requirementLabel.style.color = 'red';
-                    // You can also uncheck the corresponding checkbox if needed
-                    // checkbox.checked = false;
-                } else {
-                    // Reset the validation message
-                    requirementValidation.textContent = '';
-                    requirementLabel.style.color = 'inherit';
+                    document.getElementById("citizenship-error").textContent = "Citizenship is required.";
+
+                    citizenshipInput.addEventListener('input', function() {
+                        document.getElementById("citizenship-error").textContent = "";
+                    });
                 }
-            }
 
 
-            const checkboxes = form.querySelectorAll('.file-input-checkbox');
 
-        fileInputs.forEach((fileInput, index) => {
-            fileInput.addEventListener('change', () => {
-                const checkbox = document.getElementById(`checkbox-${index}`);
-                checkbox.disabled = true;
-                checkbox.checked = true;
+                if (form.region.value.trim() === "") {
+                    isValid = false;
+                    document.getElementById("region-error").textContent = "Region is required.";
+                }
+
+                if (form.barangay.value.trim() === "") {
+                    isValid = false;
+                    document.getElementById("barangay-error").textContent = "Barangay is required.";
+
+                    citizenshipInput.addEventListener('input', function() {
+                        document.getElementById("citizenship-error").textContent = "";
+                    });
+                }
+
+                if (form.province.value.trim() === "") {
+                    isValid = false;
+                    document.getElementById("province-error").textContent = "Province is required.";
+                }
+
+                if (form.town_city.value.trim() === "") {
+                    isValid = false;
+                    document.getElementById("town_city-error").textContent = "Town city is required.";
+                }
+
+                if (zipCodeInput.value.trim() === "") {
+                    isValid = false;
+                    document.getElementById("zip_code-error").textContent = "Zip code is required.";
+
+                    zipCodeInput.addEventListener('input', function() {
+                        document.getElementById("zip_code-error").textContent = "";
+                    });
+                }
+
+                if (fatherNameInput.value.trim() === "") {
+                    isValid = false;
+                    document.getElementById("father_name-error").textContent = "Father name is required.";
+
+                    fatherNameInput.addEventListener('input', function() {
+                        document.getElementById("father_name-error").textContent = "";
+                    });
+                }
+
+                if (fatherAddressInput.value.trim() === "") {
+                    isValid = false;
+                    document.getElementById("father_address-error").textContent = "Address is required.";
+
+                    fatherAddressInput.addEventListener('input', function() {
+                        document.getElementById("father_address-error").textContent = "";
+                    });
+                }
+
+                if (fatherWorkInput.value.trim() === "") {
+                    isValid = false;
+                    document.getElementById("father_work-error").textContent = "Occupation is required.";
+
+                    fatherWorkInput.addEventListener('input', function() {
+                        document.getElementById("father_work-error").textContent = "";
+                    });
+                }
+
+                if (motherNameInput.value.trim() === "") {
+                    isValid = false;
+                    document.getElementById("mother_name-error").textContent = "Mother name is required.";
+
+                    motherNameInput.addEventListener('input', function() {
+                        document.getElementById("mother_name-error").textContent = "";
+                    });
+                }
+
+                if (motherAddressInput.value.trim() === "") {
+                    isValid = false;
+                    document.getElementById("mother_address-error").textContent = "Address is required.";
+
+                    motherAddressInput.addEventListener('input', function() {
+                        document.getElementById("mother_address-error").textContent = "";
+                    });
+                }
+
+                if (motherWorkInput.value.trim() === "") {
+                    isValid = false;
+                    document.getElementById("mother_work-error").textContent = "Occupation is required.";
+
+                    motherWorkInput.addEventListener('input', function() {
+                        document.getElementById("mother_work-error").textContent = "";
+                    });
+                }
+
+                if (grossIncomeInput.value.trim() === "") {
+                    isValid = false;
+                    document.getElementById("gross_income-error").textContent = "Gross income is required.";
+
+                    grossIncomeInput.addEventListener('input', function() {
+                        document.getElementById("gross_income-error").textContent = "";
+                    });
+                }
+
+                if (noSiblingsInput.value.trim() === "") {
+                    isValid = false;
+                    document.getElementById("num_siblings-error").textContent = "Number of siblings is required.";
+
+                    noSiblingsInput.addEventListener('input', function() {
+                        document.getElementById("num_siblings-error").textContent = "";
+                    });
+                }
+
+
+                var fileInputs = form.querySelectorAll('.file-input');
+
+                for (var i = 0; i < fileInputs.length; i++) {
+                    (function() {
+                        var fileInput = fileInputs[i];
+                        var requirementLabel = fileInput.previousElementSibling;
+                        var checkbox = fileInput.previousElementSibling.previousElementSibling;
+                        var requirementValidation = fileInput.parentElement.querySelector('.requirement-validation');
+
+                        fileInput.addEventListener('change', function() {
+                            if (fileInput.value.trim() !== '') {
+                                var fileName = fileInput.value;
+                                var validExtensions = ['pdf', 'jpg', 'jpeg', 'png'];
+                                var fileExtension = fileName.split('.').pop().toLowerCase();
+
+                                // Check if the file extension is valid
+                                if (validExtensions.indexOf(fileExtension) === -1) {
+                                    isValid = false;
+                                    requirementValidation.textContent = 'Invalid file format. Supported formats: PDF, JPG, JPEG, PNG.';
+                                    requirementValidation.style.color = 'red';
+                                } else {
+                                    // Clear the validation message when a valid file is uploaded
+                                    requirementValidation.textContent = '';
+                                    requirementValidation.style.color = 'inherit';
+                                }
+                            }
+                        });
+
+                        if (fileInput.value.trim() === '') {
+                            isValid = false;
+                            // Display the validation message
+                            requirementValidation.textContent = '*Must upload a valid file (PDF, JPG, JPEG, PNG)';
+                            requirementLabel.style.color = 'red';
+                            // You can also uncheck the corresponding checkbox if needed
+                            // checkbox.checked = false;
+                        } else {
+                            // Reset the validation message
+                            requirementValidation.textContent = '';
+                            requirementLabel.style.color = 'inherit';
+                        }
+                    })();
+                }
+
+                const checkboxes = form.querySelectorAll('.file-input-checkbox');
+
+                fileInputs.forEach((fileInput, index) => {
+                    fileInput.addEventListener('change', () => {
+                        const checkbox = document.getElementById(`checkbox-${index}`);
+                        checkbox.disabled = true;
+                        checkbox.checked = true;
+                    });
+                });
+
+
+
+
+                if (!isValid) {
+                    event.preventDefault(); // Prevent form submission if validation fails
+                }
             });
         });
-    
 
-        if (!isValid) {
-            event.preventDefault(); // Prevent form submission if validation fails
-        }
-    });
-});
+        document.addEventListener("DOMContentLoaded", function() {
+            // Your existing code...
 
-        document.addEventListener("DOMContentLoaded", function () {
-    // Your existing code...
+            fetch('philippine_provinces_cities_municipalities_and_barangays_2019v2.json')
+                .then(response => response.json())
+                .then(data => {
+                    const regionDropdown = document.getElementById('region');
+                    const provinceDropdown = document.getElementById('province');
+                    const townCityDropdown = document.getElementById('town_city');
+                    const barangayDropdown = document.getElementById('barangay');
 
-    fetch('philippine_provinces_cities_municipalities_and_barangays_2019v2.json')
-        .then(response => response.json())
-        .then(data => {
-            const regionDropdown = document.getElementById('region');
-            const provinceDropdown = document.getElementById('province');
-            const townCityDropdown = document.getElementById('town_city');
-            const barangayDropdown = document.getElementById('barangay');
+                    for (const regionCode in data) {
+                        const region = data[regionCode];
+                        const option = document.createElement('option');
+                        option.value = regionCode;
+                        option.textContent = region.region_name + ' - ' + regionCode;
+                        regionDropdown.appendChild(option);
+                    }
 
-            for (const regionCode in data) {
-                const region = data[regionCode];
-                const option = document.createElement('option');
-                option.value = regionCode;
-                option.textContent = region.region_name + ' - ' + regionCode;
-                regionDropdown.appendChild(option);
-            }
+                    regionDropdown.addEventListener('change', () => {
+                        const selectedRegionCode = regionDropdown.value;
+                        const provinceData = data[selectedRegionCode].province_list;
 
-            regionDropdown.addEventListener('change', () => {
-                const selectedRegionCode = regionDropdown.value;
-                const provinceData = data[selectedRegionCode].province_list;
+                        // Populate the province dropdown based on the selected region
+                        provinceDropdown.innerHTML = '';
+                        for (const provinceName in provinceData) {
+                            const option = document.createElement('option');
+                            option.value = provinceName;
+                            option.textContent = provinceName;
+                            provinceDropdown.appendChild(option);
+                        }
 
-                // Populate the province dropdown based on the selected region
-                provinceDropdown.innerHTML = '';
-                for (const provinceName in provinceData) {
-                    const option = document.createElement('option');
-                    option.value = provinceName;
-                    option.textContent = provinceName;
-                    provinceDropdown.appendChild(option);
-                }
+                        // Clear the town/city and barangay dropdowns
+                        townCityDropdown.innerHTML = '';
+                        barangayDropdown.innerHTML = '';
+                    });
 
-                // Clear the town/city and barangay dropdowns
-                townCityDropdown.innerHTML = '';
-                barangayDropdown.innerHTML = '';
-            });
+                    provinceDropdown.addEventListener('change', () => {
+                        const selectedRegionCode = regionDropdown.value;
+                        const selectedProvince = provinceDropdown.value;
+                        const townCityData = data[selectedRegionCode].province_list[selectedProvince].municipality_list;
 
-            provinceDropdown.addEventListener('change', () => {
-                const selectedRegionCode = regionDropdown.value;
-                const selectedProvince = provinceDropdown.value;
-                const townCityData = data[selectedRegionCode].province_list[selectedProvince].municipality_list;
+                        // Populate the town/city dropdown based on the selected province
+                        townCityDropdown.innerHTML = '';
+                        for (const townCityName in townCityData) {
+                            const option = document.createElement('option');
+                            option.value = townCityName;
+                            option.textContent = townCityName;
+                            townCityDropdown.appendChild(option);
+                        }
 
-                // Populate the town/city dropdown based on the selected province
-                townCityDropdown.innerHTML = '';
-                for (const townCityName in townCityData) {
-                    const option = document.createElement('option');
-                    option.value = townCityName;
-                    option.textContent = townCityName;
-                    townCityDropdown.appendChild(option);
-                }
+                        // Clear the barangay dropdown
+                        barangayDropdown.innerHTML = '';
+                    });
 
-                // Clear the barangay dropdown
-                barangayDropdown.innerHTML = '';
-            });
+                    townCityDropdown.addEventListener('change', () => {
+                        const selectedRegionCode = regionDropdown.value;
+                        const selectedProvince = provinceDropdown.value;
+                        const selectedTownCity = townCityDropdown.value;
+                        const barangayData = data[selectedRegionCode].province_list[selectedProvince].municipality_list[selectedTownCity].barangay_list;
 
-            townCityDropdown.addEventListener('change', () => {
-                const selectedRegionCode = regionDropdown.value;
-                const selectedProvince = provinceDropdown.value;
-                const selectedTownCity = townCityDropdown.value;
-                const barangayData = data[selectedRegionCode].province_list[selectedProvince].municipality_list[selectedTownCity].barangay_list;
-
-                // Populate the barangay dropdown based on the selected town/city
-                barangayDropdown.innerHTML = '';
-                for (const barangayName of barangayData) {
-                    const option = document.createElement('option');
-                    option.value = barangayName;
-                    option.textContent = barangayName;
-                    barangayDropdown.appendChild(option);
-                }
-            });
-        })
-        .catch(error => {
-            console.error('Error loading JSON file:', error);
+                        barangayDropdown.innerHTML = '';
+                        for (const barangayName of barangayData) {
+                            const option = document.createElement('option');
+                            option.value = barangayName;
+                            option.textContent = barangayName;
+                            barangayDropdown.appendChild(option);
+                        }
+                    });
+                })
+                .catch(error => {
+                    console.error('Error loading JSON file:', error);
+                });
         });
-});
-
     </script>
 </body>
 

@@ -598,6 +598,17 @@ nav .profile img {
 	border-radius: 0 36px 36px 0;
 	cursor: pointer;
 }
+
+.scholarship-container{
+	display: flex;
+}
+
+.scholarship-logo{
+width: 60px;
+border-radius: 30px;
+margin-right: 20px;
+}
+
 .notification .bxs-bell {
 	cursor: pointer;
 }
@@ -616,6 +627,23 @@ nav .profile img {
 	right: 0;
 	/* To align it with the notification icon */
 	display: none;
+}
+
+.notif-label {
+	display: flex;
+	align-items: center;
+	font-size: 18px;
+	border-bottom: 1px solid grey;
+	margin-bottom: 20px;
+	padding: 10px;
+	font-weight: bold;
+	color: rgba(0, 0, 0, 0.65);
+}
+
+.scrollable-notifications {
+	max-height: 300px;
+	/* Set your desired max height */
+	overflow-y: auto;
 }
 
 .dropdown .notify_item {

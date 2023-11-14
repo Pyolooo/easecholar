@@ -61,7 +61,7 @@ function sortTable(column, sort_asc) {
 
 const table = document.querySelector('table');
 const rows = table.querySelectorAll('tbody tr');
-const rowsPerPage = 20;
+const rowsPerPage = 1;
 let currentPage = 1;
 
 function showPage(page) {

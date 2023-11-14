@@ -93,7 +93,6 @@ if (isset($_GET['logout'])) {
                         $notificationCount = $notificationCountData['count'];
 
 
-                        // Show the notification count only if there are new messages
                         if ($notificationCount > 0) {
                             echo '<i id="bellIcon" class="bx bxs-bell"></i>';
                             echo '<span class="num">' . $notificationCount . '</span>';
@@ -104,26 +103,55 @@ if (isset($_GET['logout'])) {
                         ?>
                     </div>
 
+                    <?php
+                    function formatCreatedAt($dbCreatedAt)
+                    {
+                        $dateTimeObject = new DateTime($dbCreatedAt);
+                        return $dateTimeObject->format('Y-m-d, g:i A');
+                    }
+                    ?>
 
-                    <!-- Inside the "notif" div, add the following code: -->
                     <div class="dropdown">
+                        <div class="notif-label"><i style="margin-right: 50px;" class='bx bxs-bell'></i>Notifications</div>
                         <?php
-                        $notifications = mysqli_query($dbConn, "SELECT * FROM tbl_notifications WHERE is_read = 'unread'") or die('query failed');
+                        $notifications = mysqli_query($dbConn, "SELECT * FROM tbl_notifications WHERE is_read = 'unread' OR is_read = 'read' ORDER BY created_at DESC") or die('query failed');
                         ?>
-                        <?php while ($row = mysqli_fetch_assoc($notifications)) { ?>
-                            <div class="notify_item">
-                                <div class="notify_img">
-                                    <img src='/EASE-CHOLAR/user_profiles/<?php echo $row['image']; ?>' alt="" style="width: 50px">
-                                </div>
-                                <div class="notify_info">
-                                    <p><?php echo $row['message']; ?></p>
-                                    <span class="notify_time"><?php echo $row['created_at']; ?></span>
-                                </div>
-                            </div>
-                        <?php } ?>
-                    </div>
+                        <div class="scrollable-notifications">
+                            <?php while ($row = mysqli_fetch_assoc($notifications)) { ?>
+                                <div class="notify_item">
+                                    <div class="notify_img">
+                                        <img src='/EASE-CHOLAR/user_profiles/<?php echo $row['image']; ?>' alt="" style="width: 50px">
+                                    </div>
+                                    <div class="notify_info">
+                                        <p>
+                                            <?php
+                                            $source = $row['source'];
+                                            $applicationId = $row['application_id'];
+                                            $user_id = $row['user_id'];
 
+                                            if ($source == 'tbl_userapp') {
+                                                $viewLink = 'view_application';
+                                            } elseif ($source == 'tbl_scholarship_1_form') {
+                                                $viewLink = 'view_application1';
+                                            } else {
+                                                $viewLink = '#';
+                                            }
+                                            ?>
+
+                                            <a href="<?php echo $viewLink ?>.php?id=<?php echo $applicationId; ?>&user_id=<?php echo $user_id; ?>">
+                                                <?php echo $row['message']; ?>
+                                            </a>
+
+                                        </p>
+                                        <span class="notify_time"><?php echo formatCreatedAt($row['created_at']); ?></span>
+                                    </div>
+                                </div>
+                            <?php } ?>
+                        </div>
+                    </div>
                 </div>
+
+                
                 <div class="profile">
                     <a href="osa_profile.php" class="profile">
                         <?php
@@ -163,88 +191,83 @@ if (isset($_GET['logout'])) {
                         </li>
                     </ul>
                 </div>
-
-
-
-
-
-
             </div>
-        </main>
-
-        <?php
-        function formatDateSubmitted($dbDateSubmitted)
-        {
-            $dateTimeObject = new DateTime($dbDateSubmitted);
-            return $dateTimeObject->format('F d, Y');
-        }
-        ?>
 
 
-        <main class="table">
-            <section class="table__header">
-                <div class="export-container">
-                    <select id="scholarshipSelect" name="scholarship_id">
-                        <option value="">All Scholarships</option>
-                        <?php
-
-                        $scholarshipQuery = "(SELECT DISTINCT scholarship_id, scholarship_name FROM tbl_userapp WHERE status = 'Accepted') UNION (SELECT scholarship_id, scholarship_name FROM tbl_scholarship_1_form WHERE status = 'Accepted')";
-
-                        $scholarshipResult = mysqli_query($dbConn, $scholarshipQuery);
-
-                        if ($scholarshipResult) {
-                            while ($row = mysqli_fetch_assoc($scholarshipResult)) {
-                                $scholarshipId = $row['scholarship_id'];
-                                $scholarshipName = $row['scholarship_name'];
-                                echo '<option value="' . urlencode($scholarshipId) . '">' . $scholarshipName . '</option>';
-                            }
-                        }
-                        ?>
-
-                    </select>
-                    <select id="exportFormatSelect">
-                        <option value="pdf">PDF</option>
-                        <option value="excel">Excel</option>
-                    </select>
-
-                    <button id="exportButton" class="btn-download" title="Export Data">
-                        <i class='bx bxs-file-export'></i> Export
-                    </button>
-
-                </div>
-                <div class="input-group">
-                    <input type="search" placeholder="Search Data...">
-                    <img src="../img/search.png" alt="">
-                </div>
-            </section>
+            <?php
+            function formatDateSubmitted($dbDateSubmitted)
+            {
+                $dateTimeObject = new DateTime($dbDateSubmitted);
+                return $dateTimeObject->format('F d, Y');
+            }
+            ?>
 
 
-            <section class="table__body filterable">
-                <div class="filter">
-                    <div class="status-filter">
-                        <button class="status-button active" data-status="all">All</button>
-                        <button class="status-button pending-button" data-status="Pending">Pending</button>
-                        <button class="status-button inreview-button" data-status="In Review">In Review</button>
-                        <button class="status-button qualified-button" data-status="Qualified">Qualified</button>
-                        <button class="status-button accepted-button" data-status="Accepted">Accepted</button>
-                        <button class="status-button rejected-button" data-status="Rejected">Rejected</button>
-                    </div>
-                </div>
+            <div class="table-data">
+                <div class="order">
+                    <section class="table__header">
+                        <div class="export-container">
+                            <select title="Select Scholarships" id="scholarshipSelect" name="scholarship_id">
+                                <option value="">All Scholarships</option>
+                                <?php
+
+                                $scholarshipQuery = "(SELECT DISTINCT scholarship_id, scholarship_name FROM tbl_userapp WHERE status = 'Accepted') UNION (SELECT scholarship_id, scholarship_name FROM tbl_scholarship_1_form WHERE status = 'Accepted')";
+
+                                $scholarshipResult = mysqli_query($dbConn, $scholarshipQuery);
+
+                                if ($scholarshipResult) {
+                                    while ($row = mysqli_fetch_assoc($scholarshipResult)) {
+                                        $scholarshipId = $row['scholarship_id'];
+                                        $scholarshipName = $row['scholarship_name'];
+                                        echo '<option value="' . urlencode($scholarshipId) . '">' . $scholarshipName . '</option>';
+                                    }
+                                }
+                                ?>
+
+                            </select>
+                            <select title="Select format" id="exportFormatSelect">
+                                <option value="pdf">PDF</option>
+                                <option value="excel">Excel</option>
+                            </select>
+
+                            <button id="exportButton" class="btn-download" title="Export Data">
+                                <i class='bx bxs-file-export'></i> Export
+                            </button>
+
+                        </div>
+                        <div class="input-group">
+                            <input type="search" placeholder="Search Data...">
+                            <img src="../img/search.png" alt="">
+                        </div>
+                    </section>
 
 
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Id <span class="icon-arrow">&UpArrow;</span></th>
-                            <th>Applicant Name <span class="icon-arrow">&UpArrow;</span></th>
-                            <th>Scholarship <span class="icon-arrow">&UpArrow;</span></th>
-                            <th>Submission <span class="icon-arrow">&UpArrow;</span></th>
-                            <th>Status <span class="icon-arrow">&UpArrow;</span></th>
-                            <th>Action <span class="icon-arrow">&UpArrow;</span></th>
-                        </tr>
-                    </thead>
-                    <?php
-                    $select = mysqli_query($dbConn, "SELECT ua.application_id, ua.image, ua.applicant_name, ua.scholarship_name, ua.date_submitted, ua.status, ua.user_id, 'tbl_userapp' AS source
+                    <section class="table__body filterable">
+                        <div class="filter">
+                            <div class="status-filter">
+                                <button class="status-button active" data-status="all">All</button>
+                                <button class="status-button pending-button" data-status="Pending">Pending</button>
+                                <button class="status-button inreview-button" data-status="In Review">In Review</button>
+                                <button class="status-button qualified-button" data-status="Qualified">Qualified</button>
+                                <button class="status-button accepted-button" data-status="Accepted">Accepted</button>
+                                <button class="status-button rejected-button" data-status="Rejected">Rejected</button>
+                            </div>
+                        </div>
+
+
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Id <span class="icon-arrow">&UpArrow;</span></th>
+                                    <th>Applicant Name <span class="icon-arrow">&UpArrow;</span></th>
+                                    <th>Scholarship <span class="icon-arrow">&UpArrow;</span></th>
+                                    <th>Submission <span class="icon-arrow">&UpArrow;</span></th>
+                                    <th>Status <span class="icon-arrow">&UpArrow;</span></th>
+                                    <th>Action <span class="icon-arrow">&UpArrow;</span></th>
+                                </tr>
+                            </thead>
+                            <?php
+                            $select = mysqli_query($dbConn, "SELECT ua.application_id, ua.image, ua.applicant_name, ua.scholarship_name, ua.date_submitted, ua.status, ua.user_id, 'tbl_userapp' AS source
                     FROM tbl_userapp ua
                     JOIN tbl_user u ON ua.user_id = u.user_id
                     UNION
@@ -252,61 +275,62 @@ if (isset($_GET['logout'])) {
                     FROM tbl_scholarship_1_form s1f
                     JOIN tbl_user u ON s1f.user_id = u.user_id") or die('query failed');
 
-                    $number = 1;
-                    ?>
+                            $number = 1;
+                            ?>
 
-                    <?php
-                    while ($row = mysqli_fetch_array($select)) {
-                        $statusClass = '';
-                        switch ($row['status']) {
-                            case 'Pending':
-                                $statusClass = 'pending';
-                                break;
-                            case 'In Review':
-                                $statusClass = 'inreview';
-                                break;
-                            case 'Qualified':
-                                $statusClass = 'qualified';
-                                break;
-                            case 'Accepted':
-                                $statusClass = 'accepted';
-                                break;
-                            case 'Rejected':
-                                $statusClass = 'rejected';
-                                break;
-                            default:
-                                break;
-                        }
-                    ?>
+                            <?php
+                            while ($row = mysqli_fetch_array($select)) {
+                                $statusClass = '';
+                                switch ($row['status']) {
+                                    case 'Pending':
+                                        $statusClass = 'pending';
+                                        break;
+                                    case 'In Review':
+                                        $statusClass = 'inreview';
+                                        break;
+                                    case 'Qualified':
+                                        $statusClass = 'qualified';
+                                        break;
+                                    case 'Accepted':
+                                        $statusClass = 'accepted';
+                                        break;
+                                    case 'Rejected':
+                                        $statusClass = 'rejected';
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            ?>
 
-                        <tr>
-                            <td><?= $number ?></td>
-                            <td><img src="../user_profiles/<?= $row['image'] ?>" alt=""><?= $row['applicant_name'] ?></td>
-                            <td><?= $row['scholarship_name'] ?></td>
-                            <td><?= formatDateSubmitted($row['date_submitted']) ?></td>
-                            <td>
-                                <p class="status <?= $statusClass ?>"><?= $row['status'] ?></p>
-                            </td>
-                            <td>
-                                <?php
-                                $source = $row['source'];
-                                $viewLink = ($source == 'tbl_userapp') ? 'view_application.php' : 'view_application1.php';
-                                $applicationId = $row['application_id'];
-                                $user_id = $row['user_id'];
-                                $reviewLink = $viewLink . '?id=' . $applicationId . '&user_id=' . $user_id; // Include user_id in the URL
-                                ?>
-                                <strong><a class="view-link" href="<?= $reviewLink ?>">Review</a></strong>
-                            </td>
-                        </tr>
+                                <tr>
+                                    <td><?= $number ?></td>
+                                    <td><img src="../user_profiles/<?= $row['image'] ?>" alt=""><?= $row['applicant_name'] ?></td>
+                                    <td><?= $row['scholarship_name'] ?></td>
+                                    <td><?= formatDateSubmitted($row['date_submitted']) ?></td>
+                                    <td>
+                                        <p class="status <?= $statusClass ?>"><?= $row['status'] ?></p>
+                                    </td>
+                                    <td>
+                                        <?php
+                                        $source = $row['source'];
+                                        $viewLink = ($source == 'tbl_userapp') ? 'view_application.php' : 'view_application1.php';
+                                        $applicationId = $row['application_id'];
+                                        $user_id = $row['user_id'];
+                                        $reviewLink = $viewLink . '?id=' . $applicationId . '&user_id=' . $user_id;
+                                        ?>
+                                        <strong><a class="view-link" href="<?= $reviewLink ?>">Review</a></strong>
+                                    </td>
+                                </tr>
 
-                    <?php
-                        $number++;
-                    }
-                    ?>
+                            <?php
+                                $number++;
+                            }
+                            ?>
 
-                </table>
-                <div class="pagination"></div>
-            </section>
+                        </table>
+                        <div class="pagination"></div>
+                    </section>
+                </div>
         </main>
 
         <script src="js/applicants.js"></script>

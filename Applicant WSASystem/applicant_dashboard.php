@@ -17,7 +17,15 @@ if (isset($_GET['logout'])) {
 
 $user_id = $_SESSION['user_id'];
 
-$select = mysqli_query($dbConn, "SELECT application_id, scholarship_name, date_submitted, status FROM tbl_userapp WHERE user_id = '$user_id'") or die(mysqli_error($dbConn));
+
+$select = mysqli_query($dbConn, "
+SELECT application_id, scholarship_name, date_submitted, status FROM tbl_userapp WHERE user_id = '$user_id'
+    
+    UNION
+    
+    SELECT application_id, scholarship_name, date_submitted, status FROM tbl_scholarship_1_form WHERE user_id = '$user_id'
+") or die(mysqli_error($dbConn));
+
 
 
 $sqlAdmin = "SELECT username FROM tbl_admin WHERE admin_id = ?";

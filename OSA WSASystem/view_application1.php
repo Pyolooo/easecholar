@@ -101,7 +101,6 @@ if (isset($_POST['message_content'])) {
   $insertResult = mysqli_stmt_execute($insertStmt);
 
   if ($insertResult) {
-    $success_message = "Message Sent";
 
     $applicantEmail = $applicationData['email'];
     $applicantName = $applicationData['applicant_name'];
@@ -112,18 +111,35 @@ if (isset($_POST['message_content'])) {
 
     sendEmailNotification($applicantEmail, $applicantName, $emailSubject, $emailBody);
 
-// Send SMS notification
+    // Send SMS notification
     $phoneNumber = $applicationData['mobile_num'];
-    $smsMessage = "Dear $applicantName,\n\nYou have received a new message from OSA:$message_content";
+    $smsMessage = "Dear $applicantName,\n\nYou have received a new message from OSA:\n\n$message_content";
 
     sendSmsNotification($phoneNumber, $smsMessage);
 
 
-    header("Location: view_application1.php?id=$application_id&user_id=$user_id");
-    exit();
-  } else {
+    $success_message = "Message Sent";
+
+    echo '<script>
+        document.addEventListener("DOMContentLoaded", function() {
+            Swal.fire({
+                position: "center",
+                icon: "success",
+                title: "' . $success_message . '",
+                showConfirmButton: false,
+                timer: 1500
+            }).then((result) => {
+                if (result.dismiss === Swal.DismissReason.timer) {
+                    if (' . isset($application_id) . ' && ' . isset($user_id) . ') {
+                        window.location.href = "view_application1.php?id=' . $application_id . '&user_id=' . $user_id . '";
+                    }
+                }
+            });
+        });
+    </script>';
+} else {
     echo "Error sending message: " . mysqli_error($dbConn);
-  }
+}
 }
 
 
@@ -157,6 +173,7 @@ if (isset($_POST['status'])) {
     echo "Error updating status: " . mysqli_error($dbConn);
   }
 }
+
 function sendSmsNotification($phoneNumber, $message) {
   $apiKey = 'd9e762406ca20e174568cd6d83026550';
   $url = 'https://api.semaphore.co/api/v4/messages';
@@ -165,7 +182,7 @@ function sendSmsNotification($phoneNumber, $message) {
     'apikey' => $apiKey,
     'number' => $phoneNumber,
     'message' => $message,
-    'sendername' => 'SEMAPHORE'
+    'sendername' => 'EASECHOLAR'
   ];
 
   $ch = curl_init();
@@ -237,11 +254,35 @@ function sendEmailNotification($toEmail, $toName, $subject, $body)
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>View Application</title>
   <link rel="stylesheet" href="css/view_application.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 </head>
 
 <body>
   <?php include('../include/header.php'); ?>
   <div class="wrapper">
+
+  <?php
+if (!empty($status_message)) {
+    echo '<script>
+        Swal.fire({
+            position: "center",
+            icon: "success",
+            title: "' . $status_message . '",
+            showConfirmButton: false,
+            timer: 1500
+        }).then((result) => {
+            if (result.dismiss === Swal.DismissReason.timer) {
+                if (' . isset($application_id) . ' && ' . isset($user_id) . ') {
+                    window.location.href = "view_application1.php?id=' . $application_id . '&user_id=' . $user_id . '";
+                }
+            }
+        });
+    </script>';
+}
+
+?>
+
+
     <form action="" method="POST" enctype="multipart/form-data">
       <div class="container">
         <div class="head">
@@ -263,11 +304,6 @@ function sendEmailNotification($toEmail, $toName, $subject, $body)
               </select>
 
               <button class="submit-button" type="submit">Update</button>
-              <?php
-              if (isset($status_message)) {
-                echo '<p style="color: green; text-align:left; margin-top:10px">' . $status_message . '</p>';
-              }
-              ?>
             </form>
           </div>
         </div>
@@ -583,20 +619,16 @@ function sendEmailNotification($toEmail, $toName, $subject, $body)
                       <label for="message_content">Message:</label>
                     </div>
                     <div class="text-area">
-                      <textarea name="message_content" id="message_content" rows="4" cols="50"></textarea>
-                      <button type="submit">Send</button>
+                      <textarea name="message_content" id="message_content" rows="6" cols="172"></textarea>
                     </div>
+                    <button class="cancel-button" type="button" onclick="window.location.href='applicants.php'">Back</button>
+                    
+                    <button class="send-button" type="submit">Send</button> 
                   </div>
                 </div>
               </form>
             </div>
-
-            <?php
-            if (isset($success_message)) {
-              echo '<p style="color: green; text-align:center">' . $success_message . '</p>';
-            }
-            ?>
-            <button class="cancel-button" type="button" onclick="window.location.href='applicants.php'">Cancel</button>
+            
         </div>
     </form>
 

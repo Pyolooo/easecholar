@@ -1,3 +1,16 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600&display=swap');
+
+
+:root{
+	--primary: #6b59d3;
+	--secondary: #bfc0c0;
+	--white: #fff;
+	--text-clr: #5b6475;
+	--header-clr: #25273d;
+	--next-btn-hover: #8577d2;
+	--back-btn-hover: #8b8c8c;
+}
+
 *{
 	margin: 0;
 	padding: 0;
@@ -223,8 +236,6 @@ p{
     font-weight: bold;
 }
 .container .fields-info .form{
-	border: 1px solid #aaa;
-  border-radius: 5px;
 	padding: 5px;
 }
 .container .fields {
@@ -329,18 +340,6 @@ margin-right: 20px;
 .input-field input[type="date"]:valid{
     color: #333;
 }
-.container form button, .backBtn{
-  height: 40px;
-  padding: 0px 40px;
-  border: none;
-  outline: none;
-  color: #fff;
-  font-weight: 600;
-  border-radius: 3px;
-  background-color: #4070f4;
-  transition: all 0.3s linear;
-  cursor: pointer;
-}
 .container form .btnText{
     font-size: 14px;
     font-weight: 400;
@@ -391,9 +390,23 @@ align-items: start;
   margin-right: 5px;
 }
 
+
 .text-area{
   display: flex;
   align-items: end;
+}
+
+.send-button{
+  margin-top: 50px;
+  padding: 15px 60px;
+  border: none;
+  outline: none;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 600;
+  border-radius: 3px;
+  background-color: #4070f4;
+  cursor: pointer;
 }
 
 .cancel-button{
@@ -402,13 +415,13 @@ align-items: start;
   border: darkgreen;
   background-color: rgb(198, 197, 197);
   color: white;
-  width: 150px;
-  border-radius: 5px;
-  padding: 6px 10px;
-  font-size: 20px;
+  border-radius: 1px;
+  padding: 15px 60px;
+  font-size: 18px;
   font-weight: 600;
   transition: background-color 0.15s;
-  margin-top: 20px;
+  margin-top: 50px;
+  margin-right: 20px;
 }
 .cancel-button:hover{
   background-color: rgb(167, 167, 167);

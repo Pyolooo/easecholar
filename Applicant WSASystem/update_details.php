@@ -47,10 +47,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
                     $message = 'A new file has been uploaded by an applicant.';
                     $is_read = 'unread';
+                    $source = 'tbl_userapp';
     
-                    $sql = "INSERT INTO tbl_notifications (user_id, application_id, image, message, is_read, created_at) VALUES (?, ?, ?, ?, ?, ?)";
+                    $sql = "INSERT INTO tbl_notifications (user_id, application_id, image, message, is_read, source) VALUES (?, ?, ?, ?, ?, ?)";
                     $stmt = $dbConn->prepare($sql);
-                    $stmt->bind_param("iisssi", $user_id, $application_id, $userImage, $message, $is_read, $created_at);
+                    $stmt->bind_param("iissss", $user_id, $application_id, $userImage, $message, $is_read, $source);
     
                     if ($stmt->execute()) {
                         $successMessage = 'Details updated successfully';
@@ -89,6 +90,7 @@ if ($result->num_rows > 0) {
     $gender = $row['gender'];
     $email = $row['email'];
     $course = $row['course'];
+    $year_lvl = $row['year_lvl'];
     $mobile_num = $row['mobile_num'];
     $citizenship = $row['citizenship'];
     $barangay = $row['barangay'];
@@ -102,6 +104,8 @@ if ($result->num_rows > 0) {
     $mother_name = $row['mother_name'];
     $mother_address = $row['mother_address'];
     $mother_work = $row['mother_work'];
+    $gross_income = $row['gross_income'];
+    $num_siblings = $row['num_siblings'];
 } else {
     die('User details not found');
 }
@@ -180,9 +184,9 @@ if ($result->num_rows > 0) {
                                     <option value="Female" <?php if ($gender === 'Female') echo 'selected'; ?>>Female</option>
                                 </select>
                             </div>
-                        </div>
+                        
 
-                        <div class="select-input-field">
+                        
                             <div class="input-field">
                                 <label>Email</label>
                                 <input type="email" name="email" value="<?php echo $email; ?>" disabled>
@@ -191,7 +195,13 @@ if ($result->num_rows > 0) {
                                 <label>Mobile Number</label>
                                 <input type="number" name="mobile_num" value="<?php echo $mobile_num; ?>" disabled>
                             </div>
-                        </div>
+                            <div class="input-field">
+                                <label>Citizenship</label>
+                                <input type="text" name="citizenship" value="<?php echo $citizenship; ?>" disabled>
+                            </div>
+
+                            </div>
+                        
                         <div class="fields">
                             <div class="input-field">
                                 <label>School ID Number</label>
@@ -206,10 +216,11 @@ if ($result->num_rows > 0) {
                                 </select>
                             </div>
                             <div class="input-field">
-                                <label>Citizenship</label>
-                                <input type="text" name="citizenship" value="<?php echo $citizenship; ?>" disabled>
+                                <label>Year level</label>
+                                <input type="text" name="year_lvl" value="<?php echo $year_lvl; ?>" disabled>
                             </div>
                         </div>
+                        
                         <br>
                         <div class="input-field">
                             <h4 class="form-label">PERMANENT ADDRESS</h4>
@@ -255,6 +266,19 @@ if ($result->num_rows > 0) {
                     </div>
                 </div>
 
+                <hr>
+          <div class="select-input-field">
+                <div class="input-field">
+                <label>Total Gross Income</label>
+                <input type="number" id="email" name="gross_income" value="<?php echo $gross_income; ?>"disabled>
+              </div>
+              <div class="input-field">
+                <label>No. of Siblings in the family</label>
+                <input type="number" id="mobile_num" name="num_siblings"value="<?php echo $num_siblings; ?>" disabled>
+              </div>
+              </div>
+        
+
                 <h4 class="form-label">REQUIREMENTS UPLOADED</h4>
                 <div class="attachments-container">
                     <div class="files-column">
@@ -284,10 +308,9 @@ if ($result->num_rows > 0) {
     <?php
     $attachmentsExist = false;
 
-    // Fetch attachment files from the tbl_user_messages table based on user_id
-    $sqlAttachmentMessages = "SELECT attach_files FROM tbl_user_messages WHERE user_id = ?";
+    $sqlAttachmentMessages = "SELECT attach_files FROM tbl_user_messages WHERE user_id = ? AND application_id = ?";
     $stmtAttachmentMessages = $dbConn->prepare($sqlAttachmentMessages);
-    $stmtAttachmentMessages->bind_param("i", $user_id);
+    $stmtAttachmentMessages->bind_param("ii", $user_id, $application_id);
     $stmtAttachmentMessages->execute();
     $resultAttachmentMessages = $stmtAttachmentMessages->get_result();
 
@@ -296,7 +319,6 @@ if ($result->num_rows > 0) {
             $attach_files = $rowAttachment['attach_files'];
 
             if (!empty($attach_files)) {
-                // Display the attachments if they exist
                 $attachmentNames = explode(',', $attach_files);
                 foreach ($attachmentNames as $attachmentName) {
                     $attachmentPath = '../file_uploads/' . $attachmentName;
@@ -311,11 +333,9 @@ if ($result->num_rows > 0) {
         }
     }
 
-    // Fetch attachment files from the tbl_userapp table
     $attachments = $row['attachments'];
 
     if (!empty($attachments)) {
-        // Display the attachments from tbl_userapp if they exist
         $attachmentNames = explode(',', $attachments);
         foreach ($attachmentNames as $attachmentName) {
             $attachmentPath = '../file_uploads/' . $attachmentName;
@@ -354,7 +374,6 @@ if ($result->num_rows > 0) {
 
     </div>
 
-    <!-- Add this JavaScript code within your HTML file -->
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const form = document.querySelector('form');
@@ -378,8 +397,8 @@ if ($result->num_rows > 0) {
                 event.preventDefault();
                 Swal.fire({
                     icon: 'info',
-                    title: 'No changes made',
-                    text: 'Please update some data.',
+                    title: 'No file uploaded',
+                    text: 'Please select a file or photo.',
                     showConfirmButton: false,
                     timer: 2000 // Close the alert after 2 seconds
                 });

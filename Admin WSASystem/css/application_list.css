@@ -52,6 +52,7 @@ body {
 }
 
 
+
 /* SIDEBAR */
 #sidebar {
 	position: fixed;
@@ -89,7 +90,6 @@ body {
 	padding-top: 5px;
 	box-sizing: content-box;
 }
-
 #sidebar .brand img {
 	margin: 10px 1em 0 0;
 	width: 60px;
@@ -169,6 +169,15 @@ body {
 	min-width: calc(60px  - ((4px + 6px) * 2));
 	display: flex;
 	justify-content: center;
+}
+
+.admin-hub {
+	text-align: center;
+	flex: 0.7;
+	color: green;
+	font-size: 20px;
+	font-weight: 600px;
+	text-shadow: 0 0 1px black;
 }
 /* SIDEBAR */
 
@@ -362,7 +371,7 @@ nav .profile img {
 #content nav #switch-mode:checked + .switch-mode::before {
 	left: calc(100% - (25px - 4px) - 2px);
 }
-.admin-hub {
+.osa-hub {
 	text-align: center;
 	flex: 0.7;
 	color: green;
@@ -373,14 +382,11 @@ nav .profile img {
 .school-name{
 	margin-left: 30px;
 	font-weight: 600;
-	font-size: 20px;
+	font-size: x-large;
 	letter-spacing: 5px;
 	word-spacing: 5px;
-	color: green;
-	text-shadow: 0 0 2px darkgoldenrod;
-}
-.export-img{
-	width: 30px;
+	color: #066606;
+	text-shadow: 0 0 1px darkgoldenrod;
 }
 /* NAVBAR */
 
@@ -425,24 +431,85 @@ nav .profile img {
 	color: var(--blue);
 	pointer-events: unset;
 }
-#content main .head-title .btn-download {
-	height: 40px;
-	padding: 0 26px;
-	border-radius: 36px;
-	background: var(--blue);
-	color: var(--light);
+.export-container{
+	width: 30%;
 	display: flex;
-	justify-content: center;
 	align-items: center;
-	grid-gap: 10px;
-	font-weight: 600;
+	justify-content: space-evenly;
 }
+.export-img{
+	width: 30px;
+}
+
+#scholarshipSelect,#exportFormatSelect{
+	cursor: pointer;
+	border-radius: 5px;
+	padding: 3px 5px;
+}
+
+#exportButton{
+	cursor: pointer;
+	padding: 4px 5px;
+	border-radius: 3px;
+	border: none;
+	color: white;
+	background: #3c91e6;
+}
+.bxs-file-export:before {
+	content: "\eaa5";
+	color: white;
+}
+
 #content main .head-title .btn-download:hover{
 	opacity: 0.8;
+	color: rgb(51 106 19);
 }
 
+.pagination {
+	padding: 10px 0;
+	display: flex;
+	justify-content: end;
+}
 
+.pagination-button {
+  background-color: #007BFF; /* Background color */
+  color: #fff; /* Text color */
+  padding: 5px 10px; /* Padding */
+  border: none; /* Remove the button border */
+  border-radius: 4px; /* Add rounded corners */
+  cursor: pointer; /* Change the cursor to a pointer on hover */
+  margin: 0 2px; /* Add some margin between buttons */
+}
 
+.pagination-button:hover {
+  background-color: #d5d1defe; 
+}
+
+.pagination-button:disabled {
+  background-color: #d3d3d3; 
+  color: #7a7a7a; 
+  cursor: not-allowed; 
+}
+
+.pagination-button {
+  background-color: #8d8c90; 
+  color: #fff; 
+  padding: 5px 10px; 
+  border: none; 
+  border-radius: 4px; 
+  cursor: pointer; 
+  margin: 0 2px; 
+}
+
+.pagination-button:hover {
+  background-color: #d5d1defe; 
+}
+
+.pagination-button.active {
+  background-color: #d5d1defe; 
+  color: #fff; 
+  cursor: default; 
+}
 
 #content main .box-info {
 	display: grid;
@@ -503,7 +570,7 @@ nav .profile img {
 #content main .table-data > div {
 	border-radius: 20px;
 	background: var(--light);
-	padding: 24px;
+	padding: 24px 1px;
 	overflow-x: auto;
 }
 #content main .table-data .head {
@@ -542,9 +609,9 @@ nav .profile img {
 	padding: 16px 0;
 }
 #content main .table-data tbody a {
-	color: black;
-	font-size: 20px;
-	font-weight: 500;
+	color: #444;
+	font-size: 15px;
+	font-weight: 600;
   }
   
 #content main .table-data .order table tr td:first-child {
@@ -636,7 +703,9 @@ nav .profile img {
 	padding: 15px;
 	position: absolute;
 	top: 40px;
+	/* Adjust the distance from the notification icon as needed */
 	right: 0;
+	/* To align it with the notification icon */
 	display: none;
 }
 
@@ -701,16 +770,20 @@ option {
 	font-size: 15px;
 }
 
+/* Define CSS classes for grade status */
 .pending-grade {
 	color: orange;
+	/* Change the color to your desired indicator color */
 }
 
 .passed-grade {
 	color: green;
+	/* Change the color to your desired indicator color */
 }
 
 .failed-grade {
 	color: red;
+	/* Change the color to your desired indicator color */
 }
 .status-filter {
 display: flex;
@@ -729,25 +802,25 @@ border-top-left-radius: 10px;
 border-top-right-radius: 10px;
 }
 .pending-button{
-	background-color: #f7aa8a;
-	color: white;
-	}
-	.inreview-button{
-	background-color: #f6d872;
-	color: white;
-	}
-	.qualified-button{
-	background-color: #6dccaa;
-	color: white;
-	}
-	.accepted-button{
-	background-color: #61aa72;
-	color: white;
-	}
-	.rejected-button{
-	background-color: #ff7070;
-	color: white;
-	}
+background-color: #f7aa8a;
+color: white;
+}
+.inreview-button{
+background-color: #f6d872;
+color: white;
+}
+.qualified-button{
+background-color: #6dccaa;
+color: white;
+}
+.accepted-button{
+background-color: #61aa72;
+color: white;
+}
+.rejected-button{
+background-color: #ff7070;
+color: white;
+}
 
 .status-button.active {
 background-color: #d5d1defe;
@@ -755,6 +828,18 @@ color: black;
 border: none;
 padding: 5px 15px;
 }
+.view-link{
+	margin-left: 10px;
+  background-color: #d5d1defe;
+  border-radius: 5px;
+  padding: 5px 15px;
+  color: #444;
+  font-weight: 600;
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.30);
+}
+
+
+
 /* MAIN */
 /* CONTENT */
 
@@ -854,7 +939,6 @@ main.table {
 
 .table__header {
     width: 100%;
-    height: 10%;
     background-color: #fff4;
     padding: .8rem 1rem;
 
@@ -994,27 +1078,6 @@ tbody tr.hide td img {
     text-align: center;
 }
 
-.school-name{
-	margin-left: 30px;
-	font-weight: 600;
-	font-size: x-large;
-	letter-spacing: 5px;
-	word-spacing: 5px;
-	color: #066606;
-	text-shadow: 0 0 1px darkgoldenrod;
-}
-
-.view-link{
-  background-color: #d5d1defe;
-  border-radius: 5px;
-  padding: 5px 15px;
-  color: #444;
-  font-weight: 600;
-  box-shadow: 0 0 2px rgba(0, 0, 0, 0.30);
-}
-
-
-
 
 
 @media (max-width: 1000px) {
@@ -1056,80 +1119,4 @@ thead th.asc span.icon-arrow{
 
 thead th.active,tbody td.active {
     color: #6c00bd;
-}
-
-.export__file {
-    position: relative;
-}
-
-.export__file .export__file-btn {
-    display: inline-block;
-    width: 2rem;
-    height: 2rem;
-    background: #fff6 url(images/export.png) center / 80% no-repeat;
-    border-radius: 50%;
-    transition: .2s ease-in-out;
-}
-
-.export__file .export__file-btn:hover { 
-    background-color: #fff;
-    transform: scale(1.15);
-    cursor: pointer;
-}
-
-.export__file input {
-    display: none;
-}
-
-.export__file .export__file-options {
-    position: absolute;
-    right: 0;
-    
-    width: 12rem;
-    border-radius: .5rem;
-    overflow: hidden;
-    text-align: center;
-
-    opacity: 0;
-    transform: scale(.8);
-    transform-origin: top right;
-    
-    box-shadow: 0 .2rem .5rem #0004;
-    
-    transition: .2s;
-}
-
-.export__file input:checked + .export__file-options {
-    opacity: 1;
-    transform: scale(1);
-    z-index: 100;
-}
-
-.export__file .export__file-options label{
-    display: block;
-    width: 100%;
-    padding: .6rem 0;
-    background-color: #f2f2f2;
-    
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-
-    transition: .2s ease-in-out;
-}
-
-.export__file .export__file-options label:first-of-type{
-    padding: 1rem 0;
-    background-color: #86e49d !important;
-}
-
-.export__file .export__file-options label:hover{
-    transform: scale(1.05);
-    background-color: #fff;
-    cursor: pointer;
-}
-
-.export__file .export__file-options img{
-    width: 2rem;
-    height: auto;
 }

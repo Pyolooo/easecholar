@@ -484,7 +484,10 @@ td{
 }
 th{
 	text-align: left;
+	width: 200px;
+	font-size: 0.8rem;
 }
+
 .head-analytics{
 	width: 20px;
 }
@@ -584,8 +587,49 @@ th{
 
 .export-button-container{
 	display: flex;
-	justify-content: space-evenly;
+	align-items: center;
+	justify-content: flex-start;
 }
+
+#exportFormatSelect{
+	cursor: pointer;
+padding: 3px 10px;
+border-radius: 2px;
+border: 1px solid;
+margin-right: 10px;
+}
+
+#exportButton{
+cursor: pointer;
+padding: 3px 10px;
+border-radius: 5px;
+border: 1px solid;
+margin-right: 10px;
+background-color: #3c91e6;
+color: white;
+}
+
+
+.pagination{
+	display: flex;
+	margin-top: 15px;
+	margin-bottom: 0;
+	justify-content: center;
+	align-items: center;
+	font-size: .8rem;
+}
+
+#page-number, #applicants-page-number{
+	margin: 0 5px;
+}
+
+.hidden {
+	display: none;
+}
+
+
+
+
 
 
 
@@ -606,7 +650,7 @@ th{
 	overflow-x: auto;
 }
 #content main .table-data .head {
-	display: flex;
+	display: block;
 	align-items: center;
 	grid-gap: 16px;
 	margin-bottom: 24px;
@@ -662,7 +706,7 @@ th{
 	display: flex;
 	justify-content: center;
 }
-#content main .table-data .order table tr td p.status.pending {
+#content main .table-data .order table tr td p.status.Pending {
 	background: var(--orange);
 }
 

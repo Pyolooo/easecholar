@@ -48,9 +48,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $message = 'A new file has been uploaded by an applicant.';
                     $is_read = 'unread';
 
-                    $sql = "INSERT INTO tbl_notifications (user_id, application_id, image, message, is_read, created_at) VALUES (?, ?, ?, ?, ?, ?)";
+                    $sql = "INSERT INTO tbl_notifications (user_id, application_id, image, message, is_read) VALUES (?, ?, ?, ?, ?)";
                     $stmt = $dbConn->prepare($sql);
-                    $stmt->bind_param("iisssi", $user_id, $application_id, $userImage, $message, $is_read, $created_at);
+                    $stmt->bind_param("iisss", $user_id, $application_id, $userImage, $message, $is_read);
 
                     if ($stmt->execute()) {
                         $successMessage = 'Details updated successfully';
@@ -376,9 +376,9 @@ if ($result->num_rows > 0) {
                                 $attachmentsExist = false;
 
                                 // Fetch attachment files from the tbl_user_messages table based on user_id
-                                $sqlAttachmentMessages = "SELECT attach_files FROM tbl_user_messages WHERE user_id = ?";
+                                $sqlAttachmentMessages = "SELECT attach_files FROM tbl_user_messages WHERE user_id = ? AND application_id = ?";
                                 $stmtAttachmentMessages = $dbConn->prepare($sqlAttachmentMessages);
-                                $stmtAttachmentMessages->bind_param("i", $user_id);
+                                $stmtAttachmentMessages->bind_param("ii", $user_id, $application_id);
                                 $stmtAttachmentMessages->execute();
                                 $resultAttachmentMessages = $stmtAttachmentMessages->get_result();
 

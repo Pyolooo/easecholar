@@ -12,62 +12,45 @@ if (isset($_POST['submit'])) {
     $image_type = $_FILES['image']['type'];
     $maxImageSize = 1024 * 1024;
 
-    if (!strpos($student_num, "-")) {
-        $invalidStudentNumMessage = 'Student number must contain a "-" character (e.g., \'20-00022\').';
+    $query = mysqli_prepare($dbConn, "SELECT * FROM `tbl_user` WHERE email = ? OR student_num = ?");
+    mysqli_stmt_bind_param($query, "ss", $email, $student_num);
+    mysqli_stmt_execute($query);
+    $result = mysqli_stmt_get_result($query);
+
+    if (mysqli_num_rows($result) > 0) {
+        $userExistsMessage = 'Email or student number already exists!';
     } else {
-        $query = mysqli_prepare($dbConn, "SELECT * FROM `tbl_user` WHERE email = ? OR student_num = ?");
-        mysqli_stmt_bind_param($query, "ss", $email, $student_num);
-        mysqli_stmt_execute($query);
-        $result = mysqli_stmt_get_result($query);
+        // Move the default image assignment here, outside the 'else' block
+        $filename = 'default-avatar.png';
 
-        if (mysqli_num_rows($result) > 0) {
-            $userExistsMessage = 'Email or student number already exists!';
+        if (!empty($_FILES['image']['name'])) {
+            if (!in_array($image_type, array('image/jpeg', 'image/jpg', 'image/png'))) {
+                $imageTypeMessage = 'Only JPEG, JPG, and PNG images are allowed.';
+            } elseif ($image_size > $maxImageSize) {
+                $largeImageMessage = 'Image size is too large!';
+            } else {
+                $filename = uniqid() . '_' . $image;
+                $targetDirectory = $_SERVER['DOCUMENT_ROOT'] . '/EASE-CHOLAR/user_profiles/';
+                $targetPath = $targetDirectory . $filename;
 
-            if (!empty($_FILES['image']['name'])) {
-        if (!in_array($image_type, array('image/jpeg', 'image/jpg', 'image/png'))) {
-            $imageTypeMessage = 'Only JPEG, JPG, and PNG images are allowed.';
-        } elseif ($image_size > $maxImageSize) {
-            $largeImageMessage = 'Image size is too large!';
-        } else {
-            $filename = uniqid() . '_' . $image;
+                if (move_uploaded_file($image_tmp_name, $targetPath)) {
+                    if (file_exists($targetPath)) {
+                        $custom_id = 'ISU_' . sprintf("%03d", rand(1, 999));
+                        $insert = mysqli_prepare($dbConn, "INSERT INTO `tbl_user` (custom_id, full_name, student_num, email, password, image) VALUES(?, ?, ?, ?, ?, ?)");
+                        mysqli_stmt_bind_param($insert, "ssssss", $custom_id, $full_name, $student_num, $email, $password, $filename);
 
-            $targetDirectory = $_SERVER['DOCUMENT_ROOT'] . '/EASE-CHOLAR/user_profiles/';
-            $targetPath = $targetDirectory . $filename;
-
-            if (move_uploaded_file($image_tmp_name, $targetPath)) {
-                if (file_exists($targetPath)) {
-                    // Insert user data into the database with the selected image
-                    $custom_id = 'ISU_' . sprintf("%03d", rand(1, 999));
-                    $insert = mysqli_prepare($dbConn, "INSERT INTO `tbl_user` (custom_id, full_name, student_num, email, password, image) VALUES(?, ?, ?, ?, ?, ?)");
-                    mysqli_stmt_bind_param($insert, "ssssss", $custom_id, $full_name, $student_num, $email, $password, $filename);
-
-                    if (mysqli_stmt_execute($insert)) {
-                        $successMessage = 'Registered successfully!';
-                    } else {
-                        error_log("Error executing insert query: " . mysqli_error($dbConn)); // Log the SQL error
-                        $registrationFailedMessage = 'Registration failed!';
+                        if (mysqli_stmt_execute($insert)) {
+                            $successMessage = 'Registered successfully!';
+                        } else {
+                            error_log("Error executing insert query: " . mysqli_error($dbConn)); // Log the SQL error
+                            $registrationFailedMessage = 'Registration failed!';
+                        }
                     }
                 }
             }
         }
     }
-            } else {
-                // User did not select an image, use the default avatar
-                $filename = 'default-avatar.png'; // Set to the default avatar filename
-                // Insert user data into the database with the default image
-                $custom_id = 'ISU_' . sprintf("%03d", rand(1, 999));
-                $insert = mysqli_prepare($dbConn, "INSERT INTO `tbl_user` (custom_id, full_name, student_num, email, password, image) VALUES(?, ?, ?, ?, ?, ?)");
-                mysqli_stmt_bind_param($insert, "ssssss", $custom_id, $full_name, $student_num, $email, $password, $filename);
-
-                if (mysqli_stmt_execute($insert)) {
-                    $successMessage = 'Registered successfully!';
-                } else {
-                    error_log("Error executing insert query: " . mysqli_error($dbConn)); // Log the SQL error
-                    $registrationFailedMessage = 'Registration failed!';
-                }
-            }
-        }
-    }
+}
 ?>
 
 
@@ -287,6 +270,21 @@ if (isset($_POST['submit'])) {
                 passwordInput.type = "password";
             }
         });
+
+        document.addEventListener('DOMContentLoaded', function () {
+        // Function to format student_num input with a dash after two digits and enforce 7 digits
+        function formatStudentNumInput() {
+            var studentNumInput = document.getElementById('student_num');
+            var inputValue = studentNumInput.value.replace(/[^0-9]/g, ''); // Remove non-digit characters
+            var formattedValue = inputValue.replace(/^(\d{2})?(\d{5})?$/, '$1-$2'); // Add dash after two digits and enforce 7 digits
+            studentNumInput.value = formattedValue;
+        }
+
+        // Add event listeners for input and blur events to format the input dynamically
+        var studentNumInput = document.getElementById('student_num');
+        studentNumInput.addEventListener('input', formatStudentNumInput);
+        studentNumInput.addEventListener('blur', formatStudentNumInput);
+    });
     </script>
 
 </body>

@@ -200,7 +200,7 @@ if ($rowUserInfo = mysqli_fetch_assoc($resultUserInfo)) {
                             echo '<span class="num" style="display: none;">' . $totalNotificationCount . '</span>';
                         }
                         ?>
-</div>
+                    </div>
 
 
                     <?php
@@ -329,7 +329,6 @@ if ($rowUserInfo = mysqli_fetch_assoc($resultUserInfo)) {
                     </ul>
                 </div>
             </div>
-        </main>
 
         <?php
         function formatDateSubmitted($dbDateSubmitted)
@@ -339,7 +338,8 @@ if ($rowUserInfo = mysqli_fetch_assoc($resultUserInfo)) {
         }
         ?>
 
-<main class="table">
+            <div class="table-data">
+                <div class="order">
             <section class="table__header">
                 <h3 class="application-label">Application Status</h3>
                 <div class="search-engine">
@@ -414,6 +414,7 @@ if ($rowUserInfo = mysqli_fetch_assoc($resultUserInfo)) {
 
                 </table>
             </section>
+            </div>
         </main>
         <!-- MAIN -->
     </section>

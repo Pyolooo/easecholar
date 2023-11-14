@@ -193,6 +193,12 @@ body {
 	display: none;
 }
 
+.scrollable-notifications {
+	max-height: 300px;
+	/* Set your desired max height */
+	overflow-y: auto;
+}
+
 .dropdown .notify_item {
 	display: flex;
 	align-items: center;
@@ -466,6 +472,17 @@ nav .profile img {
 #content nav #switch-mode:checked + .switch-mode::before {
 	left: calc(100% - (25px - 4px) - 2px);
 }
+
+.notif-label {
+	display: flex;
+	align-items: center;
+	font-size: 18px;
+	border-bottom: 1px solid grey;
+	margin-bottom: 20px;
+	padding: 10px;
+	font-weight: bold;
+	color: rgba(0, 0, 0, 0.65);
+}
 /* NAVBAR */
 
 
@@ -650,7 +667,7 @@ nav .profile img {
 	display: flex;
 	justify-content: center;
 }
-#content main .table-data .order table tr td p.status.pending {
+#content main .table-data .order table tr td p.status.Pending {
 	background: var(--orange);
 }
 
@@ -702,6 +719,46 @@ nav .profile img {
 }
 #content main .table-data .todo .todo-list li:last-child {
 	margin-bottom: 0;
+}
+
+.pagination{
+	display: flex;
+	margin-top: 15px;
+	margin-bottom: 0;
+	justify-content: center;
+	align-items: center;
+	font-size: .8rem;
+}
+
+#page-number, #applicants-page-number{
+	margin: 0 5px;
+}
+
+#exportFormatSelect{
+cursor: pointer;
+padding: 2px 10px;
+border-radius: 2px;
+border: 1px solid;
+margin-right: 10px;
+}
+
+#exportButton{
+cursor: pointer;
+padding: 3px 10px;
+border-radius: 5px;
+border: 1px solid;
+margin-right: 10px;
+background-color: #3c91e6;
+color: white;
+}
+
+.bxs-file-export:before {
+	content: "\eaa5";
+	color: white;
+}
+
+.hidden {
+	display: none;
 }
 /* MAIN */
 /* CONTENT */

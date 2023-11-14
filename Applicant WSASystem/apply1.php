@@ -190,6 +190,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $errorMessage = "Failed to insert application.";
     } else {
 
+      $application_id = $stmt->insert_id;
       $sql = "SELECT image FROM tbl_user WHERE user_id = ?";
       $stmt = $dbConn->prepare($sql);
       $stmt->bind_param("s", $user_id);
@@ -203,11 +204,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $userImage = 'default.jpg';
       }
       $is_read = 'unread';
+      $source = 'tbl_scholarship_1_form';
+
 
       $notificationMessage = "New application has been submitted";
-      $sql = "INSERT INTO tbl_notifications (user_id, message, image, is_read) VALUES (?, ?, ?, ?)";
+      $sql = "INSERT INTO tbl_notifications (user_id, message, image, is_read, source, application_id) VALUES (?, ?, ?, ?, ?, ?)";
       $stmt = $dbConn->prepare($sql);
-      $stmt->bind_param("ssss", $user_id, $notificationMessage, $userImage, $is_read);
+      $stmt->bind_param("issssi", $user_id, $notificationMessage, $userImage, $is_read, $source, $application_id);
       $stmt->execute();
 
       $successMessage = "Application submitted successfully!";
@@ -381,7 +384,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="fields">
               <div class="input-field">
                 <label>School ID Number</label>
-                <input type="number" id="id_number" name="id_number" placeholder="2XXXX21" value="<?php echo $id_number; ?>" required>
+                <input type="text" id="id_number" name="id_number" placeholder="2XXXX21" value="<?php echo $id_number; ?>" oninput="formatIdNumber(this)" required>
                 <div class="validation-message" id="id_number-error"></div>
               </div>
 
@@ -510,7 +513,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
             <div class="input-field">
               <label>Year Graduated</label>
-              <input type="number" id="prim_year_grad" name="prim_year_grad" placeholder="Primary year graduated" value="<?php echo $prim_year_grad; ?>" required>
+              <input type="text" id="prim_year_grad" name="prim_year_grad" placeholder="YYYY or YYYY-YYYY" value="<?php echo $prim_year_grad; ?>" pattern="\d{4}(-\d{4})?" required>
+
               <div class="validation-message" id="prim_year_grad-error"></div>
             </div>
 
@@ -553,7 +557,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
             <div class="btns_wrap">
               <div class="common_btns form_3_btns">
-                <button type="button" class="btn_back"><span class="icon"><ion-icon name="arrow-back-sharp"></ion-icon></span>Back</button>
+                <button type="button" onclick="href" class="btn_back">Back</button>
                 <button type="submit" class="btn_done" name="submit">Done</button>
               </div>
             </div>
@@ -565,52 +569,140 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   </div>
   <script>
+        function formatIdNumber(input) {
+            let formattedValue = input.value.replace(/-/g, '');
+
+            if (formattedValue.length >= 2) {
+                formattedValue = formattedValue.slice(0, 2) + '-' + formattedValue.slice(2);
+            }
+            input.value = formattedValue;
+        }
+
     document.addEventListener("DOMContentLoaded", function() {
       const form = document.querySelector("form");
+      const lastNameInput = form.last_name;
+      const firstNameInput = form.first_name;
+      const middleNameInput = form.middle_name;
+      const pobInput = form.pob;
+      const religionInput = form.religion;
+      const provinceInput = form.province;
+      const townCityInput = form.town_city;
+      const barangayInput = form.barangay;
+      const zipCodeInput = form.zip_code;
+      const citizenshipInput = form.citizenship;
+      const fatherLNameInput = form.father_lname;
+      const fatherFNameInput = form.father_fname;
+      const fatherMNameInput = form.father_mname;
+      const fatherWorkInput = form.father_work;
+      const motherSNameInput = form.mother_sname;
+      const motherFNameInput = form.mother_fname;
+      const motherMNameInput = form.mother_mname;
+      const motherWorkInput = form.mother_work;
+      const grossIncomeInput = form.gross_income;
+      const noSiblingsInput = form.num_siblings;
+      const courseDropdown = document.getElementById('course');
+      const yearLevelDropdown = document.getElementById('year_lvl');
       const doneButton = document.querySelector(".btn_done");
+
+      courseDropdown.addEventListener('change', function() {
+                document.getElementById("course-error").textContent = '';
+
+                const selectedCourse = courseDropdown.value;
+
+                yearLevelDropdown.innerHTML = '<option disabled selected>Select year</option>';
+
+                if (selectedCourse === 'BSA') {
+                    yearLevelDropdown.innerHTML += '<option value="1st">1st Year</option>';
+                    yearLevelDropdown.innerHTML += '<option value="2nd">2nd Year</option>';
+                } else if (selectedCourse === 'BSIT') {
+                    yearLevelDropdown.innerHTML += '<option value="1st">1st Year</option>';
+                    yearLevelDropdown.innerHTML += '<option value="2nd">2nd Year</option>';
+                    yearLevelDropdown.innerHTML += '<option value="3rd">3rd Year</option>';
+                    yearLevelDropdown.innerHTML += '<option value="4th">4th Year</option>';
+                }
+            });
+
+            yearLevelDropdown.addEventListener('change', function() {
+                const selectedYear = yearLevelDropdown.value;
+                const year_lvl_error = document.getElementById('year_lvl-error');
+
+                if (selectedYear === 'Select year') {
+                    year_lvl_error.textContent = 'Please select a year';
+                    isValid = false;
+                } else {
+                    year_lvl_error.textContent = '';
+                }
+            });
 
       doneButton.addEventListener("click", function(event) {
         let isValid = true;
 
-        // Reset validation messages
         const validationMessages = document.querySelectorAll(".validation-message");
         validationMessages.forEach(function(message) {
           message.textContent = "";
         });
 
-        // Add validation logic here for each field
-        if (form.last_name.value.trim() === "") {
+
+        if (lastNameInput.value.trim() === "") {
           isValid = false;
           document.getElementById("last_name-error").textContent = "Last Name is required.";
-        }
-        if (form.first_name.value.trim() === "") {
-          isValid = false;
-          document.getElementById("first_name-error").textContent = "First Name is required.";
-        }
-        if (form.middle_name.value.trim() === "") {
-          isValid = false;
-          document.getElementById("middle_name-error").textContent = 'Middle Name is required';
+
+          lastNameInput.addEventListener('input', function() {
+            document.getElementById("last_name-error").textContent = "";
+          });
         }
 
+        if (firstNameInput.value.trim() === "") {
+          isValid = false;
+          document.getElementById("first_name-error").textContent = "First Name is required.";
+
+          firstNameInput.addEventListener('input', function() {
+            document.getElementById("first_name-error").textContent = "";
+          });
+        }
+
+        if (middleNameInput.value.trim() === "") {
+          isValid = false;
+          document.getElementById("middle_name-error").textContent = 'Middle Name is required';
+
+          middleNameInput.addEventListener('input', function() {
+            document.getElementById("middle_name-error").textContent = "";
+          });
+        }
+
+        // Add validation logic for date of birth
         var dobInput = document.querySelector('input[name="dob"]');
         var dobError = document.getElementById('date_birth-error');
 
-        var selectedDate = new Date(dobInput.value);
-        var currentDate = new Date();
+        function validateDateOfBirth() {
+          var selectedDate = new Date(dobInput.value);
+          var currentDate = new Date();
 
-        if (isNaN(selectedDate)) {
-          dobError.textContent = 'Please enter a valid date of birth.';
-          isValid = false;
-        } else if (selectedDate > currentDate) {
-          dobError.textContent = 'Date of birth cannot be in the future.';
-          isValid = false;
-        } else {
-          dobError.textContent = '';
+          if (isNaN(selectedDate)) {
+            dobError.textContent = 'Please enter a valid date of birth.';
+            isValid = false;
+          } else if (selectedDate > currentDate) {
+            dobError.textContent = 'Date of birth cannot be in the future.';
+            isValid = false;
+          } else {
+            dobError.textContent = '';
+          }
         }
 
-        if (form.pob.value.trim() === "") {
+        validateDateOfBirth();
+
+        dobInput.addEventListener('input', function() {
+          validateDateOfBirth();
+        });
+
+
+        if (pobInput.value.trim() === "") {
           isValid = false;
           document.getElementById("pob-error").textContent = "Place of birth is required.";
+
+          pobInput.addEventListener('input', function() {
+            document.getElementById("pob-error").textContent = "";
+          });
         }
 
         if (form.age.value.trim() === "") {
@@ -618,10 +710,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           document.getElementById("age-error").textContent = "Age is required.";
         }
 
-        if (form.citizenship.value.trim() === "") {
-          isValid = false;
-          document.getElementById("citizenship-error").textContent = "Citizenship is required.";
-        }
+        if (citizenshipInput.value.trim() === "") {
+                    isValid = false;
+                    document.getElementById("citizenship-error").textContent = "Citizenship is required.";
+
+                    citizenshipInput.addEventListener('input', function() {
+                        document.getElementById("citizenship-error").textContent = "";
+                    });
+                }
 
 
         var civil_status = document.getElementById('civil_status');
@@ -635,67 +731,133 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           civil_status_error.textContent = '';
         }
 
+        // Add validation logic for gender
         var gender = document.getElementById('gender');
         var gender_error = document.getElementById('gender-error');
-        var selectedGender = gender.value;
 
-        if (selectedGender === 'Select sex') {
-          gender_error.textContent = 'Please select a gender.';
-          isValid = false;
-        } else {
-          gender_error.textContent = '';
+        function validateGender() {
+          var selectedGender = gender.value;
+
+          if (selectedGender === 'Select sex') {
+            gender_error.textContent = 'Please select a gender';
+            isValid = false;
+          } else {
+            gender_error.textContent = '';
+          }
         }
 
+        // Initial validation
+        validateGender();
+
+        gender.addEventListener('change', function() {
+          validateGender();
+        });
+
+
+        // Add validation logic for email
         var emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+        var email = form.email; // Assuming form.email is the input element
+
+        function validateEmail() {
+          if (email.value.trim() === '') {
+            document.getElementById("email-error").textContent = 'Email is required';
+            isValid = false;
+          } else if (!emailRegex.test(email.value.trim())) {
+            document.getElementById("email-error").textContent = 'Please enter a valid email address';
+            isValid = false;
+          } else {
+            document.getElementById("email-error").textContent = ''; // Clear the validation message
+          }
+        }
+
+        // Initial validation
+        validateEmail();
+
+        // Add an event listener to clear the validation message when the user types
+        email.addEventListener('input', function() {
+          validateEmail();
+        });
+
         var mobileNumRegex = /^[0-9]{11}$/;
-        var idNumberRegex = /^[0-9]{7}$/;
+        var mobileNum = form.mobile_num;
 
-        if (email.value.trim() === '') {
-          document.getElementById("email-error").textContent = 'Email is required';
-          isValid = false;
-        } else if (!emailRegex.test(email.value.trim())) {
-          document.getElementById("email-error").textContent = 'Please enter a valid email address';
-          isValid = false;
+        function validateMobileNum() {
+          if (form.mobile_num.value.trim() === '') {
+            document.getElementById("mobile_num-error").textContent = "Mobile number is required.";
+            isValid = false;
+          } else if (!mobileNumRegex.test(mobile_num.value.trim())) {
+            document.getElementById("mobile_num-error").textContent = 'Please enter a valid 11-digit mobile number';
+            isValid = false;
+          } else {
+            document.getElementById("mobile_num-error").textContent = '';
+          }
         }
 
-        if (form.mobile_num.value.trim() === '') {
-          document.getElementById("mobile_num-error").textContent = "Mobile number is required.";
-          isValid = false;
-        } else if (!mobileNumRegex.test(mobile_num.value.trim())) {
-          document.getElementById("mobile_num-error").textContent = 'Please enter a valid 11-digit mobile number';
-          isValid = false;
-        }
+        validateMobileNum();
 
-        if (form.religion.value.trim() === "") {
+        // Add an event listener to clear the validation message when the user types
+        mobileNum.addEventListener('input', function() {
+          validateMobileNum();
+        });
+
+        if (religionInput.value.trim() === "") {
           isValid = false;
           document.getElementById("religion-error").textContent = "Religion is required.";
+
+          religionInput.addEventListener('input', function() {
+            document.getElementById("religion-error").textContent = "";
+          });
         }
+
 
         var course = document.getElementById('course');
-        var course_error = document.getElementById('course-error');
-        var selectedCourse = course.value;
+                var course_error = document.getElementById('course-error');
+                var selectedCourse = course.value;
 
-        if (selectedCourse === 'Select course') {
-          document.getElementById("course-error").textContent = 'Please select a course';
-          isValid = false;
-        }
+                if (selectedCourse === 'Select course') {
+                    document.getElementById("course-error").textContent = 'Please select a course';
+                    isValid = false;
+                }
 
-        var year_lvl = document.getElementById('year_lvl');
-        var year_lvl_error = document.getElementById('year_lvl-error');
-        var selectedYearLevel = year_lvl.value;
+                const year_lvl = document.getElementById('year_lvl');
+                const year_lvl_error = document.getElementById('year_lvl-error');
+                const selectedYear = year_lvl.value;
 
-        if (selectedYearLevel === 'Select year level') {
-          document.getElementById("year_lvl-error").textContent = 'Please select your year level';
-          isValid = false;
-        }
+                if (selectedYear === 'Select year') {
+                    year_lvl_error.textContent = 'Please select a year';
+                    isValid = false;
+                } else {
+                    year_lvl_error.textContent = ''; // Clear the validation message
+                }
 
-        if (id_number.value.trim() === '') {
-          document.getElementById("id_number-error").textContent = 'Id Number is required';
-          isValid = false;
-        } else if (!idNumberRegex.test(id_number.value.trim())) {
-          document.getElementById("id_number-error").textContent = 'Please enter a valid 7-digit ID number';
-          isValid = false;
-        }
+
+
+          var idNumberRegex = /^\d+-\d{5}$/;
+                // Initial validation when the form is submitted or loaded
+                if (id_number.value.trim() === '') {
+                    document.getElementById("id_number-error").textContent = 'ID Number is required';
+                    isValid = false;
+                } else if (!idNumberRegex.test(id_number.value.trim())) {
+                    document.getElementById("id_number-error").textContent = 'Please enter a valid ID number in the format XX-XXXX';
+                    isValid = false;
+                }
+
+                // Attach the input event listener
+                document.getElementById('id_number').addEventListener('input', function() {
+                    formatIdNumber(this); // Format the ID number
+
+                    // Validate the formatted ID number
+                    if (this.value.trim() === '') {
+                        document.getElementById("id_number-error").textContent = 'ID Number is required';
+                        isValid = false;
+                    } else if (!idNumberRegex.test(this.value.trim())) {
+                        document.getElementById("id_number-error").textContent = 'Please enter a valid ID number in the format XX-XXXX';
+                        isValid = false;
+                    } else {
+                        document.getElementById("id_number-error").textContent = ''; // Clear the validation message
+                        isValid = true; // Update isValid when the input is valid
+                    }
+                });
 
 
         if (form.region.value.trim() === "") {
@@ -723,69 +885,122 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           document.getElementById("zip_code-error").textContent = "Zip code is required.";
         }
 
-        if (form.father_lname.value.trim() === "") {
+        if (fatherLNameInput.value.trim() === "") {
           isValid = false;
           document.getElementById("father_lname-error").textContent = "Father' lastname is required.";
+        
+          fatherLNameInput.addEventListener('input', function() {
+            document.getElementById("father_lname-error").textContent = "";
+          });
         }
 
-        if (form.father_fname.value.trim() === "") {
+        if (fatherFNameInput.value.trim() === "") {
           isValid = false;
           document.getElementById("father_fname-error").textContent = "Father' firstname is required.";
+        
+          fatherFNameInput.addEventListener('input', function() {
+            document.getElementById("father_fname-error").textContent = "";
+          });
         }
 
-        if (form.father_mname.value.trim() === "") {
+        if (fatherMNameInput.value.trim() === "") {
           isValid = false;
           document.getElementById("father_mname-error").textContent = "Father' middlename is required.";
+        
+          fatherMNameInput.addEventListener('input', function() {
+            document.getElementById("father_mname-error").textContent = "";
+          });
         }
 
-        if (form.father_work.value.trim() === "") {
+        if (fatherWorkInput.value.trim() === "") {
           isValid = false;
           document.getElementById("father_work-error").textContent = "Occupation is required.";
+        
+          fatherWorkInput.addEventListener('input', function() {
+            document.getElementById("father_work-error").textContent = "";
+          });
         }
 
-        if (form.mother_sname.value.trim() === "") {
+        if (motherSNameInput.value.trim() === "") {
           isValid = false;
           document.getElementById("mother_sname-error").textContent = "Mother's surname is required.";
+        
+          motherSNameInput.addEventListener('input', function() {
+            document.getElementById("mother_sname-error").textContent = "";
+          });
         }
 
-        if (form.mother_fname.value.trim() === "") {
+        if (motherFNameInput.value.trim() === "") {
           isValid = false;
           document.getElementById("mother_fname-error").textContent = "Mother's firstname is required.";
+        
+          motherFNameInput.addEventListener('input', function() {
+            document.getElementById("mother_fname-error").textContent = "";
+          });
         }
 
-        if (form.mother_mname.value.trim() === "") {
+        if (motherMNameInput.value.trim() === "") {
           isValid = false;
           document.getElementById("mother_mname-error").textContent = "Mother's middlename is required.";
+        
+          motherMNameInput.addEventListener('input', function() {
+            document.getElementById("mother_mname-error").textContent = "";
+          });
         }
 
-        if (form.mother_work.value.trim() === "") {
+        if (motherWorkInput.value.trim() === "") {
           isValid = false;
           document.getElementById("mother_work-error").textContent = "Occupation is required.";
+        
+          motherWorkInput.addEventListener('input', function() {
+            document.getElementById("mother_work-error").textContent = "";
+          });
         }
 
         if (form.primary_school.value.trim() === "") {
           isValid = false;
           document.getElementById("primary_school-error").textContent = "Primary School is required.";
+        
+          motherWorkInput.addEventListener('input', function() {
+            document.getElementById("mother_work-error").textContent = "";
+          });
         }
 
         if (form.prim_year_grad.value.trim() === "") {
-          isValid = false;
-          document.getElementById("prim_year_grad-error").textContent = "Primary Year Graduated is required.";
+    isValid = false;
+    document.getElementById("prim_year_grad-error").textContent = "Please enter your Primary Year Graduated.";
+
+    motherWorkInput.addEventListener('input', function() {
+            document.getElementById("mother_work-error").textContent = "";
+          });
         }
+ 
 
         if (form.secondary_school.value.trim() === "") {
           isValid = false;
           document.getElementById("secondary_school-error").textContent = "Secondary School is required.";
+        
+          motherWorkInput.addEventListener('input', function() {
+            document.getElementById("mother_work-error").textContent = "";
+          });
         }
 
         if (form.sec_year_grad.value.trim() === "") {
           isValid = false;
           document.getElementById("sec_year_grad-error").textContent = "Secondary Year Graduated is required.";
+        
+          motherWorkInput.addEventListener('input', function() {
+            document.getElementById("mother_work-error").textContent = "";
+          });
         }
 
         if (form.tertiary_school.value.trim() === "") {
           isValid = false;
           document.getElementById("tertiary_school-error").textContent = "Tertiary School is required.";
+        
+          motherWorkInput.addEventListener('input', function() {
+            document.getElementById("mother_work-error").textContent = "";
+          });
         }
 
         if (form.ter_year_grad.value.trim() === "") {

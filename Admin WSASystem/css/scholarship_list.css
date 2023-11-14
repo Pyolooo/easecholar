@@ -392,6 +392,80 @@ nav .profile img {
 	color: #066606;
 	text-shadow: 0 0 1px darkgoldenrod;
 }
+
+
+.notification .bxs-bell {
+	cursor: pointer;
+}
+
+.dropdown {
+	width: 350px;
+	height: auto;
+	background: whitesmoke;
+	border-radius: 5px;
+	box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.125);
+	margin: 15px auto 0;
+	padding: 15px;
+	position: absolute;
+	top: 40px;
+	/* Adjust the distance from the notification icon as needed */
+	right: 0;
+	/* To align it with the notification icon */
+	display: none;
+}
+
+.dropdown .notify_item {
+	display: flex;
+	align-items: center;
+	padding: 10px 0;
+	border-bottom: 1px solid #dbdaff;
+}
+
+.dropdown .notify_item:last-child {
+	border-bottom: 0px;
+}
+
+.dropdown .notify_item .notify_img {
+	margin-right: 15px;
+}
+
+.dropdown .notify_item .notify_info p {
+	margin-bottom: 5px;
+}
+
+.dropdown .notify_item .notify_info p span {
+	color: #605dff;
+	margin-left: 5px;
+}
+
+.dropdown .notify_item .notify_info .notify_time {
+	color: #c5c5e6;
+	font-size: 12px;
+}
+
+.dropdown:before {
+	content: "";
+	position: absolute;
+	top: -30px;
+	left: 50%;
+	transform: translateX(-50%);
+	border: 15px solid;
+	border-color: transparent transparent #fff transparent;
+}
+
+.dropdown.active {
+	display: block;
+}
+.scholarship-deadline{
+	font-size: 15px;
+	color:black;
+}
+/* In your CSS file */
+.scholarship-status {
+color: green; /* Change to your desired color */
+
+}
+
 /* NAVBAR */
 
 
@@ -676,6 +750,16 @@ color: green;
 
 .closed-scholarship .scholarship-status {
 	color: red; 
+}
+
+.scholarship-container{
+	display: flex;
+}
+
+.scholarship-logo{
+width: 60px;
+border-radius: 30px;
+margin-right: 20px;
 }
 
 

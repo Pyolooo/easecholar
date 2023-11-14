@@ -431,24 +431,24 @@ nav .profile img {
 .export-img{
 	width: 30px;
 }
-#scholarshipSelect{
-	border-radius: 5px;
-	padding: 3px 5px;
-}
 
-#exportFormatSelect{
+#scholarshipSelect,#exportFormatSelect{
+	cursor: pointer;
 	border-radius: 5px;
 	padding: 3px 5px;
 }
 
 #exportButton{
-	padding: 3px 5px;
+	cursor: pointer;
+	padding: 4px 5px;
 	border-radius: 3px;
-	border: 1px solid darkgray;
+	border: none;
+	color: white;
+	background: #3c91e6;
 }
 .bxs-file-export:before {
 	content: "\eaa5";
-	color: darkgreen;
+	color: white;
 }
 
 #content main .head-title .btn-download:hover{
@@ -473,39 +473,34 @@ nav .profile img {
 }
 
 .pagination-button:hover {
-  background-color: #0056b3; /* Darker background color on hover */
+  background-color: #d5d1defe; 
 }
 
 .pagination-button:disabled {
-  background-color: #d3d3d3; /* Disabled button background color */
-  color: #7a7a7a; /* Disabled button text color */
-  cursor: not-allowed; /* Set cursor to not-allowed for disabled button */
+  background-color: #d3d3d3; 
+  color: #7a7a7a; 
+  cursor: not-allowed; 
 }
 
 .pagination-button {
-  background-color: #007BFF; /* Background color */
-  color: #fff; /* Text color */
-  padding: 5px 10px; /* Padding */
-  border: none; /* Remove the button border */
-  border-radius: 4px; /* Add rounded corners */
-  cursor: pointer; /* Change the cursor to a pointer on hover */
-  margin: 0 2px; /* Add some margin between buttons */
+  background-color: #8d8c90; 
+  color: #fff; 
+  padding: 5px 10px; 
+  border: none; 
+  border-radius: 4px; 
+  cursor: pointer; 
+  margin: 0 2px; 
 }
 
 .pagination-button:hover {
-  background-color: #0056b3; /* Darker background color on hover */
+  background-color: #d5d1defe; 
 }
 
 .pagination-button.active {
-  background-color: #17a2b8; /* Active button background color */
-  color: #fff; /* Active button text color */
-  cursor: default; /* Default cursor for active button */
+  background-color: #d5d1defe; 
+  color: #fff; 
+  cursor: default; 
 }
-
-
-
-
-
 
 #content main .box-info {
 	display: grid;
@@ -566,7 +561,7 @@ nav .profile img {
 #content main .table-data > div {
 	border-radius: 20px;
 	background: var(--light);
-	padding: 24px;
+	padding: 24px 1px;
 	overflow-x: auto;
 }
 #content main .table-data .head {
@@ -605,9 +600,9 @@ nav .profile img {
 	padding: 16px 0;
 }
 #content main .table-data tbody a {
-	color: black;
-	font-size: 20px;
-	font-weight: 500;
+	color: #444;
+	font-size: 15px;
+	font-weight: 600;
   }
   
 #content main .table-data .order table tr td:first-child {
@@ -703,6 +698,23 @@ nav .profile img {
 	right: 0;
 	/* To align it with the notification icon */
 	display: none;
+}
+
+.notif-label {
+	display: flex;
+	align-items: center;
+	font-size: 18px;
+	border-bottom: 1px solid grey;
+	margin-bottom: 20px;
+	padding: 10px;
+	font-weight: bold;
+	color: rgba(0, 0, 0, 0.65);
+}
+
+.scrollable-notifications {
+	max-height: 300px;
+	/* Set your desired max height */
+	overflow-y: auto;
 }
 
 .dropdown .notify_item {
@@ -825,6 +837,7 @@ border: none;
 padding: 5px 15px;
 }
 .view-link{
+	margin-left: 10px;
   background-color: #d5d1defe;
   border-radius: 5px;
   padding: 5px 15px;
@@ -934,7 +947,6 @@ main.table {
 
 .table__header {
     width: 100%;
-    height: 10%;
     background-color: #fff4;
     padding: .8rem 1rem;
 
@@ -1132,80 +1144,4 @@ thead th.asc span.icon-arrow{
 
 thead th.active,tbody td.active {
     color: #6c00bd;
-}
-
-.export__file {
-    position: relative;
-}
-
-.export__file .export__file-btn {
-    display: inline-block;
-    width: 2rem;
-    height: 2rem;
-    background: #fff6 url(images/export.png) center / 80% no-repeat;
-    border-radius: 50%;
-    transition: .2s ease-in-out;
-}
-
-.export__file .export__file-btn:hover { 
-    background-color: #fff;
-    transform: scale(1.15);
-    cursor: pointer;
-}
-
-.export__file input {
-    display: none;
-}
-
-.export__file .export__file-options {
-    position: absolute;
-    right: 0;
-    
-    width: 12rem;
-    border-radius: .5rem;
-    overflow: hidden;
-    text-align: center;
-
-    opacity: 0;
-    transform: scale(.8);
-    transform-origin: top right;
-    
-    box-shadow: 0 .2rem .5rem #0004;
-    
-    transition: .2s;
-}
-
-.export__file input:checked + .export__file-options {
-    opacity: 1;
-    transform: scale(1);
-    z-index: 100;
-}
-
-.export__file .export__file-options label{
-    display: block;
-    width: 100%;
-    padding: .6rem 0;
-    background-color: #f2f2f2;
-    
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-
-    transition: .2s ease-in-out;
-}
-
-.export__file .export__file-options label:first-of-type{
-    padding: 1rem 0;
-    background-color: #86e49d !important;
-}
-
-.export__file .export__file-options label:hover{
-    transform: scale(1.05);
-    background-color: #fff;
-    cursor: pointer;
-}
-
-.export__file .export__file-options img{
-    width: 2rem;
-    height: auto;
 }

@@ -50,6 +50,26 @@ $select = mysqli_query($dbConn, "
 ") or die(mysqli_error($dbConn));
 
 
+$sql = "SELECT s.scholarship, 
+        (COUNT(ua.user_id) + COUNT(sf.user_id)) AS num_applicants
+        FROM tbl_scholarship s
+        LEFT JOIN tbl_userapp ua ON s.scholarship_id = ua.scholarship_id
+        LEFT JOIN tbl_scholarship_1_form sf ON s.scholarship_id = sf.scholarship_id
+        GROUP BY s.scholarship";
+
+$listResult = mysqli_query($dbConn, $sql);
+
+
+if (!$listResult) {
+    echo 'Error executing the query: ' . mysqli_error($dbConn);
+    die(mysqli_error($dbConn));
+} else {
+    $data = array();
+
+    while ($row = mysqli_fetch_assoc($listResult)) {
+        $data[] = $row;
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -67,6 +87,8 @@ $select = mysqli_query($dbConn, "
     <link rel="stylesheet" href="css/style.css">
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.18/dist/sweetalert2.all.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+
 
     <title>OSAModule</title>
 
@@ -156,7 +178,6 @@ $select = mysqli_query($dbConn, "
                         $notificationCount = $notificationCountData['count'];
 
 
-                        // Show the notification count only if there are new messages
                         if ($notificationCount > 0) {
                             echo '<i id="bellIcon" class="bx bxs-bell"></i>';
                             echo '<span class="num">' . $notificationCount . '</span>';
@@ -175,32 +196,53 @@ $select = mysqli_query($dbConn, "
                     }
                     ?>
 
-                    <!-- Inside the "notif" div, add the following code: -->
                     <div class="dropdown">
+                        <div class="notif-label"><i style="margin-right: 50px;" class='bx bxs-bell'></i>Notifications</div>
                         <?php
-                        $notifications = mysqli_query($dbConn, "SELECT * FROM tbl_notifications WHERE is_read = 'unread'") or die('query failed');
+                        $notifications = mysqli_query($dbConn, "SELECT * FROM tbl_notifications WHERE is_read = 'unread' OR is_read = 'read' ORDER BY created_at DESC") or die('query failed');
                         ?>
-                        <?php while ($row = mysqli_fetch_assoc($notifications)) { ?>
-                            <div class="notify_item">
-                                <div class="notify_img">
-                                    <img src='/EASE-CHOLAR/user_profiles/<?php echo $row['image']; ?>' alt="" style="width: 50px">
-                                </div>
-                                <div class="notify_info">
-                                    <p><?php echo $row['message']; ?></p>
-                                    <span class="notify_time"><?php echo formatCreatedAt($row['created_at']); ?></span>
-                                </div>
-                            </div>
-                        <?php } ?>
-                    </div>
+                        <div class="scrollable-notifications">
+                            <?php while ($row = mysqli_fetch_assoc($notifications)) { ?>
+                                <div class="notify_item">
+                                    <div class="notify_img">
+                                        <img src='/EASE-CHOLAR/user_profiles/<?php echo $row['image']; ?>' alt="" style="width: 50px">
+                                    </div>
+                                    <div class="notify_info">
+                                        <p>
+                                            <?php
+                                            $source = $row['source'];
+                                            $applicationId = $row['application_id'];
+                                            $user_id = $row['user_id'];
 
+                                            if ($source == 'tbl_userapp') {
+                                                $viewLink = 'view_application';
+                                            } elseif ($source == 'tbl_scholarship_1_form') {
+                                                $viewLink = 'view_application1';
+                                            } else {
+                                                $viewLink = '#';
+                                            }
+                                            ?>
+
+                                            <a href="<?php echo $viewLink ?>.php?id=<?php echo $applicationId; ?>&user_id=<?php echo $user_id; ?>">
+                                                <?php echo $row['message']; ?>
+                                            </a>
+
+                                        </p>
+                                        <span class="notify_time"><?php echo formatCreatedAt($row['created_at']); ?></span>
+                                    </div>
+                                </div>
+                            <?php } ?>
+                        </div>
+                    </div>
                 </div>
+
+                
                 <div class="profile">
                     <a href="osa_profile.php" class="profile">
                         <?php
                         $select_osa = mysqli_query($dbConn, "SELECT * FROM `tbl_admin` WHERE admin_id = '$admin_id'") or die('query failed');
                         $fetch = mysqli_fetch_assoc($select_osa);
                         if ($fetch && $fetch['profile'] != '') {
-                            // Build the absolute path to the image using $_SERVER['DOCUMENT_ROOT']
                             $imagePath = $_SERVER['DOCUMENT_ROOT'] . '/EASE-CHOLAR/user_profiles/' . $fetch['profile'];
 
                             if (file_exists($imagePath)) {
@@ -291,6 +333,27 @@ $select = mysqli_query($dbConn, "
                 </li>
             </ul>
 
+            <div class="table-data">
+                <div class="order">
+                    <div class="scholarship-analytics">
+                        <div class="head">
+                            <h3>Scholarship Analytics</h3>
+                            <div class="export-button-container">
+                                <select title="Select format" id="exportFormatSelect">
+                                    <option value="pdf">PDF</option>
+                                    <option value="excel">Excel</option>
+                                </select>
+                                <button title="Export" id="exportButton">
+                                <i class='bx bxs-file-export'></i>Export</button>
+                            </div>
+                        </div>
+                        <canvas id="scholarshipAnalyticsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+
+
             <?php
             function formatDateSubmitted($dbDateSubmitted)
             {
@@ -303,7 +366,7 @@ $select = mysqli_query($dbConn, "
                     <div class="head">
                         <h3>Recent Applicants</h3>
                     </div>
-                    <table>
+                    <table id="recent-applicants-table">
                         <thead>
                             <tr>
                                 <th>Applicant</th>
@@ -313,13 +376,18 @@ $select = mysqli_query($dbConn, "
                         </thead>
                         <tbody>
                             <?php
+                            $perPage = 10;
+                            $applicantsData = array();
+
                             while ($row = mysqli_fetch_array($select)) {
                                 $statusClass = '';
+                                $dateSubmitted = '';
+                                $statusText = '';
 
                                 if (isset($row['userapp_status'])) {
                                     switch ($row['userapp_status']) {
                                         case 'Pending':
-                                            $statusClass = 'pending';
+                                            $statusClass = 'Pending';
                                             break;
                                         case 'In Review':
                                             $statusClass = 'inreview';
@@ -339,7 +407,7 @@ $select = mysqli_query($dbConn, "
                                         default:
                                             break;
                                     }
-                                } else if (isset($row['scholarship_status'])) {
+                                } elseif (isset($row['scholarship_status'])) {
                                     switch ($row['scholarship_status']) {
                                     }
                                 }
@@ -349,7 +417,7 @@ $select = mysqli_query($dbConn, "
                                     $dateSubmitted = $row['userapp_date_submitted'];
                                 } elseif ($row['source'] === 'tbl_scholarship_1_form' && isset($row['scholarship_status'])) {
                                     $statusText = $row['scholarship_status'];
-                                    $dateSubmitted = $row['scholarship_date_submitted'];
+                                    $dateSubmitted = $row['date_submitted'];
                                 }
 
                                 echo '
@@ -357,39 +425,69 @@ $select = mysqli_query($dbConn, "
                                     <td><img src="../user_profiles/' . $row['image'] . '" alt="">' . $row['applicant_name'] . '</td>
                                     <td>' . formatDateSubmitted($dateSubmitted) . '</td>
                                     <td><p class="status ' . $statusClass . '">' . $statusText . '</td>
+                                    
                                 </tr>';
+
+
+
+                                $applicantsData[] = array(
+                                    'applicant_name' => $row['applicant_name'],
+                                    'date_submitted' => formatDateSubmitted($dateSubmitted),
+                                    'status' => $statusClass,
+                                    'image' => $row['image'],
+                                );
                             }
                             ?>
-                        </tbody>
 
+                        </tbody>
                     </table>
+                    <div class="pagination applicants-pagination">
+                        <a href="#" class="prev" id="prev-applicants-page">&lt; Previous</a>
+                        <span id="applicants-page-number">Page 1</span>
+                        <a href="#" class="next" id="next-applicants-page">Next &gt;</a>
+                    </div>
                 </div>
 
 
                 <?php
-                $newScholarsQuery = "(SELECT DISTINCT applicant_name, image, application_id FROM tbl_userapp WHERE status = 'Accepted') UNION (SELECT DISTINCT applicant_name, image, application_id FROM tbl_scholarship_1_form WHERE status = 'Accepted') ORDER BY application_id DESC LIMIT 10";
+                $newScholarsQuery = "(SELECT DISTINCT applicant_name, image, application_id FROM tbl_userapp WHERE status = 'Accepted') UNION (SELECT DISTINCT applicant_name, image, application_id FROM tbl_scholarship_1_form WHERE status = 'Accepted') ORDER BY application_id DESC";
                 $result = $dbConn->query($newScholarsQuery);
+                $totalScholars = $result->num_rows;
                 ?>
+
                 <div class="todo">
                     <div class="head">
                         <h3>New Scholars</h3>
                     </div>
-                    <ul class="scholars_list">
+                    <ul class="scholars_list" id="scholars-list">
                         <?php
                         if ($result->num_rows > 0) {
+                            $count = 0;
                             while ($row = $result->fetch_assoc()) {
-                                echo '<li class="scholar_container"><img class="scholar_image" src="/EASE-CHOLAR/user_profiles/' . $row['image'] . '" alt=""> <span class="scholar_name">' . $row['applicant_name'] . ' </span> </li>';
+                                if ($count >= 10) {
+                                    echo '<li class="scholar_container hidden"><img class="scholar_image" src="/EASE-CHOLAR/user_profiles/' . $row['image'] . '" alt=""> <span class="scholar_name">' . $row['applicant_name'] . ' </span> </li>';
+                                } else {
+                                    echo '<li class="scholar_container"><img class="scholar_image" src="/EASE-CHOLAR/user_profiles/' . $row['image'] . '" alt=""> <span class="scholar_name">' . $row['applicant_name'] . ' </span> </li>';
+                                }
+                                $count++;
                             }
                         } else {
                             echo '<li>No new scholars found.</li>';
                         }
                         ?>
                     </ul>
+                    <?php
+                    if ($totalScholars > 10) {
+                        echo '<a href="application_list.php" id="view-all-scholars">View All</a>';
+                    }
+                    ?>
                 </div>
+
             </div>
         </main>
         <!-- MAIN -->
     </section>
+
 
     <script>
         $(document).ready(function() {
@@ -427,6 +525,115 @@ $select = mysqli_query($dbConn, "
                 confirmLogout();
             });
 
+            var backgroundColors = [
+                'rgba(75, 192, 192, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 205, 86, 0.2)',
+                'rgba(54, 162, 235, 0.2)',
+                'rgba(153, 102, 255, 0.2)',
+                'rgba(255, 159, 64, 0.2)',
+                'rgba(255, 0, 0, 0.2)',
+                'rgba(0, 255, 0, 0.2)',
+                'rgba(0, 0, 255, 0.2)',
+                'rgba(128, 128, 128, 0.2)'
+            ];
+
+            if (!window.chartInitialized) {
+                var labels = <?php echo json_encode(array_column($data, 'scholarship')); ?>;
+                var numApplicants = <?php echo json_encode(array_column($data, 'num_applicants')); ?>;
+
+                var ctx = document.getElementById('scholarshipAnalyticsChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Number of Applicants',
+                            data: numApplicants,
+                            backgroundColor: backgroundColors,
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1
+                        }],
+                    },
+                    options: {
+                        indexAxis: 'x',
+                    }
+                });
+
+                window.chartInitialized = true;
+            }
+
+            document.getElementById("exportButton").addEventListener("click", function() {
+                var exportFormatSelect = document.getElementById("exportFormatSelect");
+                var selectedFormat = exportFormatSelect.value;
+
+                var exportURL = "pdf_scholarship.php"; 
+
+                if (selectedFormat === "excel") {
+                    exportURL = "excel_scholarship.php";
+                }
+
+                window.location.href = exportURL;
+            });
+
+            const scholarshipAnalyticsTable = document.getElementById("scholarship-analytics-table");
+            const recentApplicantsTable = document.getElementById("recent-applicants-table");
+
+            function displayApplicantsPage(page, applicantData, applicantRowsPerPage) {
+                const tableBody = recentApplicantsTable.querySelector("tbody");
+                tableBody.innerHTML = "";
+                const start = (page - 1) * applicantRowsPerPage;
+                const end = start + applicantRowsPerPage;
+                const pageData = applicantData.slice(start, end);
+
+                pageData.forEach((row) => {
+                    const newRow = document.createElement("tr");
+                    newRow.innerHTML = `
+                    <td><img src="../user_profiles/${row.image}" alt=""> ${row.applicant_name}</td>
+                    <td>${row.date_submitted}</td>
+                    <td><p class="status ${row.status}">${row.status}</td>
+                `;
+                    tableBody.appendChild(newRow);
+                });
+
+                document.getElementById("applicants-page-number").textContent = `Page ${page}`;
+            }
+
+            const applicantData = <?php echo json_encode($applicantsData); ?>;
+            const applicantRowsPerPage = <?php echo $perPage; ?>;
+            let applicantCurrentPage = 1;
+
+            displayApplicantsPage(applicantCurrentPage, applicantData, applicantRowsPerPage);
+
+            document.getElementById("prev-applicants-page").addEventListener("click", () => {
+                if (applicantCurrentPage > 1) {
+                    applicantCurrentPage--;
+                    displayApplicantsPage(applicantCurrentPage, applicantData, applicantRowsPerPage);
+                }
+            });
+
+            document.getElementById("next-applicants-page").addEventListener("click", () => {
+                const totalPages = Math.ceil(applicantData.length / applicantRowsPerPage);
+                if (applicantCurrentPage < totalPages) {
+                    applicantCurrentPage++;
+                    displayApplicantsPage(applicantCurrentPage, applicantData, applicantRowsPerPage);
+                }
+            });
+
+            document.addEventListener("DOMContentLoaded", function() {
+                const viewAllScholarsLink = document.getElementById("view-all-scholars");
+                const hiddenScholars = document.querySelectorAll(".hidden");
+
+                viewAllScholarsLink.addEventListener("click", function() {
+                    hiddenScholars.forEach(function(scholar) {
+                        scholar.style.display = "block";
+                    });
+
+                    // Hide the "View All" link after showing all scholars
+                    viewAllScholarsLink.style.display = "none";
+                });
+            });
+
             const menuBar = document.querySelector('#content nav .bx.bx-menu');
             const sidebar = document.getElementById('sidebar');
 
@@ -460,8 +667,7 @@ $select = mysqli_query($dbConn, "
                 toggleDropdown();
                 if ($(".dropdown").hasClass("active")) {
                     markAllNotificationsAsRead();
-                } else {
-                }
+                } else {}
             });
 
             $(document).on("click", function() {
@@ -489,29 +695,6 @@ $select = mysqli_query($dbConn, "
             $(".notify_item").on("click", function() {
                 var notificationId = $(this).data("notification-id");
                 markNotificationAsRead(notificationId);
-            });
-
-            $(".notify_options .delete_option").on("click", function(event) {
-                event.stopPropagation();
-                const notificationId = $(this).data("notification-id");
-                $.ajax({
-                    url: "delete_notification.php",
-                    type: "POST",
-                    data: {
-                        notification_id: notificationId
-                    },
-                    success: function() {
-                        $(".notify_item[data-notification-id='" + notificationId + "']").remove();
-                        fetchNotificationCount();
-                    },
-                    error: function() {
-                    }
-                });
-            });
-
-            $(".notify_options .cancel_option").on("click", function(event) {
-                event.stopPropagation();
-                $(this).closest(".options_menu").removeClass("active");
             });
         });
     </script>

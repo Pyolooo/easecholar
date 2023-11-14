@@ -101,7 +101,6 @@ function formatExpireDate($dbExpireDate)
                         $notificationCount = $notificationCountData['count'];
 
 
-                        // Show the notification count only if there are new messages
                         if ($notificationCount > 0) {
                             echo '<i id="bellIcon" class="bx bxs-bell"></i>';
                             echo '<span class="num">' . $notificationCount . '</span>';
@@ -112,50 +111,70 @@ function formatExpireDate($dbExpireDate)
                         ?>
                     </div>
 
+                    <?php
+                    function formatCreatedAt($dbCreatedAt)
+                    {
+                        $dateTimeObject = new DateTime($dbCreatedAt);
+                        return $dateTimeObject->format('Y-m-d, g:i A');
+                    }
+                    ?>
 
-                    <!-- Inside the "notif" div, add the following code: -->
                     <div class="dropdown">
+                        <div class="notif-label"><i style="margin-right: 50px;" class='bx bxs-bell'></i>Notifications</div>
                         <?php
-                        $notifications = mysqli_query($dbConn, "SELECT * FROM tbl_notifications WHERE is_read = 'unread'") or die('query failed');
+                        $notifications = mysqli_query($dbConn, "SELECT * FROM tbl_notifications WHERE is_read = 'unread' OR is_read = 'read' ORDER BY created_at DESC") or die('query failed');
                         ?>
-                        <?php while ($row = mysqli_fetch_assoc($notifications)) { ?>
-                            <div class="notify_item">
-                                <div class="notify_img">
-                                    <img src='/EASE-CHOLAR/user_profiles/<?php echo $row['image']; ?>' alt="" style="width: 50px">
-                                </div>
-                                <div class="notify_info">
-                                    <p><?php echo $row['message']; ?></p>
-                                    <span class="notify_time"><?php echo $row['created_at']; ?></span>
-                                </div>
-                                <div class="notify_options">
-                                    <i class="bx bx-dots-vertical-rounded"></i>
-                                    <!-- Add the ellipsis (three-dots) icon and the options menu -->
-                                    <div class="options_menu">
-                                        <span class="delete_option" data-notification-id="<?php echo $row['notification_id']; ?>">Delete</span>
-                                        <span class="cancel_option">Cancel</span>
+                        <div class="scrollable-notifications">
+                            <?php while ($row = mysqli_fetch_assoc($notifications)) { ?>
+                                <div class="notify_item">
+                                    <div class="notify_img">
+                                        <img src='/EASE-CHOLAR/user_profiles/<?php echo $row['image']; ?>' alt="" style="width: 50px">
+                                    </div>
+                                    <div class="notify_info">
+                                        <p>
+                                            <?php
+                                            $source = $row['source'];
+                                            $applicationId = $row['application_id'];
+                                            $user_id = $row['user_id'];
+
+                                            if ($source == 'tbl_userapp') {
+                                                $viewLink = 'view_application';
+                                            } elseif ($source == 'tbl_scholarship_1_form') {
+                                                $viewLink = 'view_application1';
+                                            } else {
+                                                $viewLink = '#';
+                                            }
+                                            ?>
+
+                                            <a href="<?php echo $viewLink ?>.php?id=<?php echo $applicationId; ?>&user_id=<?php echo $user_id; ?>">
+                                                <?php echo $row['message']; ?>
+                                            </a>
+
+                                        </p>
+                                        <span class="notify_time"><?php echo formatCreatedAt($row['created_at']); ?></span>
                                     </div>
                                 </div>
-                            </div>
-                        <?php } ?>
+                            <?php } ?>
+                        </div>
                     </div>
-
                 </div>
+
+                
                 <div class="profile">
                     <a href="osa_profile.php" class="profile">
                         <?php
                         $select_osa = mysqli_query($dbConn, "SELECT * FROM `tbl_admin` WHERE admin_id = '$admin_id'") or die('query failed');
                         $fetch = mysqli_fetch_assoc($select_osa);
                         if ($fetch && $fetch['profile'] != '') {
-                            // Build the absolute path to the image using $_SERVER['DOCUMENT_ROOT']
                             $imagePath = $_SERVER['DOCUMENT_ROOT'] . '/EASE-CHOLAR/user_profiles/' . $fetch['profile'];
 
                             if (file_exists($imagePath)) {
                                 echo '<img src="../user_profiles/' . $fetch['profile'] . '">';
                             } else {
-                                echo '<img src="../img/default-avatar.png">';
+                                echo '<img src="../user_profiles/default-avatar.png">';
                             }
                         } else {
-                            echo '<img src="../img/default-avatar.png">';
+                            echo '<img src="../user_profiles/default-avatar.png">';
                         }
                         ?>
                     </a>
@@ -163,8 +182,6 @@ function formatExpireDate($dbExpireDate)
                 </div>
             </div>
         </nav>
-
-
 
         <!-- NAVBAR -->
 
@@ -212,11 +229,12 @@ function formatExpireDate($dbExpireDate)
                         </thead>
                         <tbody id="scholarship-list">
                             <?php
-                            $sql = "SELECT scholarship_id, scholarship, scholarship_status, expire_date FROM tbl_scholarship";
+                            $sql = "SELECT scholarship_id, scholarship_logo, scholarship, scholarship_status, expire_date FROM tbl_scholarship";
                             $result = $dbConn->query($sql);
 
                             while ($row = $result->fetch_assoc()) {
                                 $scholarshipId = $row['scholarship_id'];
+                                $scholarshipLogo = $row['scholarship_logo'];
                                 $scholarshipName = $row['scholarship'];
                                 $expireDate = $row['expire_date'];
                                 $scholarshipStatus = $row['scholarship_status'];
@@ -242,19 +260,29 @@ function formatExpireDate($dbExpireDate)
                                 if ($scholarshipStatus == 'Ongoing') {
                                     $output .= "<td>";
                                     $output .= "<a href='scholarship_details.php?id=$scholarshipId'>";
+                                    $output .= "<div class='scholarship-container'>";
+                                    $output .= "<img class='scholarship-logo' src='../file_uploads/" . basename($scholarshipLogo) . "' alt='Scholarship Logo'>";
+                                    $output .= "<div class='scholarship-name'>";
                                     $output .= "$scholarshipName";
                                     $output .= "<div class='scholarship-deadline'>";
                                     $output .= "<span class='scholarship-status'>$scholarshipStatus</span>";
                                     $output .= "  " . formatExpireDate($expireDate);
+                                    $output .= "</div>";
+                                    $output .= "</div>";
                                     $output .= "</div>";
                                     $output .= "</a>";
                                     $output .= "</td>";
                                 } else {
                                     $output .= "<td class='closed-scholarship'>";
                                     $output .= "<a href='scholarship_details.php?id=$scholarshipId'>";
+                                    $output .= "<div class='scholarship-container'>";
+                                    $output .= "<img class='scholarship-logo' src='../file_uploads/" . basename($scholarshipLogo) . "' alt='Scholarship Logo'>";
+                                    $output .= "<div class='scholarship-name'>";
                                     $output .= "$scholarshipName";
                                     $output .= "<div class='scholarship-deadline'>";
                                     $output .= "<span class='scholarship-status'>$scholarshipStatus</span>";
+                                    $output .= "</div>";
+                                    $output .= "</div>";
                                     $output .= "</div>";
                                     $output .= "</a>";
                                     $output .= "</td>";

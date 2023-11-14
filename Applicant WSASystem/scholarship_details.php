@@ -11,42 +11,47 @@ if (isset($_GET['id']) && isset($_SESSION['user_id'])) {
     $scholarshipId = $_GET['id'];
     $user_id = $_SESSION['user_id'];
 
-    // Query to check if the user has already applied for this scholarship
-    $sqlCheckApplication = "SELECT * FROM tbl_userapp WHERE user_id = ? AND scholarship_id = ?";
+    $sqlCheckApplication = "SELECT user_id, scholarship_id FROM tbl_userapp WHERE user_id = ? AND scholarship_id = ? UNION SELECT user_id, scholarship_id FROM tbl_scholarship_1_form WHERE user_id = ? AND scholarship_id = ?";
     $stmtCheckApplication = $dbConn->prepare($sqlCheckApplication);
-    $stmtCheckApplication->bind_param("ii", $user_id, $scholarshipId);
+    $stmtCheckApplication->bind_param("iiii", $user_id, $scholarshipId, $user_id, $scholarshipId);
     $stmtCheckApplication->execute();
     $resultCheckApplication = $stmtCheckApplication->get_result();
+    
+
+
+    if ($stmtCheckApplication->error) {
+        die('Error in SQL query: ' . $stmtCheckApplication->error);
+    }
 
     if ($resultCheckApplication->num_rows > 0) {
-        // The applicant has already applied, display the message
         $applicationStatus = "You have already applied for this scholarship.";
-        $showApplyButton = false; // Do not show the "APPLY" button
+        $showApplyButton = false; 
     } else {
-        // Check the scholarship status
         $sqlCheckScholarshipStatus = "SELECT scholarship_status FROM tbl_scholarship WHERE scholarship_id = ?";
         $stmtCheckScholarshipStatus = $dbConn->prepare($sqlCheckScholarshipStatus);
         $stmtCheckScholarshipStatus->bind_param("i", $scholarshipId);
         $stmtCheckScholarshipStatus->execute();
         $resultCheckScholarshipStatus = $stmtCheckScholarshipStatus->get_result();
 
+        if ($stmtCheckScholarshipStatus->error) {
+            die('Error in SQL query: ' . $stmtCheckScholarshipStatus->error);
+        }
+
         if ($resultCheckScholarshipStatus->num_rows > 0) {
             $row = $resultCheckScholarshipStatus->fetch_assoc();
             $scholarshipStatus = $row['scholarship_status'];
 
             if ($scholarshipStatus === 'Closed') {
-                // The scholarship is closed, display a message
                 $applicationStatus = "This scholarship is closed and no longer accepting applications.";
-                $showApplyButton = false; // Do not show the "APPLY" button
+                $showApplyButton = false;
             } else {
-                // The scholarship is ongoing, set a default message for cases where the user hasn't applied
                 $applicationStatus = "";
-                $showApplyButton = true; // Show the "APPLY" button
+                $showApplyButton = true; 
             }
         } else {
             // Scholarship status not found, handle as needed
             $applicationStatus = "Scholarship status not found.";
-            $showApplyButton = false; // Do not show the "APPLY" button
+            $showApplyButton = false; 
         }
     }
 
@@ -57,6 +62,7 @@ if (isset($_GET['id']) && isset($_SESSION['user_id'])) {
     if ($result->num_rows > 0) {
         $row = $result->fetch_assoc();
         $details = $row['details'];
+        $scholarship_logo = $row['scholarship_logo'];
         $requirements = explode("\n", $row['requirements']);
         $benefits = explode("\n", $row['benefits']);
         $selectedFormTable = $row['application_form_table'];
@@ -78,7 +84,10 @@ if (isset($_GET['id']) && isset($_SESSION['user_id'])) {
 
         <body>
             <div class="table-data">
+                <div class="scholarship-container">
+            <img class='scholarship-logo' src='/EASE-CHOLAR/file_uploads/<?php echo basename($scholarship_logo); ?>' alt="Scholarship Logo">
                 <h1 class="scholarship-title"><?php echo $row['scholarship']; ?></h1>
+                </div>
                 <hr>
                 <div class="scholarship-details"> <?php echo $row['details']; ?></div>
                 <div class="details-container">

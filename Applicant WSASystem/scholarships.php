@@ -160,8 +160,8 @@ function formatExpireDate($dbExpireDate)
             </div>
             <div class="right-section">
                 <div class="notif">
-                <div class="notification">
-                <?php
+                    <div class="notification">
+                        <?php
                         $user_id = $_SESSION['user_id'];
 
                         // Initialize the total notification count
@@ -205,7 +205,7 @@ function formatExpireDate($dbExpireDate)
                             echo '<span class="num" style="display: none;">' . $totalNotificationCount . '</span>';
                         }
                         ?>
-</div>
+                    </div>
 
 
                     <?php
@@ -357,64 +357,73 @@ function formatExpireDate($dbExpireDate)
                             </tr>
                         </thead>
                         <tbody id="scholarship-list">
-    <?php
-    $sql = "SELECT scholarship_id, scholarship, scholarship_status, expire_date, application_form_table FROM tbl_scholarship";
-    $result = $dbConn->query($sql);
+                            <?php
+                            $sql = "SELECT scholarship_id, scholarship, scholarship_logo, scholarship_status, expire_date, application_form_table FROM tbl_scholarship";
+                            $result = $dbConn->query($sql);
 
-    while ($row = $result->fetch_assoc()) {
-        $scholarshipId = $row['scholarship_id'];
-        $scholarshipName = $row['scholarship'];
-        $expireDate = $row['expire_date'];
-        $scholarshipStatus = $row['scholarship_status'];
-        $selectedFormTable = $row['application_form_table']; // Get the application_form_table
+                            while ($row = $result->fetch_assoc()) {
+                                $scholarshipId = $row['scholarship_id'];
+                                $scholarshipLogo = $row['scholarship_logo'];
+                                $scholarshipName = $row['scholarship'];
+                                $expireDate = $row['expire_date'];
+                                $scholarshipStatus = $row['scholarship_status'];
+                                $selectedFormTable = $row['application_form_table']; // Get the application_form_table
 
-        $currentDate = date('Y-m-d');
+                                $currentDate = date('Y-m-d');
 
-        if ($currentDate >= $expireDate && $scholarshipStatus == 'Ongoing') {
-            $updateSql = "UPDATE tbl_scholarship SET scholarship_status = 'Closed' WHERE scholarship_id = $scholarshipId";
-            $updateResult = $dbConn->query($updateSql);
+                                if ($currentDate >= $expireDate && $scholarshipStatus == 'Ongoing') {
+                                    $updateSql = "UPDATE tbl_scholarship SET scholarship_status = 'Closed' WHERE scholarship_id = $scholarshipId";
+                                    $updateResult = $dbConn->query($updateSql);
 
-            if (!$updateResult) {
-                echo "Error updating scholarship status for ID: $scholarshipId<br>";
-            } else {
-                $scholarshipStatus = 'Closed';
-            }
-        }
-        // Add the data-status attribute based on scholarship status
-        $dataStatusAttribute = ($scholarshipStatus == 'Ongoing') ? 'Ongoing' : 'Closed';
+                                    if (!$updateResult) {
+                                        echo "Error updating scholarship status for ID: $scholarshipId<br>";
+                                    } else {
+                                        $scholarshipStatus = 'Closed';
+                                    }
+                                }
+                                // Add the data-status attribute based on scholarship status
+                                $dataStatusAttribute = ($scholarshipStatus == 'Ongoing') ? 'Ongoing' : 'Closed';
 
-        // Modify the output based on the scholarship status
-        $output = "<tr data-status='$dataStatusAttribute'>";
+                                // Modify the output based on the scholarship status
+                                $output = "<tr data-status='$dataStatusAttribute'>";
 
-        if ($scholarshipStatus == 'Ongoing') {
-            $output .= "<td>";
-            $output .= "<a href='scholarship_details.php?id=$scholarshipId&application_form_table=$selectedFormTable'>";
-            $output .= $scholarshipName;
-            $output .= "<div class='scholarship-deadline'>";
-            $output .= "<span class='scholarship-status'>$scholarshipStatus</span>";
-            $output .= "  " . formatExpireDate($expireDate);
-            $output .= "</div>";
-            $output .= "</a>";
-            $output .= "</td>";
-            
-        } else {
-            $output .= "<td class='closed-scholarship'>";
-            $output .= "<a href='scholarship_details.php?id=$scholarshipId&application_form_table=$selectedFormTable'>";
-            $output .= $scholarshipName;
-            $output .= "<div class 'scholarship-deadline'>";
-            $output .= "<span class='scholarship-status'>$scholarshipStatus</span>";
-            $output .= "</div>";
-            $output .= "</a>";
-            $output .= "</td>";
-            
-        }
+                                if ($scholarshipStatus == 'Ongoing') {
+                                    $output .= "<td>";
+                                    $output .= "<a href='scholarship_details.php?id=$scholarshipId&application_form_table=$selectedFormTable'>";
+                                    $output .= "<div class='scholarship-container'>";
+                                    $output .= "<img class='scholarship-logo' src='../file_uploads/" . basename($scholarshipLogo) . "' alt='Scholarship Logo'>";
+                                    $output .= "<div class='scholarship-name'>";
+                                    $output .= "$scholarshipName";
+                                    $output .= "<div class='scholarship-deadline'>";
+                                    $output .= "<span class='scholarship-status'>$scholarshipStatus</span>";
+                                    $output .= "  " . formatExpireDate($expireDate);
+                                    $output .= "</div>";
+                                    $output .= "</div>";
+                                    $output .= "</div>";
+                                    $output .= "</a>";
+                                    $output .= "</td>";
+                                } else {
+                                    $output .= "<td class='closed-scholarship'>";
+                                    $output .= "<a href='scholarship_details.php?id=$scholarshipId&application_form_table=$selectedFormTable'>";
+                                    $output .= "<div class='scholarship-container'>";
+                                    $output .= "<img class='scholarship-logo' src='../file_uploads/" . basename($scholarshipLogo) . "' alt='Scholarship Logo'>";
+                                    $output .= "<div class='scholarship-name'>";
+                                    $output .= "$scholarshipName";
+                                    $output .= "<div class='scholarship-deadline'>";
+                                    $output .= "<span class='scholarship-status'>$scholarshipStatus</span>";
+                                    $output .= "</div>";
+                                    $output .= "</div>";
+                                    $output .= "</div>";
+                                    $output .= "</a>";
+                                    $output .= "</td>";
+                                }
 
-        $output .= "</tr>";
+                                $output .= "</tr>";
 
-        echo $output;
-    }
-    ?>
-</tbody>
+                                echo $output;
+                            }
+                            ?>
+                        </tbody>
                     </table>
 
                 </div>
@@ -609,45 +618,7 @@ function formatExpireDate($dbExpireDate)
             $(".options_menu.active").not($(this).siblings(".options_menu")).removeClass("active");
         });
 
-        // Add click event listener to the delete option
-        $(".notify_options .delete_option").on("click", function(event) {
-            event.stopPropagation(); // Prevent click event propagation to the document
 
-            const notificationId = $(this).data("notification-id");
-            // Send an AJAX request to delete the notification from the database
-            $.ajax({
-                url: "delete_notification.php", // Replace with the PHP file to handle the delete operation
-                type: "POST",
-                data: {
-                    notification_id: notificationId
-                },
-                success: function() {
-                    // If deletion is successful, remove the notification from the dropdown
-                    $(this).closest(".notify_item").remove();
-                    // Update the notification count on the bell icon
-                    fetchNotificationCount();
-                    // Hide the options menu
-                    $(this).closest(".options_menu").removeClass("active");
-                },
-                error: function() {
-                    // Handle error if deletion fails
-                    alert("Failed to delete notification.");
-                }
-            });
-        });
-
-        // Add click event listener to the cancel option
-        $(".notify_options .cancel_option").on("click", function(event) {
-            event.stopPropagation(); // Prevent click event propagation to the document
-
-            // Hide the options menu
-            $(this).closest(".options_menu").removeClass("active");
-        });
-
-        // Close the options menu when clicking outside of it
-        $(document).on("click", function() {
-            $(".options_menu.active").removeClass("active");
-        });
     </script>
 </body>
 

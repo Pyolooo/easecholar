@@ -113,17 +113,35 @@ if (isset($_POST['message_content'])) {
 
     sendEmailNotification($applicantEmail, $applicantName, $emailSubject, $emailBody);
 
-// Send SMS notification
-    $phoneNumber = $applicationData['mobile_num'];
-    $smsMessage = "Dear $applicantName,\n\nYou have received a new message from OSA:$message_content";
+ // Send SMS notification
+ $phoneNumber = $applicationData['mobile_num'];
+ $smsMessage = "Dear $applicantName,\n\nYou have received a new message from OSA:\n\n$message_content";
 
-    sendSmsNotification($phoneNumber, $smsMessage);
+ sendSmsNotification($phoneNumber, $smsMessage);
 
-        header("Location: view_application.php?id=$application_id");
-        exit();
-    } else {
-        echo "Error sending message: " . mysqli_error($dbConn);
-    }
+
+ $success_message = "Message Sent";
+
+ echo '<script>
+     document.addEventListener("DOMContentLoaded", function() {
+         Swal.fire({
+             position: "center",
+             icon: "success",
+             title: "' . $success_message . '",
+             showConfirmButton: false,
+             timer: 1500
+         }).then((result) => {
+             if (result.dismiss === Swal.DismissReason.timer) {
+                 if (' . isset($application_id) . ' && ' . isset($user_id) . ') {
+                     window.location.href = "view_application.php?id=' . $application_id . '&user_id=' . $user_id . '";
+                 }
+             }
+         });
+     });
+ </script>';
+} else {
+ echo "Error sending message: " . mysqli_error($dbConn);
+}
 }
 
 // After updating the status in the database, send an email notification to the applicant
@@ -167,7 +185,7 @@ function sendSmsNotification($phoneNumber, $message) {
       'apikey' => $apiKey,
       'number' => $phoneNumber,
       'message' => $message,
-      'sendername' => 'SEMAPHORE'
+      'sendername' => 'EASECHOLAR'
     ];
   
     $ch = curl_init();
@@ -237,11 +255,34 @@ function sendEmailNotification($toEmail, $toName, $subject, $body)
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>View Application</title>
     <link rel="stylesheet" href="css/view_application.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 </head>
 
 <body>
     <?php include('../include/header.php'); ?>
     <div class="wrapper">
+
+    <?php
+if (!empty($status_message)) {
+    echo '<script>
+        Swal.fire({
+            position: "center",
+            icon: "success",
+            title: "' . $status_message . '",
+            showConfirmButton: false,
+            timer: 1500
+        }).then((result) => {
+            if (result.dismiss === Swal.DismissReason.timer) {
+                if (' . isset($application_id) . ' && ' . isset($user_id) . ') {
+                    window.location.href = "view_application.php?id=' . $application_id . '&user_id=' . $user_id . '";
+                }
+            }
+        });
+    </script>';
+}
+
+?>
+
         <form action="" method="POST" enctype="multipart/form-data">
             <div class="container">
                 <div class="head">
@@ -301,25 +342,39 @@ function sendEmailNotification($toEmail, $toName, $subject, $body)
                                     <option><?php echo $applicationData['gender']; ?></option>
                                 </select>
                             </div>
-                        </div>
+                        
 
 
                         <div class="input-field">
                             <label>Email</label>
                             <input type="email" name="email" value="<?php echo $applicationData['email']; ?>" disabled>
                         </div>
+                        <div class="input-field">
+                                <label>Mobile Number</label>
+                                <input type="number" name="mobile_num" value="<?php echo $applicationData['mobile_num']; ?>" disabled>
+                            </div>
+
+                            <div class="input-field">
+                                <label>Citizenship</label>
+                                <input type="text" name="citizenship" value="<?php echo $applicationData['citizenship']; ?>" disabled>
+                            </div>
+
+                            </div>
                         <div class="fields">
                             <div class="input-field">
                                 <label>School ID Number</label>
                                 <input type="text" name="id_number" value="<?php echo $applicationData['id_number']; ?>" disabled>
                             </div>
                             <div class="input-field">
-                                <label>Mobile Number</label>
-                                <input type="number" name="mobile_num" value="<?php echo $applicationData['mobile_num']; ?>" disabled>
+                                <label>Course</label>
+                                <select name="course" disabled>
+                                    <option value="BSIT" <?php if ($applicationData['course'] === 'BSIT') echo 'selected'; ?>>BSIT</option>
+                                    <option value="BSA" <?php if ($applicationData['course'] === 'BSA') echo 'selected'; ?>>BSA</option>
+                                </select>
                             </div>
                             <div class="input-field">
-                                <label>Citizenship</label>
-                                <input type="text" name="citizenship" value="<?php echo $applicationData['citizenship']; ?>" disabled>
+                                <label>Year level</label>
+                                <input type="text" name="year_lvl" value="<?php echo $applicationData['year_lvl']; ?>" disabled>
                             </div>
                         </div>
 
@@ -368,6 +423,16 @@ function sendEmailNotification($toEmail, $toName, $subject, $body)
                             </div>
                         </div>
                     </div>
+                    <hr>
+          <div class="select-input-field">
+                <div class="input-field">
+                <label>Total Gross Income</label>
+                <input type="number" id="email" name="gross_income" value="<?php echo $applicationData['gross_income']; ?>"disabled>
+              </div>
+              <div class="input-field">
+                <label>No. of Siblings in the family</label>
+                <input type="number" id="mobile_num" name="num_siblings"value="<?php echo $applicationData['num_siblings']; ?>" disabled>
+              </div>
                 </div>
 
                 <h3 style="color:darkgreen">REQUIREMENTS UPLOADED</h3>
@@ -477,20 +542,16 @@ if ($stmtAttachmentMessages) {
                     <label for="message_content">Message:</label>
                 </div>
                 <div class="text-area">
-                    <textarea name="message_content" id="message_content" rows="4" cols="50"></textarea>    
-                    <button type="submit">Send</button>
-                </div>
+                      <textarea name="message_content" id="message_content" rows="6" cols="172"></textarea>
+                    </div>
+                    <button class="cancel-button" type="button" onclick="window.location.href='applicants.php'">Back</button>
+                    
+                    <button class="send-button" type="submit">Send</button> 
+                  </div>
             </div>
         </div>
     </form>
 </div>
-
-                <?php
-                if (isset($success_message)) {
-                    echo '<p style="color: green; text-align:center">' . $success_message . '</p>';
-                }
-                ?>
-                <button class="cancel-button" type="button" onclick="window.location.href='applicants.php'">Cancel</button>
             </div>
         </form>
 

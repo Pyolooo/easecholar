@@ -38,81 +38,6 @@ function formatExpireDate($dbExpireDate)
 	<link rel="stylesheet" href="css/scholarship_list.css">
 
 	<title>adminModule</title>
-	<style>
-        .notification .bxs-bell {
-            cursor: pointer;
-        }
-
-        .dropdown {
-            width: 350px;
-            height: auto;
-            background: whitesmoke;
-            border-radius: 5px;
-            box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.125);
-            margin: 15px auto 0;
-            padding: 15px;
-            position: absolute;
-            top: 40px;
-            /* Adjust the distance from the notification icon as needed */
-            right: 0;
-            /* To align it with the notification icon */
-            display: none;
-        }
-
-        .dropdown .notify_item {
-            display: flex;
-            align-items: center;
-            padding: 10px 0;
-            border-bottom: 1px solid #dbdaff;
-        }
-
-        .dropdown .notify_item:last-child {
-            border-bottom: 0px;
-        }
-
-        .dropdown .notify_item .notify_img {
-            margin-right: 15px;
-        }
-
-        .dropdown .notify_item .notify_info p {
-            margin-bottom: 5px;
-        }
-
-        .dropdown .notify_item .notify_info p span {
-            color: #605dff;
-            margin-left: 5px;
-        }
-
-        .dropdown .notify_item .notify_info .notify_time {
-            color: #c5c5e6;
-            font-size: 12px;
-        }
-
-        .dropdown:before {
-            content: "";
-            position: absolute;
-            top: -30px;
-            left: 50%;
-            transform: translateX(-50%);
-            border: 15px solid;
-            border-color: transparent transparent #fff transparent;
-        }
-
-        .dropdown.active {
-            display: block;
-        }
-        .scholarship-deadline{
-            font-size: 15px;
-            color:black;
-        }
-        /* In your CSS file */
-        .scholarship-status {
-        color: green; /* Change to your desired color */
-
-}
-
-		
-    </style>
 </head>
 <body>
 
@@ -170,8 +95,8 @@ function formatExpireDate($dbExpireDate)
 				<i class='bx bx-menu'></i>
                 <span class="school-name">ISABELA STATE UNIVERSITY SANTIAGO</span>
 			</div>
-			<div class="right-section">
-			<div class="notif">
+			<!-- <div class="right-section">
+			    <div class="notif">
                     <div class="notification">
                         <?php
                         $getNotificationCountQuery = mysqli_query($dbConn, "SELECT COUNT(*) as count FROM tbl_notifications WHERE is_read = 'unread'") or die('query failed');
@@ -218,6 +143,7 @@ function formatExpireDate($dbExpireDate)
                     </div>
 
                 </div>
+                
 				<div class="profile">
                 <a href="admin_profile.php" class="profile">
                         <?php
@@ -286,11 +212,12 @@ function formatExpireDate($dbExpireDate)
                         </thead>
                         <tbody id="scholarship-list">
                             <?php
-                            $sql = "SELECT scholarship_id, scholarship, scholarship_status, expire_date FROM tbl_scholarship";
+                            $sql = "SELECT scholarship_id, scholarship, scholarship_logo, scholarship_status, expire_date FROM tbl_scholarship";
                             $result = $dbConn->query($sql);
 
                             while ($row = $result->fetch_assoc()) {
                                 $scholarshipId = $row['scholarship_id'];
+                                $scholarshipLogo = $row['scholarship_logo'];
                                 $scholarshipName = $row['scholarship'];
                                 $expireDate = $row['expire_date'];
                                 $scholarshipStatus = $row['scholarship_status'];
@@ -316,19 +243,29 @@ function formatExpireDate($dbExpireDate)
                                 if ($scholarshipStatus == 'Ongoing') {
                                     $output .= "<td>";
                                     $output .= "<a href='scholarship_details.php?id=$scholarshipId'>";
+                                    $output .= "<div class='scholarship-container'>";
+                                    $output .= "<img class='scholarship-logo' src='../file_uploads/" . basename($scholarshipLogo) . "' alt='Scholarship Logo'>";
+                                    $output .= "<div class='scholarship-name'>";
                                     $output .= "$scholarshipName";
                                     $output .= "<div class='scholarship-deadline'>";
                                     $output .= "<span class='scholarship-status'>$scholarshipStatus</span>";
                                     $output .= "  " . formatExpireDate($expireDate);
+                                    $output .= "</div>";
+                                    $output .= "</div>";
                                     $output .= "</div>";
                                     $output .= "</a>";
                                     $output .= "</td>";
                                 } else {
                                     $output .= "<td class='closed-scholarship'>";
                                     $output .= "<a href='scholarship_details.php?id=$scholarshipId'>";
+                                    $output .= "<div class='scholarship-container'>";
+                                    $output .= "<img class='scholarship-logo' src='../file_uploads/" . basename($scholarshipLogo) . "' alt='Scholarship Logo'>";
+                                    $output .= "<div class='scholarship-name'>";
                                     $output .= "$scholarshipName";
                                     $output .= "<div class='scholarship-deadline'>";
                                     $output .= "<span class='scholarship-status'>$scholarshipStatus</span>";
+                                    $output .= "</div>";
+                                    $output .= "</div>";
                                     $output .= "</div>";
                                     $output .= "</a>";
                                     $output .= "</td>";
@@ -432,7 +369,7 @@ function formatExpireDate($dbExpireDate)
 
             // Function to toggle the dropdown
             function toggleDropdown() {
-                $(".num").hide(); // Hide the notification count when the dropdown is toggled
+                $(".num").hide();
             }
 
             // Add click event listener to the bell icon to mark all notifications as read
@@ -480,35 +417,6 @@ function formatExpireDate($dbExpireDate)
                 markNotificationAsRead(notificationId);
             });
 
-            // Function to handle delete option click
-            $(".notify_options .delete_option").on("click", function(event) {
-                event.stopPropagation();
-                const notificationId = $(this).data("notification-id");
-                // Send an AJAX request to delete the notification from the database
-                $.ajax({
-                    url: "delete_notification.php", // Replace with the PHP file to handle the delete operation
-                    type: "POST",
-                    data: {
-                        notification_id: notificationId
-                    },
-                    success: function() {
-                        // If deletion is successful, remove the notification from the dropdown
-                        $(".notify_item[data-notification-id='" + notificationId + "']").remove();
-                        // Fetch and update the notification count on the bell icon
-                        fetchNotificationCount();
-                    },
-                    error: function() {
-                        // Handle error if deletion fails
-                    }
-                });
-            });
-
-            // Function to handle cancel option click
-            $(".notify_options .cancel_option").on("click", function(event) {
-                event.stopPropagation();
-                // Hide the options menu
-                $(this).closest(".options_menu").removeClass("active");
-            });
         });
     </script>
 </body>

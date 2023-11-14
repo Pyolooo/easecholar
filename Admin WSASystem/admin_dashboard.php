@@ -59,7 +59,6 @@ $inReviewCount = $row['inReviewCount'];
 $qualifiedCount = $row['qualifiedCount'];
 $acceptedCount = $row['acceptedCount'];
 $rejectedCount = $row['rejectedCount'];
-
 ?>
 
 
@@ -120,13 +119,13 @@ $rejectedCount = $row['rejectedCount'];
             </li>
         </ul>
         <ul class="side-menu">
-			<li>
-				<a href="#" class="logout">
-					<i class='bx bxs-log-out-circle' ></i>
-					<span class="text">Logout</span>
-				</a>
-			</li>
-		</ul>
+            <li>
+                <a href="#" class="logout">
+                    <i class='bx bxs-log-out-circle'></i>
+                    <span class="text">Logout</span>
+                </a>
+            </li>
+        </ul>
     </section>
     <!-- SIDEBAR -->
 
@@ -183,7 +182,7 @@ $rejectedCount = $row['rejectedCount'];
             </div>
 
             <ul class="box-info">
-            <li>
+                <li>
                     <i class='bx bxs-calendar-check'></i>
                     <?php include('../include/connection.php'); ?>
 
@@ -283,7 +282,7 @@ $rejectedCount = $row['rejectedCount'];
                             <button id="exportButton">Export</button>
                         </div>
                     </div>
-                    <table>
+                    <table id="scholarship-analytics-table">
                         <thead>
                             <tr>
                                 <th>Scholarship Name</th>
@@ -292,29 +291,51 @@ $rejectedCount = $row['rejectedCount'];
                         </thead>
                         <tbody>
                             <?php
-                           $sql = "SELECT s.scholarship, 
+                            $sql = "SELECT s.scholarship, 
                            (COUNT(ua.user_id) + COUNT(sf.user_id)) AS num_applicants
-                   FROM tbl_scholarship s
-                   LEFT JOIN tbl_userapp ua ON s.scholarship_id = ua.scholarship_id
-                   LEFT JOIN tbl_scholarship_1_form sf ON s.scholarship_id = sf.scholarship_id
-                   GROUP BY s.scholarship";
-           
-           $listResult = mysqli_query($dbConn, $sql);
-           
-           if ($listResult) {
-               while ($row = mysqli_fetch_assoc($listResult)) {
-                   echo '<tr>';
-                   echo '<td>' . $row['scholarship'] . '</td>';
-                   echo '<td class="applicants-count"> <span class="num_applicants">'  . $row['num_applicants'] . '</span></td>';
-                   echo '</tr>';
-               }
-           } else {
-               echo '<tr><td colspan="2">Error executing the query: ' . mysqli_error($dbConn) . '</td></tr>';
-           }
-           
+                            FROM tbl_scholarship s
+                            LEFT JOIN tbl_userapp ua ON s.scholarship_id = ua.scholarship_id
+                            LEFT JOIN tbl_scholarship_1_form sf ON s.scholarship_id = sf.scholarship_id
+                            GROUP BY s.scholarship";
+
+                            $listResult = mysqli_query($dbConn, $sql);
+
+                            if ($listResult) {
+                                while ($row = mysqli_fetch_assoc($listResult)) {
+                                    echo '<tr>';
+                                    echo '<td>' . $row['scholarship'] . '</td>';
+                                    echo '<td class="applicants-count"> <span class="num_applicants">'  . $row['num_applicants'] . '</span></td>';
+                                    echo '</tr>';
+                                }
+                            } else {
+                                echo '<tr><td colspan="2">Error executing the query: ' . mysqli_error($dbConn) . '</td></tr>';
+                            }
+
+                            $rowsPerPage = 3;
+                            $data = array();
+
+                            $listResult = mysqli_query($dbConn, $sql);
+
+                            if (!$listResult) {
+                                echo 'Error executing the query: ' . mysqli_error($dbConn);
+                                die(mysqli_error($dbConn));
+                            } else {
+                                $data = array();
+
+                                while ($row = mysqli_fetch_assoc($listResult)) {
+                                    $data[] = $row;
+                                }
+                            }
+
+
                             ?>
                         </tbody>
                     </table>
+                    <div class="pagination">
+                        <a href="#" class="prev" id="prev-page">&lt; Previous</a>
+                        <span id="page-number">Page 1</span>
+                        <a href="#" class="next" id="next-page">Next &gt;</a>
+                    </div>
                 </div>
             </div>
 
@@ -331,7 +352,7 @@ $rejectedCount = $row['rejectedCount'];
                     <div class="head">
                         <h3>Recent Applicants</h3>
                     </div>
-                    <table>
+                    <table id="recent-applicants-table">
                         <thead>
                             <tr>
                                 <th>Applicant</th>
@@ -341,13 +362,18 @@ $rejectedCount = $row['rejectedCount'];
                         </thead>
                         <tbody>
                             <?php
+                            $perPage = 10;
+                            $applicantsData = array();
+
                             while ($row = mysqli_fetch_array($select)) {
                                 $statusClass = '';
+                                $dateSubmitted = '';
+                                $statusText = '';
 
                                 if (isset($row['userapp_status'])) {
                                     switch ($row['userapp_status']) {
                                         case 'Pending':
-                                            $statusClass = 'pending';
+                                            $statusClass = 'Pending';
                                             break;
                                         case 'In Review':
                                             $statusClass = 'inreview';
@@ -367,7 +393,7 @@ $rejectedCount = $row['rejectedCount'];
                                         default:
                                             break;
                                     }
-                                } else if (isset($row['scholarship_status'])) {
+                                } elseif (isset($row['scholarship_status'])) {
                                     switch ($row['scholarship_status']) {
                                     }
                                 }
@@ -377,7 +403,7 @@ $rejectedCount = $row['rejectedCount'];
                                     $dateSubmitted = $row['userapp_date_submitted'];
                                 } elseif ($row['source'] === 'tbl_scholarship_1_form' && isset($row['scholarship_status'])) {
                                     $statusText = $row['scholarship_status'];
-                                    $dateSubmitted = $row['scholarship_date_submitted'];
+                                    $dateSubmitted = $row['date_submitted'];
                                 }
 
                                 echo '
@@ -385,32 +411,63 @@ $rejectedCount = $row['rejectedCount'];
                                     <td><img src="../user_profiles/' . $row['image'] . '" alt="">' . $row['applicant_name'] . '</td>
                                     <td>' . formatDateSubmitted($dateSubmitted) . '</td>
                                     <td><p class="status ' . $statusClass . '">' . $statusText . '</td>
+                                    
                                 </tr>';
+
+
+
+                                $applicantsData[] = array(
+                                    'applicant_name' => $row['applicant_name'],
+                                    'date_submitted' => formatDateSubmitted($dateSubmitted),
+                                    'status' => $statusClass,
+                                    'image' => $row['image'],
+                                );
                             }
                             ?>
+
                         </tbody>
                     </table>
+                    <div class="pagination applicants-pagination">
+                        <a href="#" class="prev" id="prev-applicants-page">&lt; Previous</a>
+                        <span id="applicants-page-number">Page 1</span>
+                        <a href="#" class="next" id="next-applicants-page">Next &gt;</a>
+                    </div>
                 </div>
+
                 <?php
-                $newScholarsQuery = "SELECT * FROM tbl_userapp WHERE status = 'Qualified' ORDER BY application_id DESC LIMIT 10";
+                $newScholarsQuery = "(SELECT DISTINCT applicant_name, image, application_id FROM tbl_userapp WHERE status = 'Accepted') UNION (SELECT DISTINCT applicant_name, image, application_id FROM tbl_scholarship_1_form WHERE status = 'Accepted') ORDER BY application_id DESC";
                 $result = $dbConn->query($newScholarsQuery);
+                $totalScholars = $result->num_rows;
                 ?>
+
                 <div class="todo">
                     <div class="head">
                         <h3>New Scholars</h3>
                     </div>
-                    <ul class="scholars_list">
+                    <ul class="scholars_list" id="scholars-list">
                         <?php
                         if ($result->num_rows > 0) {
+                            $count = 0;
                             while ($row = $result->fetch_assoc()) {
-                                echo '<li class="scholar_container"><img class="scholar_image" src="/EASE-CHOLAR/user_profiles/' . $row['image'] . '" alt=""> <span class="scholar_name">' . $row['applicant_name'] . ' </span> </li>';
+                                if ($count >= 10) {
+                                    echo '<li class="scholar_container hidden"><img class="scholar_image" src="/EASE-CHOLAR/user_profiles/' . $row['image'] . '" alt=""> <span class="scholar_name">' . $row['applicant_name'] . ' </span> </li>';
+                                } else {
+                                    echo '<li class="scholar_container"><img class="scholar_image" src="/EASE-CHOLAR/user_profiles/' . $row['image'] . '" alt=""> <span class="scholar_name">' . $row['applicant_name'] . ' </span> </li>';
+                                }
+                                $count++;
                             }
                         } else {
                             echo '<li>No new scholars found.</li>';
                         }
                         ?>
                     </ul>
+                    <?php
+                    if ($totalScholars > 10) {
+                        echo '<a href="application_list.php" id="view-all-scholars">View All</a>';
+                    }
+                    ?>
                 </div>
+
             </div>
         </main>
         <!-- MAIN -->
@@ -418,7 +475,7 @@ $rejectedCount = $row['rejectedCount'];
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-         $(document).ready(function() {
+        $(document).ready(function() {
             function confirmLogout() {
                 Swal.fire({
                     title: "Logout",
@@ -431,72 +488,170 @@ $rejectedCount = $row['rejectedCount'];
                     cancelButtonText: "Cancel"
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        // If the user confirms, redirect to the logout script
                         window.location.href = "admin_logout.php";
                     }
                 });
             }
 
-            // Attach the click event to the "Logout" link
             document.querySelector(".logout").addEventListener("click", function(event) {
-                event.preventDefault(); // Prevent the link from navigating directly
+                event.preventDefault();
                 confirmLogout();
             });
 
-        const statusCounts = {
-            'Pending': <?php echo $pendingCount; ?>,
-            'In Review': <?php echo $inReviewCount; ?>,
-            'Qualified': <?php echo $qualifiedCount; ?>,
-            'Accepted': <?php echo $acceptedCount; ?>,
-            'Rejected': <?php echo $rejectedCount; ?>,
-        };
+            const statusCounts = {
+                'Pending': <?php echo $pendingCount; ?>,
+                'In Review': <?php echo $inReviewCount; ?>,
+                'Qualified': <?php echo $qualifiedCount; ?>,
+                'Accepted': <?php echo $acceptedCount; ?>,
+                'Rejected': <?php echo $rejectedCount; ?>,
+            };
 
-        const ctx = document.getElementById('applicationStatusChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: Object.keys(statusCounts),
-                datasets: [{
-                    data: Object.values(statusCounts),
-                    backgroundColor: [
-                        '#fd7238', // Pending
-                        '#ffce26', // In Review
-                        '#00d084', // Qualified
-                        '#28a745', // Accepted
-                        'red', // Rejected
-                    ],
-                }],
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: true,
-                        position: 'bottom'
-                    },
-                    title: {
-                        display: true,
-                        text: 'Application Statistics',
-                        fontSize: 16,
+            const ctx = document.getElementById('applicationStatusChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(statusCounts),
+                    datasets: [{
+                        data: Object.values(statusCounts),
+                        backgroundColor: [
+                            '#fd7238', // Pending
+                            '#ffce26', // In Review
+                            '#00d084', // Qualified
+                            '#28a745', // Accepted
+                            'red', // Rejected
+                        ],
+                    }],
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'bottom'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Application Statistics',
+                            fontSize: 16,
+                        },
                     },
                 },
-            },
-        });
+            });
 
 
             document.getElementById("exportButton").addEventListener("click", function() {
-    var exportFormatSelect = document.getElementById("exportFormatSelect");
-    var selectedFormat = exportFormatSelect.value;
+                var exportFormatSelect = document.getElementById("exportFormatSelect");
+                var selectedFormat = exportFormatSelect.value;
 
-    var exportURL = "generate_pdf.php"; // Default to PDF export URL
+                var exportURL = "generate_pdf.php"; // Default to PDF export URL
 
-    if (selectedFormat === "excel") {
-        exportURL = "generate_excel.php"; // Use Excel export URL if selected format is "excel"
-    }
+                if (selectedFormat === "excel") {
+                    exportURL = "generate_excel.php"; // Use Excel export URL if selected format is "excel"
+                }
 
-    window.location.href = exportURL;
-});
+                window.location.href = exportURL;
+            });
+
+            const scholarshipAnalyticsTable = document.getElementById("scholarship-analytics-table");
+            const recentApplicantsTable = document.getElementById("recent-applicants-table");
+
+            // Function to display a page of data
+            function displayPage(page, data, rowsPerPage) {
+                const tableBody = scholarshipAnalyticsTable.querySelector("tbody");
+                tableBody.innerHTML = "";
+                const start = (page - 1) * rowsPerPage;
+                const end = start + rowsPerPage;
+                const pageData = data.slice(start, end);
+
+                pageData.forEach((row) => {
+                    const newRow = document.createElement("tr");
+                    newRow.innerHTML = `<td>${row.scholarship}</td><td class="applicants-count"><span class="num_applicants">${row.num_applicants}</span></td>`;
+                    tableBody.appendChild(newRow);
+                });
+
+                document.getElementById("page-number").textContent = `Page ${page}`;
+            }
+
+            const data = <?php echo json_encode($data); ?>;
+            const rowsPerPage = <?php echo $rowsPerPage; ?>;
+            let currentPage = 1;
+
+            displayPage(currentPage, data, rowsPerPage);
+
+
+            document.getElementById("prev-page").addEventListener("click", () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    displayPage(currentPage, data, rowsPerPage);
+                }
+            });
+
+            document.getElementById("next-page").addEventListener("click", () => {
+                const totalPages = Math.ceil(data.length / rowsPerPage);
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    displayPage(currentPage, data, rowsPerPage);
+                }
+            });
+
+            function displayApplicantsPage(page, applicantData, applicantRowsPerPage) {
+                const tableBody = recentApplicantsTable.querySelector("tbody");
+                tableBody.innerHTML = "";
+                const start = (page - 1) * applicantRowsPerPage;
+                const end = start + applicantRowsPerPage;
+                const pageData = applicantData.slice(start, end);
+
+                pageData.forEach((row) => {
+                    const newRow = document.createElement("tr");
+                    newRow.innerHTML = `
+                    <td><img src="../user_profiles/${row.image}" alt=""> ${row.applicant_name}</td>
+                    <td>${row.date_submitted}</td>
+                    <td><p class="status ${row.status}">${row.status}</td>
+                `;
+                    tableBody.appendChild(newRow);
+                });
+
+                document.getElementById("applicants-page-number").textContent = `Page ${page}`;
+            }
+
+            const applicantData = <?php echo json_encode($applicantsData); ?>;
+            const applicantRowsPerPage = <?php echo $perPage; ?>;
+            let applicantCurrentPage = 1;
+
+            displayApplicantsPage(applicantCurrentPage, applicantData, applicantRowsPerPage);
+
+            document.getElementById("prev-applicants-page").addEventListener("click", () => {
+                if (applicantCurrentPage > 1) {
+                    applicantCurrentPage--;
+                    displayApplicantsPage(applicantCurrentPage, applicantData, applicantRowsPerPage);
+                }
+            });
+
+            document.getElementById("next-applicants-page").addEventListener("click", () => {
+                const totalPages = Math.ceil(applicantData.length / applicantRowsPerPage);
+                if (applicantCurrentPage < totalPages) {
+                    applicantCurrentPage++;
+                    displayApplicantsPage(applicantCurrentPage, applicantData, applicantRowsPerPage);
+                }
+            });
+
+            document.addEventListener("DOMContentLoaded", function() {
+                const viewAllScholarsLink = document.getElementById("view-all-scholars");
+                const hiddenScholars = document.querySelectorAll(".hidden");
+
+                viewAllScholarsLink.addEventListener("click", function() {
+                    hiddenScholars.forEach(function(scholar) {
+                        scholar.style.display = "block";
+                    });
+
+                    // Hide the "View All" link after showing all scholars
+                    viewAllScholarsLink.style.display = "none";
+                });
+            });
+
+
+
 
             const menuBar = document.querySelector('#content nav .bx.bx-menu');
             const sidebar = document.getElementById('sidebar');

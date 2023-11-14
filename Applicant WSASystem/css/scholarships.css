@@ -9,6 +9,9 @@
 a {
 	text-decoration: none;
 }
+a:hover{
+	text-decoration: none;
+}
 
 li {
 	list-style: none;
@@ -722,6 +725,16 @@ nav .profile img {
 }
 .scholarship-status {
 color: green; 
+}
+
+.scholarship-container{
+	display: flex;
+}
+
+.scholarship-logo{
+width: 60px;
+border-radius: 30px;
+margin-right: 20px;
 }
 
 

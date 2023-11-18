@@ -423,7 +423,6 @@ nav .profile img {
 	pointer-events: unset;
 }
 .export-container{
-	width: 30%;
 	display: flex;
 	align-items: center;
 	justify-content: space-evenly;
@@ -432,7 +431,8 @@ nav .profile img {
 	width: 30px;
 }
 
-#scholarshipSelect,#exportFormatSelect{
+#statusSelect,#scholarshipSelect,#exportFormatSelect{
+	margin-right: 10px;
 	cursor: pointer;
 	border-radius: 5px;
 	padding: 3px 5px;
@@ -596,21 +596,21 @@ nav .profile img {
 	font-size: 13px;
 	border-bottom: 1px solid var(--grey);
 }
-#content main .table-data .order table td {
+/* #content main .table-data .order table td {
 	padding: 16px 0;
-}
+} */
 #content main .table-data tbody a {
 	color: #444;
 	font-size: 15px;
 	font-weight: 600;
   }
   
-#content main .table-data .order table tr td:first-child {
+/* #content main .table-data .order table tr td:first-child {
 	display: flex;
 	align-items: center;
 	grid-gap: 12px;
 	padding-left: 6px;
-}
+} */
 
 #content main .table-data .order table tbody tr:hover {
 	background: var(--grey);
@@ -956,10 +956,10 @@ main.table {
 }
 
 .table__header .input-group {
-    width: 35%;
+    width: 30%;
     height: 100%;
     background-color: #fff5;
-    padding: 0 .8rem;
+    padding: .1rem .8rem;
     border-radius: 2rem;
 
     display: flex;
@@ -970,7 +970,7 @@ main.table {
 }
 
 .table__header .input-group:hover {
-    width: 45%;
+    width: 35%;
     background-color: #fff8;
     box-shadow: 0 .1rem .4rem #0002;
 }
@@ -1022,7 +1022,7 @@ table {
 td img {
     width: 36px;
     height: 36px;
-    margin-right: .5rem;
+    margin-right: .2rem;
     border-radius: 50%;
 
     vertical-align: middle;
@@ -1030,8 +1030,9 @@ td img {
 
 table, th, td {
     border-collapse: collapse;
-    padding: 1rem;
-    text-align: left;
+    padding: 1rem .5rem;
+    text-align: center;
+		font-size: 13px;
 }
 
 thead th {

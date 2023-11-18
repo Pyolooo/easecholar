@@ -58,7 +58,6 @@ while ($row = mysqli_fetch_assoc($result)) {
     // Set Y position for the next row
     $pdf->SetY($yPosScholarship);
 
-
     
     $pdf->Cell(6, $heightScholarship, $number++, 1, 0, 'C');
 
@@ -76,8 +75,6 @@ while ($row = mysqli_fetch_assoc($result)) {
 
     $pdf->Ln();
 }
-
-
 
 $pdf->Output();
 

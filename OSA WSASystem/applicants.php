@@ -207,6 +207,11 @@ if (isset($_GET['logout'])) {
                 <div class="order">
                     <section class="table__header">
                         <div class="export-container">
+                        <select title="Select Status" id="statusSelect">
+                            <option value="Accepted">Accepted</option>
+                            <option value="Rejected">Rejected</option>
+                        </select>
+
                             <select title="Select Scholarships" id="scholarshipSelect" name="scholarship_id">
                                 <option value="">All Scholarships</option>
                                 <?php
@@ -360,23 +365,32 @@ if (isset($_GET['logout'])) {
                 });
 
                 document.getElementById("exportButton").addEventListener("click", function() {
-                    var scholarshipSelect = document.getElementById("scholarshipSelect");
-                    var exportFormatSelect = document.getElementById("exportFormatSelect");
-                    var selectedScholarshipId = scholarshipSelect.value;
-                    var selectedFormat = exportFormatSelect.value;
+    var scholarshipSelect = document.getElementById("scholarshipSelect");
+    var exportFormatSelect = document.getElementById("exportFormatSelect");
+    var statusSelect = document.getElementById("statusSelect"); // new line
+    var selectedScholarshipId = scholarshipSelect.value;
+    var selectedFormat = exportFormatSelect.value;
+    var selectedStatus = statusSelect.value; // new line
 
-                    var exportURL = "generate_pdf.php";
+    var exportURL = "generate_pdf.php";
 
-                    if (selectedFormat === "excel") {
-                        exportURL = "generate_excel.php";
-                    }
+    if (selectedFormat === "excel") {
+        exportURL = "generate_excel.php";
+    }
 
-                    if (selectedScholarshipId) {
-                        exportURL += "?scholarship_id=" + selectedScholarshipId;
-                    }
+    if (selectedScholarshipId) {
+        exportURL += "?scholarship_id=" + encodeURIComponent(selectedScholarshipId);
+    }
 
-                    window.location.href = exportURL;
-                });
+    if (selectedStatus) { // new block
+        exportURL += (selectedScholarshipId ? "&" : "?") + "status=" + encodeURIComponent(selectedStatus);
+    }
+
+    window.location.href = exportURL;
+});
+
+
+
 
                 const menuBar = document.querySelector('#content nav .bx.bx-menu');
                 const sidebar = document.getElementById('sidebar');

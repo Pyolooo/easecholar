@@ -409,6 +409,30 @@ align-items: start;
   cursor: pointer;
 }
 
+.update-container{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.update-button{
+  width: 80%;
+  margin-top: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+	border: 0;
+  padding: 10px 60px;
+	background: var(--primary);
+	color: var(--white);
+	font-size: 18px;
+  font-weight: 600;
+	border-radius: 10px;
+	transition: 0.5s ease;
+	cursor: pointer;
+	transition: opacity 0.15s;
+}
+
 .cancel-button{
   cursor: pointer;
   text-align: center;

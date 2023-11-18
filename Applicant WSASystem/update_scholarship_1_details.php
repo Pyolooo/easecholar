@@ -376,7 +376,7 @@ if ($result->num_rows > 0) {
                                 $attachmentsExist = false;
 
                                 // Fetch attachment files from the tbl_user_messages table based on user_id
-                                $sqlAttachmentMessages = "SELECT attach_files FROM tbl_user_messages WHERE user_id = ? AND application_id = ?";
+                                $sqlAttachmentMessages = "SELECT attach_files FROM tbl_user_messages WHERE user_id = ? AND application_id = ? AND source = 'tbl_scholarship_1_form'";
                                 $stmtAttachmentMessages = $dbConn->prepare($sqlAttachmentMessages);
                                 $stmtAttachmentMessages->bind_param("ii", $user_id, $application_id);
                                 $stmtAttachmentMessages->execute();

@@ -525,7 +525,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
             <div class="input-field">
               <label>Year Graduated</label>
-              <input type="number" id="sec_year_grad" name="sec_year_grad" placeholder="Primary year graduated" value="<?php echo $sec_year_grad; ?>" required>
+              <input type="text" id="sec_year_grad" name="sec_year_grad" placeholder="YYYY or YYYY-YYYY" value="<?php echo $sec_year_grad; ?>" pattern="\d{4}(-\d{4})?" required>
+
               <div class="validation-message" id="sec_year_grad-error"></div>
             </div>
 
@@ -537,7 +538,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
             <div class="input-field">
               <label>Year Graduated</label>
-              <input type="number" id="ter_year_grad" name="ter_year_grad" placeholder="Primary year graduated" value="<?php echo $ter_year_grad; ?>" required>
+              <input type="text" id="ter_year_grad" name="ter_year_grad" placeholder="YYYY or YYYY-YYYY" value="<?php echo $ter_year_grad; ?>" pattern="\d{4}(-\d{4})?" required>
+
               <div class="validation-message" id="ter_year_grad-error"></div>
             </div>
           </div>
@@ -557,7 +559,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
             <div class="btns_wrap">
               <div class="common_btns form_3_btns">
-                <button type="button" onclick="href" class="btn_back">Back</button>
+              <button type="button" onclick="window.location.href='scholarships.php'" class="btn_back">Cancel</button>
+
                 <button type="submit" class="btn_done" name="submit">Done</button>
               </div>
             </div>
@@ -584,6 +587,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       const firstNameInput = form.first_name;
       const middleNameInput = form.middle_name;
       const pobInput = form.pob;
+      const ageInput = form.age;
       const religionInput = form.religion;
       const provinceInput = form.province;
       const townCityInput = form.town_city;
@@ -598,8 +602,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       const motherFNameInput = form.mother_fname;
       const motherMNameInput = form.mother_mname;
       const motherWorkInput = form.mother_work;
-      const grossIncomeInput = form.gross_income;
-      const noSiblingsInput = form.num_siblings;
+      const primSchoolInput = form.primary_school;
+      const primYearInput = form.prim_year_grad;
+      const secSchoolInput = form.secondary_school;
+      const secYearInput = form.sec_year_grad;
+      const terSchoolInput = form.tertiary_school;
+      const terYearInput = form.ter_year_grad;
       const courseDropdown = document.getElementById('course');
       const yearLevelDropdown = document.getElementById('year_lvl');
       const doneButton = document.querySelector(".btn_done");
@@ -705,10 +713,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           });
         }
 
-        if (form.age.value.trim() === "") {
+        if (ageInput.value.trim() === "") {
           isValid = false;
           document.getElementById("age-error").textContent = "Age is required.";
-        }
+        
+          ageInput.addEventListener('input', function() {
+                        document.getElementById("age-error").textContent = "";
+                    });
+                }
 
         if (citizenshipInput.value.trim() === "") {
                     isValid = false;
@@ -722,14 +734,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         var civil_status = document.getElementById('civil_status');
         var civil_status_error = document.getElementById('civil_status-error');
+
+        function validateStatus() {
         var selectedCivilStatus = civil_status.value;
 
-        if (selectedCivilStatus === 'Select status') {
-          civil_status_error.textContent = 'Please select a civil status.';
-          isValid = false;
-        } else {
-          civil_status_error.textContent = '';
+          if (selectedCivilStatus === 'Select status') {
+            civil_status_error.textContent = 'Please select a status';
+            isValid = false;
+          } else {
+            civil_status_error.textContent = '';
+          }
         }
+
+        // Initial validation
+        validateStatus();
+
+        civil_status.addEventListener('change', function() {
+          validateStatus();
+        });
 
         // Add validation logic for gender
         var gender = document.getElementById('gender');
@@ -957,101 +979,159 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           });
         }
 
-        if (form.primary_school.value.trim() === "") {
+        if (primSchoolInput.value.trim() === "") {
           isValid = false;
-          document.getElementById("primary_school-error").textContent = "Primary School is required.";
+          document.getElementById("primary_school-error").textContent = "Please enter your Primary School.";
         
-          motherWorkInput.addEventListener('input', function() {
-            document.getElementById("mother_work-error").textContent = "";
+          primSchoolInput.addEventListener('input', function() {
+            document.getElementById("primary_school-error").textContent = "";
           });
         }
 
-        if (form.prim_year_grad.value.trim() === "") {
+
+        var primYearInput = document.getElementById("prim_year_grad");
+
+        // Add an event listener for the input event
+        primYearInput.addEventListener("input", function() {
+    // Check if the input is not empty and is in the correct format
+    if (primYearInput.value.trim() !== "" && /^(\d{4}|\d{4}-\d{4})$/.test(primYearInput.value.trim())) {
+        // If correct format, clear the validation message
+        document.getElementById("prim_year_grad-error").textContent = "";
+    }
+});
+
+// Initial validation
+if (primYearInput.value.trim() === "") {
     isValid = false;
     document.getElementById("prim_year_grad-error").textContent = "Please enter your Primary Year Graduated.";
-
-    motherWorkInput.addEventListener('input', function() {
-            document.getElementById("mother_work-error").textContent = "";
-          });
-        }
+} else if (!/^(\d{4}|\d{4}-\d{4})$/.test(primYearInput.value.trim())) {
+    isValid = false;
+    document.getElementById("prim_year_grad-error").textContent = "Invalid format. Please enter a valid year (YYYY) or range (YYYY-YYYY)";
+}
  
 
-        if (form.secondary_school.value.trim() === "") {
+        if (secSchoolInput.value.trim() === "") {
           isValid = false;
-          document.getElementById("secondary_school-error").textContent = "Secondary School is required.";
+          document.getElementById("secondary_school-error").textContent = "Please enter your Secondary School.";
         
-          motherWorkInput.addEventListener('input', function() {
-            document.getElementById("mother_work-error").textContent = "";
+          secSchoolInput.addEventListener('input', function() {
+            document.getElementById("secondary_school-error").textContent = "";
           });
         }
 
-        if (form.sec_year_grad.value.trim() === "") {
-          isValid = false;
-          document.getElementById("sec_year_grad-error").textContent = "Secondary Year Graduated is required.";
+var secYearInput = document.getElementById("sec_year_grad");
+
+// Add an event listener for the input event
+secYearInput.addEventListener("input", function() {
+    // Check if the input is not empty and is in the correct format
+    if (secYearInput.value.trim() !== "" && /^(\d{4}|\d{4}-\d{4})$/.test(secYearInput.value.trim())) {
+        // If correct format, clear the validation message
+        document.getElementById("sec_year_grad-error").textContent = "";
+    }
+});
+
+// Initial validation
+if (secYearInput.value.trim() === "") {
+    isValid = false;
+    document.getElementById("sec_year_grad-error").textContent = "Please enter your Secondary Year Graduated.";
+} else if (!/^(\d{4}|\d{4}-\d{4})$/.test(secYearInput.value.trim())) {
+    isValid = false;
+    document.getElementById("sec_year_grad-error").textContent = "Invalid format. Please enter a valid year (YYYY) or range (YYYY-YYYY)";
+}
+
+
         
-          motherWorkInput.addEventListener('input', function() {
-            document.getElementById("mother_work-error").textContent = "";
-          });
-        }
 
-        if (form.tertiary_school.value.trim() === "") {
-          isValid = false;
-          document.getElementById("tertiary_school-error").textContent = "Tertiary School is required.";
-        
-          motherWorkInput.addEventListener('input', function() {
-            document.getElementById("mother_work-error").textContent = "";
-          });
-        }
+var terSchoolInput = document.getElementById("tertiary_school");
+var terYearGradInput = document.getElementById("ter_year_grad");
 
-        if (form.ter_year_grad.value.trim() === "") {
-          isValid = false;
-          document.getElementById("ter_year_grad-error").textContent = "Tertiary Year Graduated is required.";
-        }
+// Initial validation for Tertiary School
+if (terSchoolInput.value.trim() === "") {
+    isValid = false;
+    document.getElementById("tertiary_school-error").textContent = "Please enter your Tertiary School.";
+}
+
+// Add an event listener for the input event to clear the validation message
+terSchoolInput.addEventListener('input', function() {
+    document.getElementById("tertiary_school-error").textContent = "";
+});
+
+// Initial validation for Tertiary Year Graduated
+var terYearGradInputValue = terYearGradInput.value.trim();
+
+if (terYearGradInputValue === "") {
+    isValid = false;
+    document.getElementById("ter_year_grad-error").textContent = "Please enter your Tertiary Year Graduated or use 'NA' if not applicable.";
+} else if (terYearGradInputValue.toUpperCase() !== "NA" && !/^(\d{4}|\d{4}-\d{4})$/.test(terYearGradInputValue)) {
+    isValid = false;
+    document.getElementById("ter_year_grad-error").textContent = "Invalid format. Please enter a valid year (YYYY) or range (YYYY-YYYY), or use 'NA'.";
+}
 
 
 
-        var fileInputs = form.querySelectorAll('.file-input');
 
-        for (var i = 0; i < fileInputs.length; i++) {
-          var fileInput = fileInputs[i];
-          var requirementLabel = fileInput.previousElementSibling;
-          var checkbox = fileInput.previousElementSibling.previousElementSibling;
-          var requirementValidation = fileInput.parentElement.querySelector('.requirement-validation');
 
-          fileInput.addEventListener('change', function() {
+var fileInputs = form.querySelectorAll('.file-input');
+
+for (var i = 0; i < fileInputs.length; i++) {
+    (function() {
+        var fileInput = fileInputs[i];
+        var requirementLabel = fileInput.previousElementSibling;
+        var checkbox = fileInput.previousElementSibling.previousElementSibling;
+        var requirementValidation = fileInput.parentElement.querySelector('.requirement-validation');
+
+        fileInput.addEventListener('change', function() {
             if (fileInput.value.trim() !== '') {
-              requirementValidation.textContent = '';
-              requirementValidation.style.color = 'inherit';
+                var fileName = fileInput.value;
+                var validExtensions = ['pdf', 'jpg', 'jpeg', 'png'];
+                var fileExtension = fileName.split('.').pop().toLowerCase();
+
+                // Check if the file extension is valid
+                if (validExtensions.indexOf(fileExtension) === -1) {
+                    isValid = false;
+                    requirementValidation.textContent = 'Invalid file format. Supported formats: PDF, JPG, JPEG, PNG.';
+                    requirementValidation.style.color = 'red';
+                } else {
+                    // Clear the validation message when a valid file is uploaded
+                    requirementValidation.textContent = '';
+                    requirementValidation.style.color = 'inherit';
+                }
             }
-          });
-
-          if (fileInput.value.trim() === '') {
-            isValid = false;
-            requirementValidation.textContent = '*Must upload the photo'
-            requirementLabel.style.color = 'red';
-          } else {
-            requirementValidation.textContent = '';
-            requirementLabel.style.color = 'inherit';
-          }
-        }
-
-
-        const checkboxes = form.querySelectorAll('.file-input-checkbox');
-
-        fileInputs.forEach((fileInput, index) => {
-          fileInput.addEventListener('change', () => {
-            const checkbox = document.getElementById(`checkbox-${index}`);
-            checkbox.disabled = true;
-            checkbox.checked = true;
-          });
         });
 
-
-        if (!isValid) {
-          event.preventDefault();
+        if (fileInput.value.trim() === '') {
+            isValid = false;
+            // Display the validation message
+            requirementValidation.textContent = '*Must upload a valid file (PDF, JPG, JPEG, PNG)';
+            requirementLabel.style.color = 'red';
+            // You can also uncheck the corresponding checkbox if needed
+            // checkbox.checked = false;
+        } else {
+            // Reset the validation message
+            requirementValidation.textContent = '';
+            requirementLabel.style.color = 'inherit';
         }
-      });
+    })();
+}
+
+const checkboxes = form.querySelectorAll('.file-input-checkbox');
+
+fileInputs.forEach((fileInput, index) => {
+    fileInput.addEventListener('change', () => {
+        const checkbox = document.getElementById(`checkbox-${index}`);
+        checkbox.disabled = true;
+        checkbox.checked = true;
     });
+});
+
+
+
+
+if (!isValid) {
+    event.preventDefault(); // Prevent form submission if validation fails
+}
+});
+});
 
     document.addEventListener("DOMContentLoaded", function() {
       fetch('philippine_provinces_cities_municipalities_and_barangays_2019v2.json')

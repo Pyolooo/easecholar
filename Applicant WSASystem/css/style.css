@@ -67,6 +67,12 @@ body {
 	background-color: #0000004f;
 }
 
+.scrollable-notifications {
+	max-height: 300px;
+	/* Set your desired max height */
+	overflow-y: auto;
+}
+
 /* SIDEBAR */
 #sidebar {
 	position: fixed;

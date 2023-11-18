@@ -221,6 +221,7 @@ if ($rowUserInfo = mysqli_fetch_assoc($resultUserInfo)) {
 
                     <div class="dropdown">
                         <div class="notif-label"><i style="margin-right: 50px;" class='bx bxs-bell'></i>Notifications</div>
+                        <div class="scrollable-notifications">
                         <?php
                         $applicationIdsQuery = "(SELECT application_id
                          FROM tbl_userapp
@@ -253,6 +254,7 @@ if ($rowUserInfo = mysqli_fetch_assoc($resultUserInfo)) {
                             // Loop through messages for the current application
                             while ($row = mysqli_fetch_assoc($notificationsResult)) {
                         ?>
+                        
                                 <div class="notify_item" data-message-id="<?php echo $row['message_id']; ?>" data-application-id="<?php echo $row['application_id']; ?>" data-admin-id="<?php echo $row['admin_id']; ?>">
                                     <div class="notify_img">
                                         <?php
@@ -280,6 +282,7 @@ if ($rowUserInfo = mysqli_fetch_assoc($resultUserInfo)) {
                             }
                         }
                         ?>
+                        </div>
                     </div>
                 </div>
 

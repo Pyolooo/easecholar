@@ -176,43 +176,43 @@ if (isset($_POST['status'])) {
   }
 }
 
-// function sendSmsNotification($phoneNumber, $message) {
-//   $apiKey = 'd9e762406ca20e174568cd6d83026550';
-//   $url = 'https://api.semaphore.co/api/v4/messages';
+function sendSmsNotification($phoneNumber, $message) {
+  $apiKey = 'd9e762406ca20e174568cd6d83026550';
+  $url = 'https://api.semaphore.co/api/v4/messages';
 
-//   $data = [
-//     'apikey' => $apiKey,
-//     'number' => $phoneNumber,
-//     'message' => $message,
-//     'sendername' => 'EASECHOLAR'
-//   ];
+  $data = [
+    'apikey' => $apiKey,
+    'number' => $phoneNumber,
+    'message' => $message,
+    'sendername' => 'EASECHOLAR'
+  ];
 
-//   $ch = curl_init();
-//   curl_setopt($ch, CURLOPT_URL, $url);
-//   curl_setopt($ch, CURLOPT_POST, 1);
-//   curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-//   curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-//   curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+  $ch = curl_init();
+  curl_setopt($ch, CURLOPT_URL, $url);
+  curl_setopt($ch, CURLOPT_POST, 1);
+  curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+  curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
 
-//   $output = curl_exec($ch);
+  $output = curl_exec($ch);
 
-//   if ($output === false) {
-//     echo 'Curl error: ' . curl_error($ch);
-//   } else {
-//     // Check the response for error messages
-//     $response = json_decode($output, true);
-//     if (isset($response['error'])) {
-//       echo 'Semaphore API Error: ' . $response['error']['description'];
-//     } else {
-//       // SMS sent successfully
-//       return true;
-//     }
-//   }
+  if ($output === false) {
+    echo 'Curl error: ' . curl_error($ch);
+  } else {
+    // Check the response for error messages
+    $response = json_decode($output, true);
+    if (isset($response['error'])) {
+      echo 'Semaphore API Error: ' . $response['error']['description'];
+    } else {
+      // SMS sent successfully
+      return true;
+    }
+  }
 
-//   curl_close($ch);
-//   return false;
-// }
+  curl_close($ch);
+  return false;
+}
 
 
 

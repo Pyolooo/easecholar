@@ -81,7 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     $file_name = uniqid('profile_') . '.' . $file_extension;
-    $upload_directory = $_SERVER['DOCUMENT_ROOT'] . '/EASE-CHOLAR/user_profiles/' . $file_name;
+    $upload_directory = $_SERVER['DOCUMENT_ROOT'] . '/user_profiles/' . $file_name;
 
     if (move_uploaded_file($profile['tmp_name'], $upload_directory)) {
       // Store only the file name in the database
@@ -118,7 +118,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Construct the updated profile image HTML
     $updatedProfileImageHTML = '';
     if (!empty($image_path)) {
-      $updatedProfileImageHTML = "<img src='/EASE-CHOLAR/user_profiles/{$image_path}' width='250' height='250'>";
+      $updatedProfileImageHTML = "<img src='../user_profiles/{$image_path}' width='250' height='250'>";
     }
   }
 $conn->close();
@@ -196,7 +196,7 @@ $conn->close();
               if (!empty($updatedProfileImageHTML)) {
                 echo $updatedProfileImageHTML;
               } elseif (!empty($image_path)) {
-                echo "<img src='/EASE-CHOLAR/user_profiles/{$image_path}' width='250' height='250'>";
+                echo "<img src='../user_profiles/{$image_path}' width='250' height='250'>";
               }
               ?>
             </div>

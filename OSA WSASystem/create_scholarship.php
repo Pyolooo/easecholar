@@ -22,7 +22,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   $application_form_table = $_POST["application_form_table"];
 
    // Handle image upload
-$targetDirectory = $_SERVER['DOCUMENT_ROOT'] . '/EASE-CHOLAR/file_uploads/';
+$targetDirectory = $_SERVER['DOCUMENT_ROOT'] . '/file_uploads/';
 $defaultImage = 'isulogo.png';
 $uploadOk = 1;
 $imageFileType = strtolower(pathinfo($_FILES["image"]["name"], PATHINFO_EXTENSION));

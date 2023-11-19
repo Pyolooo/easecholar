@@ -30,7 +30,7 @@ if (isset($_POST['submit'])) {
                 $largeImageMessage = 'Image size is too large!';
             } else {
                 $filename = uniqid() . '_' . $image;
-                $targetDirectory = $_SERVER['DOCUMENT_ROOT'] . '/EASE-CHOLAR/user_profiles/';
+                $targetDirectory = $_SERVER['DOCUMENT_ROOT'] . '/user_profiles/';
                 $targetPath = $targetDirectory . $filename;
 
                 if (move_uploaded_file($image_tmp_name, $targetPath)) {

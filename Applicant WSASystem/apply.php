@@ -140,7 +140,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $validImageExtension = ['jpg', 'jpeg', 'png', 'pdf'];
         $uploadedFiles = array();
 
-        $targetDirectory = $_SERVER['DOCUMENT_ROOT'] . '/EASE-CHOLAR/file_uploads/';
+        $targetDirectory = $_SERVER['DOCUMENT_ROOT'] . '/file_uploads/';
 
         for ($i = 0; $i < $fileCount; $i++) {
             $fileName = $file["name"][$i];

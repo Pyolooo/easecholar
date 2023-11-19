@@ -85,7 +85,7 @@ if (isset($_GET['id']) && isset($_SESSION['user_id'])) {
         <body>
             <div class="table-data">
                 <div class="scholarship-container">
-            <img class='scholarship-logo' src='/EASE-CHOLAR/file_uploads/<?php echo basename($scholarship_logo); ?>' alt="Scholarship Logo">
+            <img class='scholarship-logo' src='../file_uploads/<?php echo basename($scholarship_logo); ?>' alt="Scholarship Logo">
                 <h1 class="scholarship-title"><?php echo $row['scholarship']; ?></h1>
                 </div>
                 <hr>

@@ -80,7 +80,7 @@ if (isset($_GET['id'])) {
             <div id="updated-profile-image">
               <?php
               if (!empty($image)) {
-                echo "<img src='/EASE-CHOLAR/user_profiles/{$image}' width='250' height='250'>";
+                echo "<img src='../user_profiles/{$image}' width='250' height='250'>";
               }
               ?>
             </div>

@@ -205,7 +205,7 @@ if (!$listResult) {
                             <?php while ($row = mysqli_fetch_assoc($notifications)) { ?>
                                 <div class="notify_item">
                                     <div class="notify_img">
-                                        <img src='/EASE-CHOLAR/user_profiles/<?php echo $row['image']; ?>' alt="Profile">
+                                        <img src='../user_profiles/<?php echo $row['image']; ?>' alt="Profile">
                                     </div>
                                     <div class="notify_info">
                                         <p>
@@ -238,24 +238,17 @@ if (!$listResult) {
 
                 
                 <div class="profile">
-                    <a href="osa_profile.php" class="profile">
+                <a href="osa_profile.php" class="profile">
                         <?php
-                        $select_osa = mysqli_query($dbConn, "SELECT * FROM `tbl_admin` WHERE admin_id = '$admin_id'") or die('query failed');
+                        $select_osa = mysqli_query($conn, "SELECT * FROM `tbl_admin` WHERE admin_id = '$admin_id'") or die('query failed');
                         $fetch = mysqli_fetch_assoc($select_osa);
                         if ($fetch && $fetch['profile'] != '') {
-                            $imagePath = $_SERVER['DOCUMENT_ROOT'] . '/EASE-CHOLAR/user_profiles/' . $fetch['profile'];
-
-                            if (file_exists($imagePath)) {
-                                echo '<img src="../user_profiles/' . $fetch['profile'] . '">';
-                            } else {
-                                echo '<img src="../user_profiles/default-avatar.png">';
-                            }
+                            echo '<img src="../user_profiles/' . $fetch['profile'] . '">';
                         } else {
                             echo '<img src="../user_profiles/default-avatar.png">';
                         }
                         ?>
                     </a>
-
                 </div>
             </div>
         </nav>
@@ -465,9 +458,9 @@ if (!$listResult) {
                             $count = 0;
                             while ($row = $result->fetch_assoc()) {
                                 if ($count >= 10) {
-                                    echo '<li class="scholar_container hidden"><img class="scholar_image" src="/EASE-CHOLAR/user_profiles/' . $row['image'] . '" alt=""> <span class="scholar_name">' . $row['applicant_name'] . ' </span> </li>';
+                                    echo '<li class="scholar_container hidden"><img class="scholar_image" src="../user_profiles/' . $row['image'] . '" alt=""> <span class="scholar_name">' . $row['applicant_name'] . ' </span> </li>';
                                 } else {
-                                    echo '<li class="scholar_container"><img class="scholar_image" src="/EASE-CHOLAR/user_profiles/' . $row['image'] . '" alt=""> <span class="scholar_name">' . $row['applicant_name'] . ' </span> </li>';
+                                    echo '<li class="scholar_container"><img class="scholar_image" src="../user_profiles/' . $row['image'] . '" alt=""> <span class="scholar_name">' . $row['applicant_name'] . ' </span> </li>';
                                 }
                                 $count++;
                             }

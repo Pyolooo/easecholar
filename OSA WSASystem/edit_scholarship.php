@@ -31,7 +31,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Check if a new image is selected
     if ($_FILES['image']['name'] != '') {
-      $targetDir = $_SERVER['DOCUMENT_ROOT'] . '/EASE-CHOLAR/file_uploads/';
+      $targetDir = $_SERVER['DOCUMENT_ROOT'] . '/file_uploads/';
         
       // Generate a unique and secure filename
       $originalFileName = basename($_FILES["image"]["name"]);
@@ -212,7 +212,7 @@ if (isset($_GET['id'])) {
       <div class="selected-image-container">
       <div class="image-container">
       <div class="image-container">
-      <img id="selected-image" src='/EASE-CHOLAR/file_uploads/<?php echo basename($targetFile); ?>' alt="Scholarship Logo">
+      <img id="selected-image" src='../file_uploads/<?php echo basename($targetFile); ?>' alt="Scholarship Logo">
 
 </div>
 

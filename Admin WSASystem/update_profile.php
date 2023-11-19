@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $response = 'Invalid file type. Allowed types: jpg, jpeg, png, gif';
         } else {
             $file_name = uniqid('profile_') . '.' . $file_extension;
-            $upload_directory = $_SERVER['DOCUMENT_ROOT'] . '/EASE-CHOLAR/user_profiles/' . $file_name;
+            $upload_directory = $_SERVER['DOCUMENT_ROOT'] . '/user_profiles/' . $file_name;
 
             if (move_uploaded_file($profile['tmp_name'], $upload_directory)) {
                 $profile_path = $file_name;

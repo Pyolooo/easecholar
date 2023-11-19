@@ -275,21 +275,15 @@ function formatExpireDate($dbExpireDate)
                     </div>
                 </div>
                 <div class="profile">
-                    <a href="applicant_profile.php" class="profile">
+                <a href="applicant_profile.php" class="profile">
                         <?php
                         $select_user = mysqli_query($dbConn, "SELECT * FROM `tbl_user` WHERE user_id = '$user_id'") or die('query failed');
                         $fetch = mysqli_fetch_assoc($select_user);
                         if ($fetch && $fetch['image'] != '') {
-                            $imagePath = $_SERVER['DOCUMENT_ROOT'] . '/EASE-CHOLAR/user_profiles/' . $fetch['image'];
-
-                            if (file_exists($imagePath)) {
-                                echo '<img src="../user_profiles/' . $fetch['image'] . '">';
-                            } else {
-                                echo '<img src="../user_profiles/default-avatar.png">';
-                            }
+                            echo '<img src="../user_profiles/' . $fetch['image'] . '">';
                         } else {
                             echo '<img src="../user_profiles/default-avatar.png">';
-                        }
+                            }
                         ?>
                     </a>
                 </div>

@@ -292,17 +292,10 @@ if ($rowUserInfo = mysqli_fetch_assoc($resultUserInfo)) {
                         $select_user = mysqli_query($dbConn, "SELECT * FROM `tbl_user` WHERE user_id = '$user_id'") or die('query failed');
                         $fetch = mysqli_fetch_assoc($select_user);
                         if ($fetch && $fetch['image'] != '') {
-                            // Build the absolute path to the image using $_SERVER['DOCUMENT_ROOT']
-                            $imagePath = $_SERVER['DOCUMENT_ROOT'] . '/EASE-CHOLAR/user_profiles/' . $fetch['image'];
-
-                            if (file_exists($imagePath)) {
-                                echo '<img src="../user_profiles/' . $fetch['image'] . '">';
-                            } else {
-                                echo '<img src="../user_profiles/default-avatar.png">';
-                            }
+                            echo '<img src="../user_profiles/' . $fetch['image'] . '">';
                         } else {
                             echo '<img src="../user_profiles/default-avatar.png">';
-                        }
+                            }
                         ?>
                     </a>
                 </div>

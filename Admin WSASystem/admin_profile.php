@@ -48,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $file_name = uniqid('profile_') . '.' . $file_extension;
-        $upload_directory = $_SERVER['DOCUMENT_ROOT'] . '/EASE-CHOLAR/user_profiles/' . $file_name;
+        $upload_directory = $_SERVER['DOCUMENT_ROOT'] . '/user_profiles/' . $file_name;
 
         if (move_uploaded_file($profile['tmp_name'], $upload_directory)) {
             $profile_path = $file_name;
@@ -92,6 +92,7 @@ $dbConn->close();
     <!-- Boxicons -->
     <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 
     <link rel="stylesheet" href="css/admin_profile.css">
     <title>Your Profile</title>
@@ -99,6 +100,23 @@ $dbConn->close();
 
 <body>
     <form method="POST" action="" enctype="multipart/form-data">
+    <?php
+    if (isset($success_message)) {
+                echo '<script>
+                Swal.fire({
+                    position: "center",
+                    icon: "success",
+                    title: "' . $success_message . '",
+                    showConfirmButton: false,
+                    timer: 2500
+                }).then((result) => {
+                    if (result.dismiss === Swal.DismissReason.timer) {
+                        window.location.href = "admin_dashboard.php";
+                    }
+                });
+                </script>';
+            }
+            ?>
         <section>
             <h2 style="font-size: 25px; color: #636363; text-align:center;">Update Profile</h2>
             <div class="profile-container">
@@ -110,7 +128,7 @@ $dbConn->close();
                         <div id="updated-profile-image">
                             <?php
                             if (!empty($profile_path)) {
-                                echo "<img src='/EASE-CHOLAR/user_profiles/{$profile_path}' width='250' height='250'>";
+                                echo "<img src='../user_profiles/{$profile_path}' width='250' height='250'>";
                             }
                             ?>
                         </div>

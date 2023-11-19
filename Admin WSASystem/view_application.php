@@ -88,7 +88,7 @@ if (isset($_GET['id'])) {
     <form action="" method="POST" enctype="multipart/form-data">
       <div class="container">
         <div class="head">
-          <div class="img"><img src="/EASE-CHOLAR/user_profiles/<?php echo $applicationData['image']; ?>" alt="Profile"></div>
+          <div class="img"><img src="../user_profiles/<?php echo $applicationData['image']; ?>" alt="Profile"></div>
           <p class="applicant-name"><?php echo $applicationData['applicant_name']; ?></p>
           <div class="reminder">
             <h3 class="status-container">Status: <span class="status <?php echo strtolower($status); ?>"><?php echo $status; ?></span></h3>

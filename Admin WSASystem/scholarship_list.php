@@ -147,23 +147,15 @@ function formatExpireDate($dbExpireDate)
 				<div class="profile">
                 <a href="admin_profile.php" class="profile">
                         <?php
-                        $select_admin = mysqli_query($dbConn, "SELECT * FROM `tbl_super_admin` WHERE super_admin_id = '$super_admin_id'") or die('query failed');
+                        $select_admin = mysqli_query($conn, "SELECT * FROM `tbl_super_admin` WHERE super_admin_id = '$super_admin_id'") or die('query failed');
                         $fetch = mysqli_fetch_assoc($select_admin);
                         if ($fetch && $fetch['profile'] != '') {
-            
-                            $imagePath = $_SERVER['DOCUMENT_ROOT'] . '/EASE-CHOLAR/user_profiles/' . $fetch['profile'];
-
-                            if (file_exists($imagePath)) {
-                                echo '<img src="../user_profiles/' . $fetch['profile'] . '">';
-                            } else {
-                                echo '<img src="../user_profiles/isulogo.png">';
-                            }
+                            echo '<img src="../user_profiles/' . $fetch['profile'] . '">';
                         } else {
                             echo '<img src="../user_profiles/isulogo.png">';
                         }
                         ?>
                     </a>
-
                 </div>
 			</div>
 		</nav>

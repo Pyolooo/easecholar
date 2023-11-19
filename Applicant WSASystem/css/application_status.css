@@ -73,6 +73,11 @@ body {
 	background-color: #0000004f;
 }
 
+.scrollable-notifications {
+	max-height: 300px;
+	overflow-y: auto;
+}
+
 /* SIDEBAR */
 #sidebar {
 	position: fixed;
@@ -711,7 +716,7 @@ nav .profile img {
 	content: "";
 	position: absolute;
 	top: -30px;
-	left: 50%;
+	left: 73%;
 	transform: translateX(-50%);
 	border: 15px solid;
 	border-color: transparent transparent #fff transparent;

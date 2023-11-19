@@ -47,10 +47,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     $message = 'A new file has been uploaded by an applicant.';
                     $is_read = 'unread';
+                    $source = 'tbl_scholarship_1_form';
 
-                    $sql = "INSERT INTO tbl_notifications (user_id, application_id, image, message, is_read) VALUES (?, ?, ?, ?, ?)";
+                    $sql = "INSERT INTO tbl_notifications (user_id, application_id, image, message, is_read, source) VALUES (?, ?, ?, ?, ?, ?)";
                     $stmt = $dbConn->prepare($sql);
-                    $stmt->bind_param("iisss", $user_id, $application_id, $userImage, $message, $is_read);
+                    $stmt->bind_param("iissss", $user_id, $application_id, $userImage, $message, $is_read, $source);
 
                     if ($stmt->execute()) {
                         $successMessage = 'Details updated successfully';

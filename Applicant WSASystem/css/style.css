@@ -69,7 +69,6 @@ body {
 
 .scrollable-notifications {
 	max-height: 300px;
-	/* Set your desired max height */
 	overflow-y: auto;
 }
 
@@ -526,7 +525,7 @@ nav .profile img {
 	content: "";
 	position: absolute;
 	top: -30px;
-	left: 73%;
+	left: 67%;
 	transform: translateX(-50%);
 	border: 15px solid;
 	border-color: transparent transparent #fff transparent;

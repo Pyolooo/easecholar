@@ -732,6 +732,14 @@ nav .profile img {
 	margin-right: 15px;
 }
 
+.dropdown .notify_item .notify_img img {
+	vertical-align: middle;
+	border-style: none;
+	width: 45px;
+	height: 40px;
+	border-radius: 25px;
+}
+
 .dropdown .notify_item .notify_info p {
 	margin-bottom: 5px;
 }

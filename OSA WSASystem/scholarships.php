@@ -128,7 +128,7 @@ function formatExpireDate($dbExpireDate)
                             <?php while ($row = mysqli_fetch_assoc($notifications)) { ?>
                                 <div class="notify_item">
                                     <div class="notify_img">
-                                        <img src='/EASE-CHOLAR/user_profiles/<?php echo $row['image']; ?>' alt="" style="width: 50px">
+                                        <img src='/EASE-CHOLAR/user_profiles/<?php echo $row['image']; ?>' alt="Profile">
                                     </div>
                                     <div class="notify_info">
                                         <p>

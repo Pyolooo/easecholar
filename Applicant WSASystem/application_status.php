@@ -213,6 +213,7 @@ if ($rowUserInfo = mysqli_fetch_assoc($resultUserInfo)) {
 
                     <div class="dropdown">
                         <div class="notif-label"><i style="margin-right: 50px;" class='bx bxs-bell'></i>Notifications</div>
+                        <div class="scrollable-notifications">
                         <?php
                         $applicationIdsQuery = "SELECT application_id FROM tbl_userapp WHERE user_id = ?";
                         $stmtApplicationIds = mysqli_prepare($dbConn, $applicationIdsQuery);
@@ -265,6 +266,7 @@ if ($rowUserInfo = mysqli_fetch_assoc($resultUserInfo)) {
                             }
                         }
                         ?>
+                    </div>
                     </div>
                 </div>
 

@@ -33,6 +33,47 @@ $date_submitted = date('Y-m-d');
 $requirements = '';
 $scholarshipId = '';
 
+if (isset($_SESSION['user_id'])) {
+    $user_id = $_SESSION['user_id'];
+  
+    $sql = "SELECT * FROM tbl_userapp WHERE user_id = ?";
+    $stmt = $dbConn->prepare($sql);
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+  
+    // If the user has submitted an application, fetch the data and set default values
+    if ($result->num_rows > 0) {
+      $applicantData = $result->fetch_assoc();
+  
+      // Set default values for form fields
+      $last_name = $applicantData['last_name'];
+      $first_name = $applicantData['first_name'];
+      $middle_name = $applicantData['middle_name'];
+      $dob = $applicantData['dob'];
+      $pob = $applicantData['pob'];
+      $gender = $applicantData['gender'];
+      $email = $applicantData['email'];
+      $course = $applicantData['course'];
+      $year_lvl = $applicantData['year_lvl'];
+      $mobile_num = $applicantData['mobile_num'];
+      $citizenship = $applicantData['citizenship'];
+      $barangay = $applicantData['barangay'];
+      $town_city = $applicantData['town_city'];
+      $province = $applicantData['province'];
+      $zip_code = $applicantData['zip_code'];
+      $id_number = $applicantData['id_number'];
+      $father_name = $applicantData['father_name'];
+      $father_address = $applicantData['father_address'];
+      $father_work = $applicantData['father_work'];
+      $mother_name = $applicantData['mother_name'];
+      $mother_address = $applicantData['mother_address'];
+      $mother_work = $applicantData['mother_work'];
+      $gross_income = $applicantData['gross_income'];
+      $num_siblings = $applicantData['num_siblings'];
+    }
+  }
+
 if (isset($_GET['id'])) {
     $scholarshipId = $_GET['id'];
     $sql = "SELECT * FROM tbl_scholarship WHERE scholarship_id = ?";
@@ -314,8 +355,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <label>Sex</label>
                                 <select id="gender" name="gender" required>
                                     <option disabled selected>Select sex</option>
-                                    <option value="Male">Male</option>
-                                    <option value="Female">Female</option>
+                                    <option value="Male" <?php if ($gender == 'Male') echo 'selected' ?>>Male</option>
+                                    <option value="Female" <?php if($gender == 'Female') echo 'selected' ?>>Female</option>
                                 </select>
                                 <div class="validation-message" id="gender-error"></div>
                             </div>
@@ -342,7 +383,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <div class="fields">
                             <div class="input-field">
                                 <label>School ID Number</label>
-                                <input type="text" id="id_number" name="id_number" placeholder="2XXXXX1" value="<?php echo $id_number; ?>" oninput="formatIdNumber(this)" required>
+                                <input type="text" id="id_number" name="id_number" placeholder="2X-XXXX1" value="<?php echo $id_number; ?>" oninput="formatIdNumber(this)" required>
                                 <div class="validation-message" id="id_number-error"></div>
                             </div>
 
@@ -350,8 +391,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <label>Course</label>
                                 <select id="course" name="course" required>
                                     <option disabled selected>Select course</option>
-                                    <option value="BSIT">BSIT</option>
-                                    <option value="BSA">BSA</option>
+                                    <option value="BSIT" <?php if ($course == 'BSIT') echo 'selected' ?>>BSIT</option>
+                                    <option value="BSA" <?php if ($course == 'BSA') echo 'selected' ?>>BSA</option>
                                 </select>
                                 <div class="validation-message" id="course-error"></div>
                             </div>
@@ -360,10 +401,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <label>Year level</label>
                                 <select id="year_lvl" name="year_lvl" required>
                                     <option disabled selected>Select year</option>
-                                    <option value="1st">1st Year</option>
-                                    <option value="2nd">2nd Year</option>
-                                    <option value="3rd">3rd Year</option>
-                                    <option value="4th">4th Year</option>
+                                    <option value="1st" <?php if ($year_lvl == '1st') echo 'selected' ?>>1st Year</option>
+                                    <option value="2nd" <?php if ($year_lvl == '2nd') echo 'selected' ?>>2nd Year</option>
+                                    <option value="3rd" <?php if ($year_lvl == '3rd') echo 'selected' ?>>3rd Year</option>
+                                    <option value="4th" <?php if ($year_lvl == '4th') echo 'selected' ?>>4th Year</option>
                                 </select>
                                 <div class="validation-message" id="year_lvl-error"></div>
                             </div>

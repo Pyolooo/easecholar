@@ -42,8 +42,6 @@ if ($stmt) {
     $stmt->close();
 }
 
-$dbConn->close();
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = $_POST['username'];
     $full_name = $_POST['full_name'];
@@ -99,12 +97,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             echo "Statement preparation failed.";
         }
 
-        $dbConn->close();
     } else {
         foreach ($errors as $error) {
         }
     }
 }
+$dbConn->close();
 ?>
 
 <!DOCTYPE html>

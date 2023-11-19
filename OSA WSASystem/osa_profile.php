@@ -82,17 +82,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (empty($errors)) {
-        $dbConn = new mysqli($dbHost, $dbUser, $dbPass, $dbName);
-
-        if ($dbConn->connect_error) {
-            die("Connection failed: " . $dbConn->connect_error);
-        }
-
         $sql = "UPDATE tbl_admin SET email = ?, phone_num = ?, profile = ?, username = ?, full_name = ? WHERE admin_id = ?";
         $stmt = $dbConn->prepare($sql);
 
         if ($stmt) {
-            // Bind parameters
             $stmt->bind_param("sssssi", $email, $phone_num, $profile_path, $username, $full_name, $admin_id);
 
             if ($stmt->execute()) {

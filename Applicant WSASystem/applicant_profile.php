@@ -73,14 +73,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $upload_directory = $_SERVER['DOCUMENT_ROOT'] . '/user_profiles/' . $file_name;
 
     if (move_uploaded_file($profile['tmp_name'], $upload_directory)) {
-      // Store only the file name in the database
       $image_path = $file_name;
     } else {
       $errors[] = 'File upload failed.';
     }
   }
 
-  // Update the user's profile in the database
+  
   $sql = "UPDATE tbl_user SET full_name = ?, email = ?, student_num = ?, password = ?, image = ? WHERE user_id = ?";
   $stmt = $dbConn->prepare($sql);
 

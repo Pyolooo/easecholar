@@ -18,20 +18,9 @@ if (isset($_GET['logout'])) {
 
 $image_path = '';
 
-// Check if the user profile data exists in the database
-$dbHost = "localhost"; // Replace with your database host
-$dbUser = "root"; // Replace with your database username
-$dbPass = ""; // Replace with your database password
-$dbName = "easecholar"; // Replace with your database name
-
-$conn = new mysqli($dbHost, $dbUser, $dbPass, $dbName);
-
-if ($conn->connect_error) {
-  die("Connection failed: " . $conn->connect_error);
-}
 
 $sql = "SELECT * FROM tbl_user WHERE user_id = ?";
-$stmt = $conn->prepare($sql);
+$stmt = $dbConn->prepare($sql);
 
 if ($stmt) {
   $stmt->bind_param("i", $user_id);
@@ -93,7 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   // Update the user's profile in the database
   $sql = "UPDATE tbl_user SET full_name = ?, email = ?, student_num = ?, password = ?, image = ? WHERE user_id = ?";
-  $stmt = $conn->prepare($sql);
+  $stmt = $dbConn->prepare($sql);
 
   if ($stmt) {
     $stmt->bind_param("sssssi", $full_name, $email, $student_num, $password, $image_path, $user_id);
@@ -106,7 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $stmt->close();
   } else {
-    $errors[] = "Statement preparation failed: " . $conn->error;
+    $errors[] = "Statement preparation failed: " . $dbConn->error;
   }
       
     } else {
@@ -121,7 +110,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $updatedProfileImageHTML = "<img src='../user_profiles/{$image_path}' width='250' height='250'>";
     }
   }
-$conn->close();
+$dbConn->close();
 ?>
 
 <!DOCTYPE html>

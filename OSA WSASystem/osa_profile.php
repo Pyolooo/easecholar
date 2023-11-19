@@ -20,20 +20,9 @@ $profile_path = '';
 $email = '';
 $phone_num = '';
 
-// Check if the user profile data exists in the database
-$dbHost = "localhost"; // Replace with your database host
-$dbUser = "root"; // Replace with your database username
-$dbPass = ""; // Replace with your database password
-$dbName = "easecholar"; // Replace with your database name
-
-$conn = new mysqli($dbHost, $dbUser, $dbPass, $dbName);
-
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
 
 $sql = "SELECT * FROM tbl_admin WHERE admin_id = ?";
-$stmt = $conn->prepare($sql);
+$stmt = $dbConn->prepare($sql);
 
 if ($stmt) {
     $stmt->bind_param("i", $admin_id);
@@ -53,7 +42,7 @@ if ($stmt) {
     $stmt->close();
 }
 
-$conn->close();
+$dbConn->close();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = $_POST['username'];
@@ -93,14 +82,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (empty($errors)) {
-        $conn = new mysqli($dbHost, $dbUser, $dbPass, $dbName);
+        $dbConn = new mysqli($dbHost, $dbUser, $dbPass, $dbName);
 
-        if ($conn->connect_error) {
-            die("Connection failed: " . $conn->connect_error);
+        if ($dbConn->connect_error) {
+            die("Connection failed: " . $dbConn->connect_error);
         }
 
         $sql = "UPDATE tbl_admin SET email = ?, phone_num = ?, profile = ?, username = ?, full_name = ? WHERE admin_id = ?";
-        $stmt = $conn->prepare($sql);
+        $stmt = $dbConn->prepare($sql);
 
         if ($stmt) {
             // Bind parameters
@@ -117,7 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             echo "Statement preparation failed.";
         }
 
-        $conn->close();
+        $dbConn->close();
     } else {
         foreach ($errors as $error) {
         }

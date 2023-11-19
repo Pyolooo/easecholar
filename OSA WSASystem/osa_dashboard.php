@@ -240,7 +240,7 @@ if (!$listResult) {
                 <div class="profile">
                 <a href="osa_profile.php" class="profile">
                         <?php
-                        $select_osa = mysqli_query($conn, "SELECT * FROM `tbl_admin` WHERE admin_id = '$admin_id'") or die('query failed');
+                        $select_osa = mysqli_query($dbConn, "SELECT * FROM `tbl_admin` WHERE admin_id = '$admin_id'") or die('query failed');
                         $fetch = mysqli_fetch_assoc($select_osa);
                         if ($fetch && $fetch['profile'] != '') {
                             echo '<img src="../user_profiles/' . $fetch['profile'] . '">';

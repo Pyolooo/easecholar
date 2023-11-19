@@ -9,7 +9,7 @@ if (isset($_POST['submit'])) {
     $profile = $_FILES['profile']['name'];
     $image_size = $_FILES['profile']['size'];
     $image_tmp_name = $_FILES['profile']['tmp_name'];
-    $image_folder = $_SERVER['DOCUMENT_ROOT'] . '/EASE-CHOLAR/user_profiles/' . $profile;
+    $image_folder = $_SERVER['DOCUMENT_ROOT'] . '/user_profiles/' . $profile;
 
     $role = 'OSA';
 

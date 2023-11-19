@@ -147,7 +147,7 @@ function formatExpireDate($dbExpireDate)
 				<div class="profile">
                 <a href="admin_profile.php" class="profile">
                         <?php
-                        $select_admin = mysqli_query($conn, "SELECT * FROM `tbl_super_admin` WHERE super_admin_id = '$super_admin_id'") or die('query failed');
+                        $select_admin = mysqli_query($dbConn, "SELECT * FROM `tbl_super_admin` WHERE super_admin_id = '$super_admin_id'") or die('query failed');
                         $fetch = mysqli_fetch_assoc($select_admin);
                         if ($fetch && $fetch['profile'] != '') {
                             echo '<img src="../user_profiles/' . $fetch['profile'] . '">';

@@ -20,8 +20,11 @@ $email = '';
 $phone_num = '';
 
 
-function compressImage($source, $destination, $quality)
-{
+function compressImage($source, $destination, $quality) {
+    if (empty($source)) {
+        return false;
+    }
+
     $info = getimagesize($source);
 
     if ($info['mime'] == 'image/jpeg') {
@@ -29,7 +32,6 @@ function compressImage($source, $destination, $quality)
     } elseif ($info['mime'] == 'image/png') {
         $image = imagecreatefrompng($source);
     } else {
-
         return false;
     }
 

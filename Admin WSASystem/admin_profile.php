@@ -36,7 +36,6 @@ if ($stmt) {
 }
 
 function compressImage($source, $destination, $quality) {
-    // Check if $source is not empty
     if (empty($source)) {
         return false;
     }

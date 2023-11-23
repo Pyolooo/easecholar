@@ -35,6 +35,25 @@ if ($stmt) {
     $stmt->close();
 }
 
+function compressImage($source, $destination, $quality) {
+    $info = getimagesize($source);
+  
+    if ($info['mime'] == 'image/jpeg') {
+        $image = imagecreatefromjpeg($source);
+    } elseif ($info['mime'] == 'image/png') {
+        $image = imagecreatefrompng($source);
+    } else {
+      
+        return false;
+    }
+  
+    $success = imagejpeg($image, $destination, $quality);
+  
+    imagedestroy($image);
+  
+    return $success ? $destination : false;
+  }
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $profile = $_FILES['profile'];
@@ -42,20 +61,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!empty($profile['name'])) {
         $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif'];
         $file_extension = strtolower(pathinfo($profile['name'], PATHINFO_EXTENSION));
-
+    
         if (!in_array($file_extension, $allowed_extensions)) {
             $errors[] = 'Invalid file type. Allowed types: jpg, jpeg, png, gif';
         }
-
+    
         $file_name = uniqid('profile_') . '.' . $file_extension;
         $upload_directory = $_SERVER['DOCUMENT_ROOT'] . '/user_profiles/' . $file_name;
-
-        if (move_uploaded_file($profile['tmp_name'], $upload_directory)) {
+    
+        $compressedPath = compressImage($profile['tmp_name'], $upload_directory, 10);
+    
+        if ($compressedPath) {
             $profile_path = $file_name;
         } else {
-            $errors[] = 'File upload failed.';
+            $errors[] = 'Image compression failed.';
         }
     }
+
 
     if (empty($errors)) {
 

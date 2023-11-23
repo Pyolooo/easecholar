@@ -10,7 +10,6 @@ if (!isset($admin_id)) {
 }
 
 if (isset($_GET['logout'])) {
-    unset($admin_id);
     session_destroy();
     header('location: osa_login.php');
     exit();
@@ -20,6 +19,26 @@ $profile_path = '';
 $email = '';
 $phone_num = '';
 
+
+function compressImage($source, $destination, $quality)
+{
+    $info = getimagesize($source);
+
+    if ($info['mime'] == 'image/jpeg') {
+        $image = imagecreatefromjpeg($source);
+    } elseif ($info['mime'] == 'image/png') {
+        $image = imagecreatefrompng($source);
+    } else {
+
+        return false;
+    }
+
+    $success = imagejpeg($image, $destination, $quality);
+
+    imagedestroy($image);
+
+    return $success ? $destination : false;
+}
 
 $sql = "SELECT * FROM tbl_admin WHERE admin_id = ?";
 $stmt = $dbConn->prepare($sql);
@@ -63,21 +82,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!empty($profile['name'])) {
         $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif'];
         $file_extension = strtolower(pathinfo($profile['name'], PATHINFO_EXTENSION));
-
+    
         if (!in_array($file_extension, $allowed_extensions)) {
             $errors[] = 'Invalid file type. Allowed types: jpg, jpeg, png, gif';
         }
-
+    
         $file_name = uniqid('profile_') . '.' . $file_extension;
         $upload_directory = $_SERVER['DOCUMENT_ROOT'] . '/user_profiles/' . $file_name;
-
-        if (move_uploaded_file($profile['tmp_name'], $upload_directory)) {
-            // Only update $profile_path if the move operation was successful
+    
+        // Compress the image before moving it
+        $compressedPath = compressImage($profile['tmp_name'], $upload_directory, 10);
+    
+        if ($compressedPath) {
             $profile_path = $file_name;
         } else {
-            $errors[] = 'File upload failed.';
-        }        
+            $errors[] = 'Image compression failed.';
+        }
     }
+
+
 
     if (empty($errors)) {
         $sql = "UPDATE tbl_admin SET email = ?, phone_num = ?, profile = ?, username = ?, full_name = ? WHERE admin_id = ?";
@@ -96,7 +119,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             echo "Statement preparation failed.";
         }
-
     } else {
         foreach ($errors as $error) {
         }

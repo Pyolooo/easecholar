@@ -18,7 +18,6 @@ if (isset($_GET['logout'])) {
 
 $image_path = '';
 
-
 $sql = "SELECT * FROM tbl_user WHERE user_id = ?";
 $stmt = $dbConn->prepare($sql);
 
@@ -41,16 +40,36 @@ if ($stmt) {
   $stmt->close();
 }
 
+function compressImage($source, $destination, $quality) {
+  $info = getimagesize($source);
+
+  if ($info['mime'] == 'image/jpeg') {
+      $image = imagecreatefromjpeg($source);
+  } elseif ($info['mime'] == 'image/png') {
+      $image = imagecreatefrompng($source);
+  } else {
+
+      return false;
+  }
+
+  $success = imagejpeg($image, $destination, $quality);
+
+  imagedestroy($image);
+
+  return $success ? $destination : false;
+}
+
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $full_name = $_POST['full_name'];
   $email = $_POST['email'];
   $password = $_POST['password'];
 
-  // Check if $_POST['student_num'] is set before trying to access it
+
   if (isset($_POST['student_num'])) {
     $student_num = $_POST['student_num'];
   } else {
-    $student_num = ''; // You can set a default value or leave it empty as needed
+    $student_num = ''; 
   }
 
   $errors = array();
@@ -62,53 +81,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $profile = $_FILES['profile'];
 
   if (!empty($profile['name'])) {
-    $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif'];
-    $file_extension = strtolower(pathinfo($profile['name'], PATHINFO_EXTENSION));
-
-    if (!in_array($file_extension, $allowed_extensions)) {
-      $errors[] = 'Invalid file type. Allowed types: jpg, jpeg, png, gif';
-    }
-
-    $file_name = uniqid('profile_') . '.' . $file_extension;
-    $upload_directory = $_SERVER['DOCUMENT_ROOT'] . '/user_profiles/' . $file_name;
-
-    if (move_uploaded_file($profile['tmp_name'], $upload_directory)) {
-      $image_path = $file_name;
-    } else {
-      $errors[] = 'File upload failed.';
-    }
-  }
-
+      $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif'];
+      $file_extension = strtolower(pathinfo($profile['name'], PATHINFO_EXTENSION));
   
-  $sql = "UPDATE tbl_user SET full_name = ?, email = ?, student_num = ?, password = ?, image = ? WHERE user_id = ?";
-  $stmt = $dbConn->prepare($sql);
+      if (!in_array($file_extension, $allowed_extensions)) {
+          $errors[] = 'Invalid file type. Allowed types: jpg, jpeg, png, gif';
+      }
+  
+      $file_name = uniqid('profile_') . '.' . $file_extension;
+      $upload_directory = $_SERVER['DOCUMENT_ROOT'] . '/user_profiles/' . $file_name;
+  
+      // Compress the image before moving it
+      $compressedPath = compressImage($profile['tmp_name'], $upload_directory, 10);
+  
+      if ($compressedPath) {
+          $image_path = $file_name;
+      } else {
+          $errors[] = 'Image compression failed.';
+      }
+  }
+  
 
-  if ($stmt) {
+$sql = "UPDATE tbl_user SET full_name = ?, email = ?, student_num = ?, password = ?, image = ? WHERE user_id = ?";
+$stmt = $dbConn->prepare($sql);
+
+if ($stmt) {
     $stmt->bind_param("sssssi", $full_name, $email, $student_num, $password, $image_path, $user_id);
 
     if ($stmt->execute()) {
-      $success_message = "Profile updated successfully.";
+        $success_message = "Profile updated successfully.";
     } else {
-      $errors[] = "Profile update failed.";
+        $errors[] = "Profile update failed.";
     }
 
     $stmt->close();
-  } else {
+} else {
     $errors[] = "Statement preparation failed: " . $dbConn->error;
-  }
-      
-    } else {
-      $errors[] = 'File upload failed.';
-    }
+}
 
-
-  if (empty($errors)) {
+if (empty($errors)) {
     // Construct the updated profile image HTML
     $updatedProfileImageHTML = '';
     if (!empty($image_path)) {
-      $updatedProfileImageHTML = "<img src='../user_profiles/{$image_path}' width='250' height='250'>";
+        $updatedProfileImageHTML = "<img src='../user_profiles/{$image_path}' width='250' height='250'>";
     }
-  }
+}
+}
 $dbConn->close();
 ?>
 

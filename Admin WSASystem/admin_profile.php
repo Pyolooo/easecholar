@@ -36,23 +36,27 @@ if ($stmt) {
 }
 
 function compressImage($source, $destination, $quality) {
+    // Check if $source is not empty
+    if (empty($source)) {
+        return false;
+    }
+
     $info = getimagesize($source);
-  
+
     if ($info['mime'] == 'image/jpeg') {
         $image = imagecreatefromjpeg($source);
     } elseif ($info['mime'] == 'image/png') {
         $image = imagecreatefrompng($source);
     } else {
-      
         return false;
     }
-  
+
     $success = imagejpeg($image, $destination, $quality);
-  
+
     imagedestroy($image);
-  
+
     return $success ? $destination : false;
-  }
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 

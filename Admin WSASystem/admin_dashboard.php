@@ -267,13 +267,13 @@ $rejectedCount = $row['rejectedCount'];
                 <div class="scholarship-analytics">
                     <div class="head">
                         <h3>Scholarship Analytics</h3>
-                        <div class="export-button-container">
+                        <!-- <div class="export-button-container">
                             <select id="exportFormatSelect">
                                 <option value="pdf">PDF</option>
                                 <option value="excel">Excel</option>
                             </select>
                             <button id="exportButton">Export</button>
-                        </div>
+                        </div> -->
                     </div>
                     <table id="scholarship-analytics-table">
                         <thead>
@@ -537,10 +537,10 @@ $rejectedCount = $row['rejectedCount'];
                 var exportFormatSelect = document.getElementById("exportFormatSelect");
                 var selectedFormat = exportFormatSelect.value;
 
-                var exportURL = "generate_pdf.php"; // Default to PDF export URL
+                var exportURL = "generate_pdf.php";
 
                 if (selectedFormat === "excel") {
-                    exportURL = "generate_excel.php"; // Use Excel export URL if selected format is "excel"
+                    exportURL = "generate_excel.php";
                 }
 
                 window.location.href = exportURL;

@@ -176,7 +176,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       }
     }
 
-    $fileNamesString = implode(',', $uploadedFiles);
+    $attachments = implode(',', $uploadedFiles);
   }
 
   $isValid = true;
@@ -234,7 +234,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $sec_year_grad,
       $tertiary_school,
       $ter_year_grad,
-      $fileNamesString,
+      $attachments,
       $scholarship_id
     );
 

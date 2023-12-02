@@ -160,7 +160,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
-        $fileNamesString = implode(',', $uploadedFiles);
+        $attachments = implode(',', $uploadedFiles);
+
     }
 
     $isValid = true;
@@ -210,7 +211,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $mother_work,
             $gross_income,
             $num_siblings,
-            $fileNamesString,
+            $attachments,
             $scholarship_id
         );
 

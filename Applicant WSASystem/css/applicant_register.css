@@ -141,6 +141,7 @@
 
 .log-in form .input-container .input-style {
   padding: 10.5px;
+  outline: none;
   border: 1px solid #dedede;
   border-top-right-radius: 2px;
   border-bottom-right-radius: 2px;

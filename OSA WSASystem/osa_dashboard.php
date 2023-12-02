@@ -167,7 +167,7 @@ if (!$listResult) {
         <nav>
             <div class="menu">
                 <i class='bx bx-menu'></i>
-                <span class="school-name">ISABELA STATE UNIVERSITY SANTIAGO</span>
+                <span class="school-name">EASE-CHOLAR</span>
             </div>
             <div class="right-section">
                 <div class="notif">
@@ -236,9 +236,9 @@ if (!$listResult) {
                     </div>
                 </div>
 
-                
+
                 <div class="profile">
-                <a href="osa_profile.php" class="profile">
+                    <a href="osa_profile.php" class="profile">
                         <?php
                         $select_osa = mysqli_query($dbConn, "SELECT * FROM `tbl_admin` WHERE admin_id = '$admin_id'") or die('query failed');
                         $fetch = mysqli_fetch_assoc($select_osa);
@@ -337,7 +337,7 @@ if (!$listResult) {
                                     <option value="excel">Excel</option>
                                 </select>
                                 <button title="Export" id="exportButton">
-                                <i class='bx bxs-file-export'></i>Export</button>
+                                    <i class='bx bxs-file-export'></i>Export</button>
                             </div>
                         </div>
                         <canvas id="scholarshipAnalyticsChart"></canvas>
@@ -458,9 +458,9 @@ if (!$listResult) {
                             $count = 0;
                             while ($row = $result->fetch_assoc()) {
                                 if ($count >= 10) {
-                                    echo '<li class="scholar_container hidden"><img class="scholar_image" src="../user_profiles/' . $row['image'] . '" alt=""> <span class="scholar_name">' . $row['applicant_name'] . ' </span> </li>';
+                                    echo '<li class="scholar_container hidden"><img class="scholar_image" src="../user_profiles/' . $row['image'] . '" alt="Profile"> <span class="scholar_name">' . $row['applicant_name'] . ' </span> </li>';
                                 } else {
-                                    echo '<li class="scholar_container"><img class="scholar_image" src="../user_profiles/' . $row['image'] . '" alt=""> <span class="scholar_name">' . $row['applicant_name'] . ' </span> </li>';
+                                    echo '<li class="scholar_container"><img class="scholar_image" src="../user_profiles/' . $row['image'] . '" alt="Profile"> <span class="scholar_name">' . $row['applicant_name'] . ' </span> </li>';
                                 }
                                 $count++;
                             }
@@ -481,7 +481,9 @@ if (!$listResult) {
         <!-- MAIN -->
     </section>
 
-
+    <script src="js/osa_logout.js"></script>
+    <script src="js/toggle_sidebar.js"></script>
+    <script src="js/bell_dropdown.js"></script>
     <script>
         $(document).ready(function() {
             $("#reminderModal").modal("show");
@@ -496,27 +498,6 @@ if (!$listResult) {
         });
 
         $(document).ready(function() {
-            function confirmLogout() {
-                Swal.fire({
-                    title: "Logout",
-                    text: "Are you sure you want to log out?",
-                    icon: "warning",
-                    showCancelButton: true,
-                    confirmButtonColor: "#3085d6",
-                    cancelButtonColor: "#d33",
-                    confirmButtonText: "Yes, log out",
-                    cancelButtonText: "Cancel"
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        window.location.href = "osa_logout.php";
-                    }
-                });
-            }
-
-            document.querySelector(".logout").addEventListener("click", function(event) {
-                event.preventDefault();
-                confirmLogout();
-            });
 
             var backgroundColors = [
                 'rgba(75, 192, 192, 0.2)',
@@ -541,7 +522,6 @@ if (!$listResult) {
                     data: {
                         labels: labels,
                         datasets: [{
-                            label: 'Number of Applicants',
                             data: numApplicants,
                             backgroundColor: backgroundColors,
                             borderColor: 'rgba(75, 192, 192, 1)',
@@ -550,17 +530,34 @@ if (!$listResult) {
                     },
                     options: {
                         indexAxis: 'x',
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            x: {
+                                display: true
+                            },
+                            y: {
+                                display: true, 
+                                suggestedMin: 0,
+                                suggestedMax: 30, 
+                                stepSize: 5 
+                            }
+                        }
                     }
                 });
 
                 window.chartInitialized = true;
             }
 
+
             document.getElementById("exportButton").addEventListener("click", function() {
                 var exportFormatSelect = document.getElementById("exportFormatSelect");
                 var selectedFormat = exportFormatSelect.value;
 
-                var exportURL = "pdf_scholarship.php"; 
+                var exportURL = "pdf_scholarship.php";
 
                 if (selectedFormat === "excel") {
                     exportURL = "excel_scholarship.php";
@@ -625,46 +622,6 @@ if (!$listResult) {
                     // Hide the "View All" link after showing all scholars
                     viewAllScholarsLink.style.display = "none";
                 });
-            });
-
-            const menuBar = document.querySelector('#content nav .bx.bx-menu');
-            const sidebar = document.getElementById('sidebar');
-
-            function toggleSidebar() {
-                sidebar.classList.toggle('hide');
-            }
-
-            menuBar.addEventListener('click', toggleSidebar);
-
-            function handleResize() {
-                const screenWidth = window.innerWidth;
-
-                if (screenWidth <= 768) {
-                    sidebar.classList.add('hide');
-                } else {
-                    sidebar.classList.remove('hide');
-                }
-            }
-
-            window.addEventListener('resize', handleResize);
-            handleResize();
-
-
-            function toggleDropdown() {
-                $(".num").hide();
-            }
-
-            $(".notification .bxs-bell").on("click", function(event) {
-                event.stopPropagation();
-                $(".dropdown").toggleClass("active");
-                toggleDropdown();
-                if ($(".dropdown").hasClass("active")) {
-                    markAllNotificationsAsRead();
-                } else {}
-            });
-
-            $(document).on("click", function() {
-                $(".dropdown").removeClass("active");
             });
 
 

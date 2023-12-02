@@ -7,16 +7,14 @@ a {
 li{
 	margin: 5px;
 }
-ul{
-	padding-top: 10px;
-	padding-bottom: 15px;
+ul {
+	padding: 10px 15px 15px 40px;
 }
 
 
 :root {
 	--poppins: 'Poppins', sans-serif;
 	--lato: 'Lato', sans-serif;
-
 	--light: #F9F9F9;
 	--blue: #3C91E6;
 	--light-blue: #CFE8FF;
@@ -263,6 +261,13 @@ h2{
 		flex-direction: column;
 	}
 	.scholarship-title{
-		font-size: 25px;
+		font-size: 15px;
 	}
+
+	.scholarship-logo {
+    width: 60px;
+    height: 60px;
+    border-radius: 30px;
+    margin-right: 20px;
+}
 }

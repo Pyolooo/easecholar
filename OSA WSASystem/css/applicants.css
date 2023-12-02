@@ -373,7 +373,7 @@ nav .profile img {
 .school-name{
 	margin-left: 30px;
 	font-weight: 600;
-	font-size: x-large;
+	font-size: 20px;
 	letter-spacing: 5px;
 	word-spacing: 5px;
 	color: #066606;
@@ -431,11 +431,17 @@ nav .profile img {
 	width: 30px;
 }
 
-#statusSelect,#scholarshipSelect,#exportFormatSelect{
+#statusSelect,#scholarshipSelect,#exportFormatSelect,#rowsPerPage {
+	outline: none;
 	margin-right: 10px;
 	cursor: pointer;
 	border-radius: 5px;
 	padding: 3px 5px;
+}
+
+.select-option {
+	font-size: 13px;
+	margin: 3px 0;
 }
 
 #exportButton{
@@ -680,9 +686,12 @@ nav .profile img {
 	border-radius: 0 36px 36px 0;
 	cursor: pointer;
 }
+
 .notification .bxs-bell {
 	cursor: pointer;
+	font-size: x-large;
 }
+
 
 .dropdown {
 	width: 350px;
@@ -736,7 +745,7 @@ nav .profile img {
 	vertical-align: middle;
 	border-style: none;
 	width: 45px;
-	height: 40px;
+	height: 45px;
 	border-radius: 25px;
 }
 
@@ -777,6 +786,16 @@ option {
 	font-size: 20px;
 	font-weight: 700;
 	padding-top: 20px;
+}
+
+.reason-filter {
+	padding: 10px 5px;
+	background-color: #d5d1defe;
+}
+
+#reasonFilter {
+	padding: 3px 2px;
+	border-radius: 2px;
 }
 
 .status-filter {
@@ -997,7 +1016,7 @@ main.table {
 }
 
 .table__body {
-    width: 95%;
+    width: 97%;
     max-height: calc(89% - 1.6rem);
     background-color: #fffb;
 
@@ -1030,15 +1049,24 @@ table {
 td img {
     width: 36px;
     height: 36px;
-    margin-right: .2rem;
+    margin-right: .5rem;
     border-radius: 50%;
-
     vertical-align: middle;
+		display: flex;
+}
+
+.image-applicant-container{
+	display: flex;
+	align-items: center;
+}
+
+.entries-range{
+	margin-top: 30px;
 }
 
 table, th, td {
     border-collapse: collapse;
-    padding: 1rem .5rem;
+    padding: 1rem .1rem;
     text-align: center;
 		font-size: 13px;
 }

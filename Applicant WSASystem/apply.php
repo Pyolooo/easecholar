@@ -509,8 +509,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <?php foreach ($requirements as $index => $requirement) { ?>
                             <div class="input-file">
                                 <input id="checkbox-<?php echo $index; ?>" class="checkbox" type="checkbox" disabled>
-                                <label class="requirement-label" for="file-input-<?php echo $index; ?>"><?php echo $requirement; ?></label>
-                                <div class="requirement-validation" id="requirement-validation"></div>
+                                <div class="file-container">
+                                    <label class="requirement-label" for="file-input-<?php echo $index; ?>"><?php echo $requirement; ?></label>
+                                    <div class="requirement-validation" id="requirement-validation"></div>
+                                    </div>
                                 <input id="file-input-<?php echo $index; ?>" class="file-input" type="file" name="file[]" required>
                             </div>
                         <?php } ?>
@@ -627,7 +629,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     });
                 }
 
-                // Add validation logic for date of birth
                 var dobInput = document.querySelector('input[name="dob"]');
                 var dobError = document.getElementById('date_birth-error');
 
@@ -662,7 +663,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     });
                 }
 
-                // Add validation logic for gender
                 var gender = document.getElementById('gender');
                 var gender_error = document.getElementById('gender-error');
 
@@ -677,16 +677,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                 }
 
-                // Initial validation
                 validateGender();
 
                 gender.addEventListener('change', function() {
                     validateGender();
                 });
 
-                // Add validation logic for email
                 var emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
-                var email = form.email; // Assuming form.email is the input element
+                var email = form.email; 
 
                 function validateEmail() {
                     if (email.value.trim() === '') {
@@ -696,14 +694,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         document.getElementById("email-error").textContent = 'Please enter a valid email address';
                         isValid = false;
                     } else {
-                        document.getElementById("email-error").textContent = ''; // Clear the validation message
+                        document.getElementById("email-error").textContent = ''; 
                     }
                 }
 
-                // Initial validation
                 validateEmail();
 
-                // Add an event listener to clear the validation message when the user types
                 email.addEventListener('input', function() {
                     validateEmail();
                 });
@@ -725,7 +721,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 validateMobileNum();
 
-                // Add an event listener to clear the validation message when the user types
                 mobileNum.addEventListener('input', function() {
                     validateMobileNum();
                 });
@@ -748,11 +743,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     year_lvl_error.textContent = 'Please select a year';
                     isValid = false;
                 } else {
-                    year_lvl_error.textContent = ''; // Clear the validation message
+                    year_lvl_error.textContent = ''; 
                 }
 
                 var idNumberRegex = /^\d+-\d{5}$/;
-                // Initial validation when the form is submitted or loaded
                 if (id_number.value.trim() === '') {
                     document.getElementById("id_number-error").textContent = 'ID Number is required';
                     isValid = false;
@@ -761,11 +755,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     isValid = false;
                 }
 
-                // Attach the input event listener
                 document.getElementById('id_number').addEventListener('input', function() {
-                    formatIdNumber(this); // Format the ID number
+                    formatIdNumber(this);
 
-                    // Validate the formatted ID number
                     if (this.value.trim() === '') {
                         document.getElementById("id_number-error").textContent = 'ID Number is required';
                         isValid = false;
@@ -773,8 +765,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         document.getElementById("id_number-error").textContent = 'Please enter a valid ID number in the format XX-XXXX';
                         isValid = false;
                     } else {
-                        document.getElementById("id_number-error").textContent = ''; // Clear the validation message
-                        isValid = true; // Update isValid when the input is valid
+                        document.getElementById("id_number-error").textContent = '';
+                        isValid = true; 
                     }
                 });
 

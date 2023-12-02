@@ -115,6 +115,12 @@ if ($result->num_rows > 0) {
 } else {
     die('User details not found');
 }
+
+    $sqlAdditionalInfo = "SELECT status, reasons, other_reason FROM tbl_scholarship_1_form WHERE user_id = ? AND application_id = ?";
+    $stmtAdditionalInfo = $dbConn->prepare($sqlAdditionalInfo);
+    $stmtAdditionalInfo->bind_param("ii", $user_id, $application_id);
+    $stmtAdditionalInfo->execute();
+    $resultAdditionalInfo = $stmtAdditionalInfo->get_result();
 ?>
 
 
@@ -127,6 +133,7 @@ if ($result->num_rows > 0) {
     <link rel="stylesheet" href="css/update_status.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 
     <title>Application Form</title>
@@ -154,8 +161,31 @@ if ($result->num_rows > 0) {
         }
         ?>
 
+
         <form action="" method="POST" enctype="multipart/form-data">
             <div class="container">
+            <?php
+if ($resultAdditionalInfo->num_rows > 0) {
+    $rowAdditionalInfo = $resultAdditionalInfo->fetch_assoc();
+
+    if ($rowAdditionalInfo['status'] == "Rejected") {
+        echo '<div class="rejected-info">';
+        echo '<img class="rejected-icon" src="../img/rejected-icon.png" alt="Rejected Image">';
+        // echo '<h4>Status: ' . $rowAdditionalInfo['status'] . '</h4>';
+        echo '<div class="rejected-reasons">';
+        $reasonsArray = json_decode($rowAdditionalInfo['reasons'], true);
+        echo '<p><span class="reason-label">Reasons: </span><span class="rejected-reason">' . implode(", ", $reasonsArray) . '</span></p>';
+        
+        if (!empty($rowAdditionalInfo['other_reason'])) {
+            echo '<p><span class="reason-label">Other Reasons: </span><span class="rejected-reason">' . $rowAdditionalInfo['other_reason'] . '</span></p>';
+        }
+        
+        echo '</div>';
+        echo '</div>';
+    }
+}
+?>
+
                 <div class="form first">
                     <h4 class="form-label">PERSONAL INFORMATION:</h4>
                     <br>
@@ -361,7 +391,6 @@ if ($result->num_rows > 0) {
                                             // Display a link to the file
                                             echo '<p>File: <a href="' . $filePath . '" target="_blank">' . $fileName . '</a></p>';
                                         } else {
-                                            // Handle the case where the file is missing
                                             echo '<p>File not found: ' . $fileName . '</p>';
                                         }
                                     }
@@ -373,72 +402,73 @@ if ($result->num_rows > 0) {
 
                             <div class="attachments-column">
                                 <h4 class="files-label">Lack of Documents</h4>
-                                <?php
-                                $attachmentsExist = false;
+                                <div class="attachments-container">
+                                    <div class="attachments-label">
+                                        <?php
+                                        $attachmentsExist = false;
+                                        $sqlAttachmentMessages = "SELECT attach_files FROM tbl_user_messages WHERE user_id = ? AND application_id = ? AND source = 'tbl_scholarship_1_form'";
+                                        $stmtAttachmentMessages = $dbConn->prepare($sqlAttachmentMessages);
+                                        $stmtAttachmentMessages->bind_param("ii", $user_id, $application_id);
+                                        $stmtAttachmentMessages->execute();
+                                        $resultAttachmentMessages = $stmtAttachmentMessages->get_result();
 
-                                // Fetch attachment files from the tbl_user_messages table based on user_id
-                                $sqlAttachmentMessages = "SELECT attach_files FROM tbl_user_messages WHERE user_id = ? AND application_id = ? AND source = 'tbl_scholarship_1_form'";
-                                $stmtAttachmentMessages = $dbConn->prepare($sqlAttachmentMessages);
-                                $stmtAttachmentMessages->bind_param("ii", $user_id, $application_id);
-                                $stmtAttachmentMessages->execute();
-                                $resultAttachmentMessages = $stmtAttachmentMessages->get_result();
+                                        if ($resultAttachmentMessages->num_rows > 0) {
+                                            while ($rowAttachment = $resultAttachmentMessages->fetch_assoc()) {
+                                                $attach_files = $rowAttachment['attach_files'];
 
-                                if ($resultAttachmentMessages->num_rows > 0) {
-                                    while ($rowAttachment = $resultAttachmentMessages->fetch_assoc()) {
-                                        $attach_files = $rowAttachment['attach_files'];
+                                                if (!empty($attach_files)) {
+                                                    // Display the attachments if they exist
+                                                    $attachmentNames = explode(',', $attach_files);
+                                                    foreach ($attachmentNames as $attachmentName) {
+                                                        $attachmentPath = '../file_uploads/' . $attachmentName;
+                                                        if (file_exists($attachmentPath)) {
+                                                            echo '<p>Attachment: <a href="' . $attachmentPath . '" target="_blank">' . $attachmentName . '</a></p>';
+                                                        } else {
+                                                            echo '<p>' . $attachmentName . '</p>';
+                                                        }
+                                                        $attachmentsExist = true;
+                                                    }
+                                                }
+                                            }
+                                        }
 
-                                        if (!empty($attach_files)) {
-                                            // Display the attachments if they exist
-                                            $attachmentNames = explode(',', $attach_files);
+                                        echo '</div>';
+
+                                        echo '<div class="attachments-uploaded">';
+                                        $attachments = $row['attachments'];
+
+                                        if (!empty($attachments)) {
+                                            $attachmentNames = explode(',', $attachments);
                                             foreach ($attachmentNames as $attachmentName) {
                                                 $attachmentPath = '../file_uploads/' . $attachmentName;
                                                 if (file_exists($attachmentPath)) {
-                                                    echo '<p>Attachment: <a href="' . $attachmentPath . '" target="_blank">' . $attachmentName . '</a></p>';
+                                                    echo '<p><a href="' . $attachmentPath . '" target="_blank">' . $attachmentName . '</a></p>';
                                                 } else {
                                                     echo '<p>' . $attachmentName . '</p>';
                                                 }
                                                 $attachmentsExist = true;
                                             }
                                         }
-                                    }
-                                }
 
-                                // Fetch attachment files from the tbl_userapp table
-                                $attachments = $row['attachments'];
-
-                                if (!empty($attachments)) {
-                                    // Display the attachments from tbl_userapp if they exist
-                                    $attachmentNames = explode(',', $attachments);
-                                    foreach ($attachmentNames as $attachmentName) {
-                                        $attachmentPath = '../file_uploads/' . $attachmentName;
-                                        if (file_exists($attachmentPath)) {
-                                            echo '<p><a href="' . $attachmentPath . '" target="_blank">' . $attachmentName . '</a></p>';
-                                        } else {
-                                            echo '<p>' . $attachmentName . '</p>';
+                                        if (!$attachmentsExist) {
+                                            echo '<p>No attachments uploaded</p>';
                                         }
-                                        $attachmentsExist = true;
-                                    }
-                                }
-
-                                if (!$attachmentsExist) {
-                                    echo '<p>No attachments uploaded</p>';
-                                }
-                                ?>
+                                        ?>
+                                    </div>
+                                </div>
                             </div>
-
-
-
                         </div>
 
                         <h4 class="attach-label">Attach file or photo here</h4>
                         <input type="file" name="new_attachments[]" id="new_attachments" multiple>
+                        <button class="upload-button" type="submit" name="submit"><i class='bx bx-upload'></i>Upload</button>
+                        <div id="selected-files"></div>
 
 
 
                         <div class="btns_wrap">
                             <div class="common_btns form_3_btns">
                                 <button class="cancel-button" type="button" onclick="window.location.href='application_status.php'">Back</button>
-                                <button class="update-button" type="submit" class="btn_done" name="submit">Update Details</button>
                             </div>
                         </div>
                 </div>
@@ -446,38 +476,84 @@ if ($result->num_rows > 0) {
 
     </div>
 
-    <!-- Add this JavaScript code within your HTML file -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.querySelector('form');
-            let isFormDirty = false;
+   document.addEventListener('DOMContentLoaded', function () {
+        const fileInput = document.getElementById('new_attachments');
+        const selectedFilesContainer = document.getElementById('selected-files');
 
-            // Function to mark the form as dirty when a form field is changed
-            function handleFormChange() {
-                isFormDirty = true;
+        fileInput.addEventListener('change', function (event) {
+            selectedFilesContainer.innerHTML = ''; 
+
+            const files = event.target.files;
+            for (const file of files) {
+                const fileName = file.name;
+                const fileItem = createFileItem(fileName);
+                selectedFilesContainer.appendChild(fileItem);
             }
-
-            // Add an event listener to each form field to detect changes
-            const formFields = form.querySelectorAll('input, select');
-            formFields.forEach(field => {
-                field.addEventListener('input', handleFormChange);
-            });
-
-            // Add a submit event listener to the form to prevent submission if the form is not dirty
-            form.addEventListener('submit', function(event) {
-                if (!isFormDirty) {
-                    // Form is not dirty; prevent submission
-                    event.preventDefault();
-                    Swal.fire({
-                        icon: 'info',
-                        title: 'No changes made',
-                        text: 'Please update some data.',
-                        showConfirmButton: false,
-                        timer: 2000 // Close the alert after 2 seconds
-                    });
-                }
-            });
         });
+
+        selectedFilesContainer.addEventListener('click', function (event) {
+    if (event.target.classList.contains('remove-selected-file')) {
+        const fileName = event.target.getAttribute('data-filename');
+        removeFile(fileName);
+    }
+});
+
+
+        function createFileItem(fileName) {
+            const fileItem = document.createElement('div');
+            fileItem.innerHTML = `<span class="filename">${fileName}</span><button type="button" class="remove-selected-file" data-filename="${fileName}">X</button>`;
+            return fileItem;
+        }
+
+        function removeFile(fileName) {
+    const fileInput = document.getElementById('new_attachments');
+    const files = fileInput.files;
+
+    // Remove the file from the displayed list
+    const fileItem = selectedFilesContainer.querySelector(`[data-filename="${fileName}"]`);
+    if (fileItem) {
+        fileItem.parentNode.removeChild(fileItem);
+    }
+
+    // Remove the file from the input
+    const updatedFiles = Array.from(files).filter(file => file.name !== fileName);
+    fileInput.value = ''; // Clear the file input
+    updatedFiles.forEach(file => {
+        fileInput.files.add(file);
+    });
+
+    if (updatedFiles.length === 0) {
+        selectedFilesContainer.innerHTML = '';
+    }
+}
+
+
+        const form = document.querySelector('form');
+        let isFormDirty = false;
+
+        function handleFormChange() {
+            isFormDirty = true;
+        }
+
+        const formFields = form.querySelectorAll('input, select');
+        formFields.forEach(field => {
+            field.addEventListener('input', handleFormChange);
+        });
+
+        form.addEventListener('submit', function (event) {
+            if (!isFormDirty) {
+                event.preventDefault();
+                Swal.fire({
+                    icon: 'info',
+                    title: 'No file selected',
+                    text: 'Please attach a file or photo.',
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+            }
+        });
+    });
     </script>
 
 </body>

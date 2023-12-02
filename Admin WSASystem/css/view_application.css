@@ -57,6 +57,31 @@ p{
     box-shadow: 0 5px 10px rgba(0,0,0,0.1);
     margin: 3rem;
 }
+
+.top-section{
+  width: 65%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.reason-label, .other-reason {
+  font-weight: 600;
+  font-size: 17px;
+}
+
+.reason-list, .other-reason-list {
+  color: rgb(213, 65, 65);
+  font-style: italic;
+}
+
+.reasons-container{
+  line-height: 30px;
+  border: 1px solid grey;
+  border-radius: 5px;
+  padding: 10px 80px 10px 10px;
+}
+
 .container .head {
     margin: 0px;
 }
@@ -99,6 +124,7 @@ p{
 .container img{
     width: 125px;
 }
+
 
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600&display=swap');
 

@@ -7,14 +7,12 @@ if (isset($_POST['submit'])) {
     $emailOrStudentNum = mysqli_real_escape_string($dbConn, $_POST['email_or_student_num']);
     $password = mysqli_real_escape_string($dbConn, $_POST['password']);
 
-    // Use a prepared statement to prevent SQL injection
     $query = mysqli_prepare($dbConn, "SELECT * FROM tbl_user WHERE (email = ? OR student_num = ?)");
     mysqli_stmt_bind_param($query, "ss", $emailOrStudentNum, $emailOrStudentNum);
     mysqli_stmt_execute($query);
     $result = mysqli_stmt_get_result($query);
 
     if (isset($_POST['remember_me'])) {
-        // Set cookies with user credentials
         setcookie('remember_user', $emailOrStudentNum, time() + (30 * 24 * 3600), '/');
         setcookie('remember_password', $password, time() + (30 * 24 * 3600), '/');
     }
@@ -27,7 +25,6 @@ if (isset($_POST['submit'])) {
             $incorrectMessage = 'Incorrect LRN!';
         }
     } else {
-        // Check if the user exists in the database (not verified)
         $query = mysqli_prepare($dbConn, "SELECT * FROM tbl_user WHERE email = ? OR student_num = ?");
         mysqli_stmt_bind_param($query, "ss", $emailOrStudentNum, $emailOrStudentNum);
         mysqli_stmt_execute($query);
@@ -161,8 +158,7 @@ if (isset($_POST['submit'])) {
                 <span class="input-container-addon">
                     <i class="fa fa-envelope-square"></i>
                 </span>
-                <input class="input-style" name="email_or_student_num" type="text" placeholder="Email or Student Number" required
-    value="<?php echo isset($_COOKIE['remember_user']) ? htmlspecialchars($_COOKIE['remember_user']) : ''; ?>">
+                <input class="input-style" name="email_or_student_num" type="text" placeholder="Email or Student Number" required value="<?php echo isset($_COOKIE['remember_user']) ? htmlspecialchars($_COOKIE['remember_user']) : ''; ?>">
             </div>
 
 
@@ -170,16 +166,15 @@ if (isset($_POST['submit'])) {
                 <span class="input-container-addon">
                     <i class="fa fa-lock"></i>
                 </span>
-                <input class="input-style" id="password" name="password" type="password" placeholder="LRN's number" required
-    value="<?php echo isset($_COOKIE['remember_password']) ? htmlspecialchars($_COOKIE['remember_password']) : ''; ?>">
+                <input class="input-style" id="password" name="password" type="password" placeholder="LRN's number" required value="<?php echo isset($_COOKIE['remember_password']) ? htmlspecialchars($_COOKIE['remember_password']) : ''; ?>">
             </div>
 
             <label class="show-password" for="show-password">
                 <input type="checkbox" id="show-password"> Show LRN's Number
             </label>
             <label class="show-password" for="remember-me">
-    <input type="checkbox" id="remember-me" name="remember_me"> Remember Me
-</label>
+                <input type="checkbox" id="remember-me" name="remember_me"> Remember Me
+            </label>
 
 
             <div class="button">
@@ -199,4 +194,5 @@ if (isset($_POST['submit'])) {
         });
     </script>
 </body>
+
 </html>

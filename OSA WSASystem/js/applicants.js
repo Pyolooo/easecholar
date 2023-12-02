@@ -59,74 +59,74 @@ function sortTable(column, sort_asc) {
         .map(sorted_row => document.querySelector('tbody').appendChild(sorted_row));
 }
 
-const table = document.querySelector('table');
-const rows = table.querySelectorAll('tbody tr');
-const rowsPerPage = 20;
-let currentPage = 1;
+// const table = document.querySelector('table');
+// const rows = table.querySelectorAll('tbody tr');
+// const rowsPerPage = 10;
+// let currentPage = 1;
 
-function showPage(page) {
-  const start = (page - 1) * rowsPerPage;
-  const end = page * rowsPerPage;
+// function showPage(page) {
+//   const start = (page - 1) * rowsPerPage;
+//   const end = page * rowsPerPage;
 
-  rows.forEach((row, index) => {
-    if (index >= start && index < end) {
-      row.style.display = '';
-    } else {
-      row.style.display = 'none';
-    }
-  });
-}
+//   rows.forEach((row, index) => {
+//     if (index >= start && index < end) {
+//       row.style.display = '';
+//     } else {
+//       row.style.display = 'none';
+//     }
+//   });
+// }
 
-function updatePaginationButtons() {
-  const totalPages = Math.ceil(rows.length / rowsPerPage);
+// function updatePaginationButtons() {
+//   const totalPages = Math.ceil(rows.length / rowsPerPage);
 
-  const paginationContainer = document.querySelector('.pagination');
-  paginationContainer.innerHTML = '';
+//   const paginationContainer = document.querySelector('.pagination');
+//   paginationContainer.innerHTML = '';
 
-  if (totalPages > 1) {
-    for (let i = 1; i <= totalPages; i++) {
-      const pageButton = document.createElement('button');
-      pageButton.textContent = i;
-      pageButton.addEventListener('click', () => {
-        currentPage = i;
-        showPage(currentPage);
-        updatePaginationButtons();
-      });
-      if (i === currentPage) {
-        pageButton.classList.add('active');
-      }
-      pageButton.classList.add('pagination-button'); // Add a class
-      paginationContainer.appendChild(pageButton);
-    }
+//   if (totalPages > 1) {
+//     for (let i = 1; i <= totalPages; i++) {
+//       const pageButton = document.createElement('button');
+//       pageButton.textContent = i;
+//       pageButton.addEventListener('click', () => {
+//         currentPage = i;
+//         showPage(currentPage);
+//         updatePaginationButtons();
+//       });
+//       if (i === currentPage) {
+//         pageButton.classList.add('active');
+//       }
+//       pageButton.classList.add('pagination-button'); // Add a class
+//       paginationContainer.appendChild(pageButton);
+//     }
 
-// Add "Previous" button
-if (currentPage > 1) {
-    const prevButton = document.createElement('button');
-    prevButton.textContent = 'Previous';
-    prevButton.classList.add('pagination-button'); // Add a class
-    prevButton.addEventListener('click', () => {
-      currentPage--;
-      showPage(currentPage);
-      updatePaginationButtons();
-    });
-    paginationContainer.insertBefore(prevButton, paginationContainer.firstChild);
-  }
+// // Add "Previous" button
+// if (currentPage > 1) {
+//     const prevButton = document.createElement('button');
+//     prevButton.textContent = 'Previous';
+//     prevButton.classList.add('pagination-button'); // Add a class
+//     prevButton.addEventListener('click', () => {
+//       currentPage--;
+//       showPage(currentPage);
+//       updatePaginationButtons();
+//     });
+//     paginationContainer.insertBefore(prevButton, paginationContainer.firstChild);
+//   }
   
-  // Add "Next" button
-  if (currentPage < totalPages) {
-    const nextButton = document.createElement('button');
-    nextButton.textContent = 'Next';
-    nextButton.classList.add('pagination-button'); // Add a class
-    nextButton.addEventListener('click', () => {
-      currentPage++;
-      showPage(currentPage);
-      updatePaginationButtons();
-    });
-    paginationContainer.appendChild(nextButton);
-  }
+//   // Add "Next" button
+//   if (currentPage < totalPages) {
+//     const nextButton = document.createElement('button');
+//     nextButton.textContent = 'Next';
+//     nextButton.classList.add('pagination-button'); // Add a class
+//     nextButton.addEventListener('click', () => {
+//       currentPage++;
+//       showPage(currentPage);
+//       updatePaginationButtons();
+//     });
+//     paginationContainer.appendChild(nextButton);
+//   }
   
-  }
-}
+//   }
+// }
 
-showPage(currentPage);
-updatePaginationButtons();
+// showPage(currentPage);
+// updatePaginationButtons();

@@ -393,9 +393,6 @@ nav .profile img {
 }
 .notification .bxs-bell {
 	cursor: pointer;
-}
-
-.bxs-bell {
 	font-size: x-large;
 }
 
@@ -814,6 +811,15 @@ margin-right: 20px;
 	#content main .table-data .todo .todo-list {
 		min-width: 420px;
 	}
+
+	#content main .table-data tbody a {
+    font-size: 13px;
+	}
+
+	#content main .table-data .head h3 {
+    font-size: 20px;
+}
+
 	.dropdown {
 		width: 300px;
 		height: auto;
@@ -836,5 +842,14 @@ margin-right: 20px;
     word-spacing: 5px;
     color: #066606;
     text-shadow: 0 0 1px darkgoldenrod;
+		visibility: hidden;
 	}
+
+	.scholarship-logo {
+    width: 50px;
+		height: 50px;
+    border-radius: 25px;
+    margin-right: 20px;
+	}
+
 }

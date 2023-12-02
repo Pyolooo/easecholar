@@ -20,12 +20,39 @@
 	font-family: 'Open Sans', sans-serif;
 }
 
+p {
+  margin-top: 0;
+  margin-bottom: 0px;
+}
+
 body{
 	background: lightgrey;
 	color: var(--text-clr);
 	font-size: 16px;
 	position: relative;
 }
+
+.rejected-info {
+	display: flex;
+	align-items: center;
+	margin-bottom: 20px;
+}
+
+.reason-label {
+	font-weight: 600;
+	font-size: 20px;
+}
+
+.rejected-reason {
+	color: rgb(173, 6, 6);
+}
+
+.rejected-icon {
+	width: 15rem;
+	height: 10rem;
+	border-radius: 15px;
+}
+
 .form-label{
 	color: darkgreen;
 	margin-top: 0;
@@ -143,7 +170,7 @@ body{
 
 .wrapper .btns_wrap .common_btns{
 	display: flex;
-	justify-content: space-evenly;
+	justify-content:left;
 	margin-top: 50px;
 }
 
@@ -151,25 +178,17 @@ body{
 	justify-content: flex-end;
 }
 
-.wrapper .btns_wrap .common_btns .update-button{
-	border: 0;
-	padding: 5px 15px;
-	background: var(--primary);
-	color: var(--white);
-	width: 200px;
-	justify-content: center;
-	display: flex;
-	align-items: center;
-	font-size: 20px;
-  font-weight: 600;
-	border-radius: 3px;
-	transition: 0.5s ease;
-	cursor: pointer;
-	transition: opacity 0.15s;
+.upload-button{
+	margin-left: 0;
+	padding: 3.2px 5px;
+	border: none;
+	color: white;
+	background-color: #3c91e6;
+
 }
 
-.wrapper .btns_wrap .common_btns .update-button:hover{
-	opacity: 0.8;
+.upload-button:hover{
+	background-color: #197ce0;
 }
 
 .wrapper .btns_wrap .common_btns button.btn_back{
@@ -384,6 +403,25 @@ width: 20px; /* Adjust the width as needed */
 height: 20px; /* Adjust the height as needed */
 margin-right: 20px;
 }
+
+
+#new_attachments{
+	border: 1px solid lightgrey;
+	margin-right: -5px;
+}
+
+.filename{
+	margin-right: 5px;
+}
+
+.remove-selected-file{
+	padding: 1px 4px;
+	border: none;
+	background-color:#8b8c8c;
+	border-radius: 2px;
+	font-size: 10px;
+	color: #e7e7e7;
+}
   
   .container .input-field .address-inputs input {
 	outline: none;
@@ -439,7 +477,7 @@ form button:hover{
 }
 form button i,
 form .backBtn i{
-    margin: 0 6px;
+    margin-right: 5px;
 }
 form .backBtn i{
     transform: rotate(180deg);
@@ -458,7 +496,6 @@ form .buttons button , .backBtn{
   background-color: rgb(167, 167, 167);
   color: white;
   width: 150px;
-  border-radius: 5px;
   padding: 6px 10px;
   font-size: 20px;
   font-weight: 600;
@@ -538,5 +575,21 @@ form .buttons button , .backBtn{
     padding-left: var(--bs-gutter-x,.75rem);
     margin-right: auto;
     margin-left: auto;
+}
+
+.rejected-icon {
+	width: 150px;
+	height: 105px;
+	border-radius: 75px;
+}
+
+.reason-label {
+	font-weight: 600;
+	font-size: 15px;
+}
+
+.rejected-reason {
+	color: rgb(173, 6, 6);
+	font-size: 15px;
 }
 }

@@ -385,7 +385,7 @@ nav .profile img {
 .school-name{
 	margin-left: 30px;
 	font-weight: 600;
-	font-size: x-large;
+	font-size: 20px;
 	letter-spacing: 5px;
 	word-spacing: 5px;
 	color: #066606;
@@ -468,7 +468,6 @@ nav .profile img {
 
 .donut-container {
 	width: 60%;
-	height: 30%;
 	background-color: white;
 	padding: 10px;
 	border-radius: 20px;
@@ -478,14 +477,15 @@ nav .profile img {
 flex-basis: 300px;
 }
 td{
-	padding-left: 10px;
 	padding-top: 10px;
+	font-size: 12px;
 
 }
+
 th{
 	text-align: left;
 	width: 200px;
-	font-size: 0.8rem;
+	font-size: 12px;
 }
 
 .head-analytics{
@@ -498,8 +498,8 @@ th{
 	color: white;
 	padding: 0px 20px;
 	border-radius: 10px;
-	background-color: dimgrey;
-	font-size: 20px;
+	background-color: #69696999;
+	font-size: 15px;
 	font-weight: 600;
 }
 #content main {

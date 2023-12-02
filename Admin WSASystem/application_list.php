@@ -16,7 +16,41 @@ if (isset($_GET['logout'])) {
     exit();
 }
 
-$select = mysqli_query($dbConn, "SELECT * FROM tbl_userapp") or die('query failed');
+$rowsPerPage = isset($_GET['rows']) ? intval($_GET['rows']) : 10;
+
+$currentPage = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$offset = ($currentPage - 1) * $rowsPerPage;
+
+$number = 1;
+
+$select = mysqli_query($dbConn, "SELECT ua.application_id, ua.image, ua.applicant_name, ua.scholarship_name, ua.date_submitted, ua.status, ua.reasons, ua.other_reason, ua.user_id, 'tbl_userapp' AS source
+FROM tbl_userapp ua
+JOIN tbl_user u ON ua.user_id = u.user_id
+UNION
+SELECT s1f.application_id, s1f.image, s1f.applicant_name, s1f.scholarship_name, s1f.date_submitted, s1f.status, s1f.reasons, s1f.other_reason, s1f.user_id, 'tbl_scholarship_1_form' AS source
+FROM tbl_scholarship_1_form s1f
+JOIN tbl_user u ON s1f.user_id = u.user_id
+ORDER BY date_submitted DESC
+LIMIT $offset, $rowsPerPage") or die('query failed');
+
+$countUserAppQuery = mysqli_query($dbConn, "SELECT COUNT(*) AS total FROM tbl_userapp") or die('count userapp query failed');
+$countUserAppData = mysqli_fetch_assoc($countUserAppQuery);
+
+$countScholarship1FormQuery = mysqli_query($dbConn, "SELECT COUNT(*) AS total FROM tbl_scholarship_1_form") or die('count scholarship_1_form query failed');
+$countScholarship1FormData = mysqli_fetch_assoc($countScholarship1FormQuery);
+
+$totalRows = $countUserAppData['total'] + $countScholarship1FormData['total'];
+
+
+$exactPages = floor($totalRows / $rowsPerPage);
+$remainingRows = $totalRows % $rowsPerPage;
+$totalPages = ($remainingRows > 0) ? $exactPages + 1 : $exactPages;
+
+
+$currentPage = min($currentPage, $totalPages);
+
+$totalPages = max($totalPages, 1);
+
 ?>
 
 <!DOCTYPE html>
@@ -88,7 +122,7 @@ $select = mysqli_query($dbConn, "SELECT * FROM tbl_userapp") or die('query faile
         <nav>
             <div class="menu">
                 <i class='bx bx-menu'></i>
-                <span class="school-name">ISABELA STATE UNIVERSITY SANTIAGO</span>
+                <span class="school-name">EASE-CHOLAR</span>
             </div>
             <!-- <div class="right-section">
                 <div class="notif">
@@ -115,7 +149,7 @@ $select = mysqli_query($dbConn, "SELECT * FROM tbl_userapp") or die('query faile
                         <?php while ($row = mysqli_fetch_assoc($notifications)) { ?>
                             <div class="notify_item">
                                 <div class="notify_img">
-                                    <img src='/EASE-CHOLAR/user_profiles/<?php echo $row['image']; ?>' alt="" style="width: 50px">
+                                    <img src='../user_profiles/<?php echo $row['image']; ?>' alt="" style="width: 50px">
                                 </div>
                                 <div class="notify_info">
                                     <p><?php echo $row['message']; ?></p>
@@ -125,20 +159,21 @@ $select = mysqli_query($dbConn, "SELECT * FROM tbl_userapp") or die('query faile
                         <?php } ?>
                     </div> -->
 
-                </div>
-                <div class="profile">
+            </div>
+            <div class="profile">
                 <a href="admin_profile.php" class="profile">
-                        <?php
-                        $select_admin = mysqli_query($dbConn, "SELECT * FROM `tbl_super_admin` WHERE super_admin_id = '$super_admin_id'") or die('query failed');
-                        $fetch = mysqli_fetch_assoc($select_admin);
-                        if ($fetch && $fetch['profile'] != '') {
-                            echo '<img src="../user_profiles/' . $fetch['profile'] . '">';
-                        } else {
-                            echo '<img src="../user_profiles/isulogo.png">';
-                        }
-                        ?>
-                    </a>
-                </div>
+                    <?php
+                    $select_admin = mysqli_query($dbConn, "SELECT * FROM `tbl_super_admin` WHERE super_admin_id = '$super_admin_id'") or die('query failed');
+                    $fetch = mysqli_fetch_assoc($select_admin);
+                    if ($fetch && $fetch['profile'] != '') {
+                        echo '<img src="../user_profiles/' . $fetch['profile'] . '">';
+                    } else {
+                        echo '<img src="../user_profiles/isulogo.png">';
+                    }
+
+                    ?>
+                </a>
+            </div>
             </div>
         </nav>
         <!-- NAVBAR -->
@@ -170,6 +205,15 @@ $select = mysqli_query($dbConn, "SELECT * FROM tbl_userapp") or die('query faile
 
             <div class="table-data">
                 <div class="order">
+                    <div class="rowsPerpage">
+                        <label for="rowsPerPage">Number of Rows:</label>
+                        <select id="rowsPerPage" onchange="changeRowsPerPage()">
+                            <option value="10" <?php if ($rowsPerPage == 10) echo 'selected'; ?>>10</option>
+                            <option value="20" <?php if ($rowsPerPage == 20) echo 'selected'; ?>>20</option>
+                            <option value="50" <?php if ($rowsPerPage == 50) echo 'selected'; ?>>50</option>
+                            <option value="100" <?php if ($rowsPerPage == 100) echo 'selected'; ?>>100</option>
+                        </select>
+                    </div>
                     <section class="table__header">
                         <h1>Applicant's Application</h1>
                         <div class="input-group">
@@ -191,6 +235,16 @@ $select = mysqli_query($dbConn, "SELECT * FROM tbl_userapp") or die('query faile
                             </div>
                         </div>
 
+                        <div class="reason-filter">
+                            <label for="reasonFilter">Filter by Reason:</label>
+                            <select id="reasonFilter" name="reasonFilter">
+                                <option value="">Select Reason</option>
+                                <option value="Insufficient GWA">Insufficient GWA</option>
+                                <option value="Failure to meet eligible criteria">Failure to meet eligible criteria</option>
+                                <option value="Lack of evidence">Lack of evidence</option>
+                                <option value="Lack of supporting documents">Lack of supporting documents</option>
+                            </select>
+                        </div>
 
                         <table>
                             <thead>
@@ -201,20 +255,9 @@ $select = mysqli_query($dbConn, "SELECT * FROM tbl_userapp") or die('query faile
                                     <th>Submission <span class="icon-arrow">&UpArrow;</span></th>
                                     <th>Status <span class="icon-arrow">&UpArrow;</span></th>
                                     <th>Action <span class="icon-arrow">&UpArrow;</span></th>
+                                    <th id="reasonHeader" style="display: none;">Reason <span class="icon-arrow">&UpArrow;</span></th>
                                 </tr>
                             </thead>
-                            <?php
-                            $select = mysqli_query($dbConn, "SELECT ua.application_id, ua.image, ua.applicant_name, ua.scholarship_name, ua.date_submitted, ua.status, ua.user_id, 'tbl_userapp' AS source
-                    FROM tbl_userapp ua
-                    JOIN tbl_user u ON ua.user_id = u.user_id
-                    UNION
-                    SELECT s1f.application_id, s1f.image, s1f.applicant_name, s1f.scholarship_name, s1f.date_submitted, s1f.status, s1f.user_id, 'tbl_scholarship_1_form' AS source
-                    FROM tbl_scholarship_1_form s1f
-                    JOIN tbl_user u ON s1f.user_id = u.user_id") or die('query failed');
-
-                            $number = 1;
-                            ?>
-
                             <?php
                             while ($row = mysqli_fetch_array($select)) {
                                 $statusClass = '';
@@ -241,7 +284,11 @@ $select = mysqli_query($dbConn, "SELECT * FROM tbl_userapp") or die('query faile
 
                                 <tr>
                                     <td><?= $number ?></td>
-                                    <td><img src="../user_profiles/<?= $row['image'] ?>" alt=""><?= $row['applicant_name'] ?></td>
+                                    <td>
+                                        <div class="image-applicant-container"><img src="../user_profiles/<?= $row['image'] ?>" alt="">
+                                            <p class="applicant_name"><?= $row['applicant_name'] ?></p>
+                                        </div>
+                                    </td>
                                     <td><?= $row['scholarship_name'] ?></td>
                                     <td><?= formatDateSubmitted($row['date_submitted']) ?></td>
                                     <td>
@@ -257,6 +304,33 @@ $select = mysqli_query($dbConn, "SELECT * FROM tbl_userapp") or die('query faile
                                         ?>
                                         <strong><a class="view-link" href="<?= $reviewLink ?>">Review</a></strong>
                                     </td>
+
+                                    <?php if ($row['status'] == 'Rejected') { ?>
+                                        <td class="reasons-cell" style="display: none;">
+                                            <?php
+                                            // Check if reasons are not null and not empty
+                                            if (!empty($row['reasons'])) {
+                                                $reasons = json_decode($row['reasons']);
+
+                                                // Check if $reasons is an array
+                                                if (is_array($reasons) || is_object($reasons)) {
+                                                    foreach ($reasons as $reason) {
+                                                        echo $reason . "<br>";
+                                                    }
+                                                } else {
+                                                    echo "Invalid reasons format";
+                                                }
+                                            } else {
+                                                echo "No reasons provided";
+                                            }
+
+                                            if (!empty($row['other_reason'])) {
+                                                echo "Others: " . $row['other_reason'];
+                                            }
+                                            ?>
+                                        </td>
+
+                                    <?php } ?>
                                 </tr>
 
                             <?php
@@ -264,58 +338,154 @@ $select = mysqli_query($dbConn, "SELECT * FROM tbl_userapp") or die('query faile
                             }
                             ?>
                         </table>
-                        <div class="pagination"></div>
+                        <div class="entries-range">
+                            Showing <?php echo min(($currentPage - 1) * $rowsPerPage + 1, $totalRows); ?> to <?php echo min($currentPage * $rowsPerPage, $totalRows); ?> of <?php echo $totalRows; ?> entries
+                        </div>
+
+
+                        <div class="pagination">
+                            <?php
+                            if ($currentPage > 1) {
+                                echo '<button class="pagination-button" onclick="changePage(' . ($currentPage - 1) . ')">&lt; Prev</button>';
+                            }
+
+                            for ($i = 1; $i <= $totalPages; $i++) {
+                                if ($totalPages > 5 && $i > 2 && $i < ($totalPages - 1) && ($i < ($currentPage - 1) || $i > ($currentPage + 1))) {
+                                    if ($i == 3 && $currentPage > 4) {
+                                        echo '<span class="pagination-ellipsis">...</span>';
+                                    }
+                                    continue;
+                                }
+
+                                echo '<button class="pagination-button' . ($currentPage == $i ? ' active' : '') . '" onclick="changePage(' . $i . ')">' . $i . '</button>';
+                            }
+
+                            if ($totalPages > 5 && $currentPage < ($totalPages - 2)) {
+                                echo '<span class="pagination-ellipsis">...</span>';
+                            }
+
+
+                            if ($totalRows > $rowsPerPage && $currentPage < $totalPages) {
+                                echo '<button class="pagination-button" onclick="changePage(\'next\')">Next &gt;</button>';
+                            }
+                            ?>
+                        </div>
                     </section>
                 </div>
         </main>
 
         <script src="js/applicants.js"></script>
+        <script src="js/admin_logout.js"></script>
+        <script src="js/toggle_sidebar.js"></script>
         <script>
+            function changePage(page) {
+                if (page === 'next' && <?php echo $currentPage; ?> < <?php echo $totalPages; ?>) {
+                    page = <?php echo $currentPage; ?> + 1;
+                } else if (page === 'prev' && <?php echo $currentPage; ?> > 1) {
+                    page = <?php echo $currentPage; ?> - 1;
+                }
+
+                window.location.href = "application_list.php?rows=" + document.getElementById("rowsPerPage").value + "&page=" + page;
+            }
+
+            function changeRowsPerPage() {
+                var selectedRows = document.getElementById("rowsPerPage").value;
+                var currentPage = <?php echo $currentPage; ?>;
+                var url = "application_list.php?rows=" + selectedRows + "&page=" + currentPage;
+
+
+
+                window.location.href = url;
+            }
+
             $(document).ready(function() {
-                function confirmLogout() {
-                    Swal.fire({
-                        title: "Logout",
-                        text: "Are you sure you want to log out?",
-                        icon: "warning",
-                        showCancelButton: true,
-                        confirmButtonColor: "#3085d6",
-                        cancelButtonColor: "#d33",
-                        confirmButtonText: "Yes, log out",
-                        cancelButtonText: "Cancel"
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            window.location.href = "admin_logout.php";
+
+
+                document.getElementById("reasonFilter").addEventListener("change", function() {
+                    const selectedStatus = document.querySelector('.status-button.active').getAttribute("data-status");
+                    const selectedReason = this.value;
+
+                    filterTableByStatusAndReason(selectedStatus, selectedReason);
+                });
+
+                function filterTableByStatusAndReason(status, reason) {
+                    const rows = document.querySelectorAll(".table__body tbody tr");
+
+                    rows.forEach((row) => {
+                        const statusCell = row.querySelector(".status");
+                        const reasonsCell = row.querySelector(".reasons-cell");
+
+                        // Check if the status and reason match the selected values
+                        if (
+                            (status === "all" || statusCell.textContent === status) &&
+                            (reason === "" || (reasonsCell && reasonsCell.textContent.includes(reason)))
+                        ) {
+                            row.style.display = "";
+                        } else {
+                            row.style.display = "none";
                         }
                     });
                 }
 
-                document.querySelector(".logout").addEventListener("click", function(event) {
-                    event.preventDefault();
-                    confirmLogout();
+                filterTableByStatusAndReasonOnLoad();
+
+
+
+                function filterTableByStatusAndReasonOnLoad() {
+                    const selectedStatus = document.querySelector('.status-button.active').getAttribute("data-status");
+                    const selectedReason = document.getElementById("reasonFilter").value;
+
+                    filterTableByStatusAndReason(selectedStatus, selectedReason);
+                }
+
+                toggleReasonFilter(document.querySelector('.status-button.active').getAttribute("data-status"));
+
+                filterTableByStatusAndReasonOnLoad();
+
+
+                document.getElementById("reasonFilter").addEventListener("change", function() {
+                    const selectedStatus = document.querySelector('.status-button.active').getAttribute("data-status");
+
+                    filterTableByStatusAndReason(selectedStatus, this.value);
                 });
 
-                const menuBar = document.querySelector('#content nav .bx.bx-menu');
-                const sidebar = document.getElementById('sidebar');
+                function toggleReasonFilter(selectedStatus) {
+                    var reasonFilterLabel = document.querySelector('label[for="reasonFilter"]');
+                    var reasonFilter = document.getElementById("reasonFilter");
+                    var reasonHeader = document.getElementById("reasonHeader");
 
-                function toggleSidebar() {
-                    sidebar.classList.toggle('hide');
-                }
+                    if (selectedStatus === "Rejected") {
 
-                menuBar.addEventListener('click', toggleSidebar);
-
-                function handleResize() {
-                    const screenWidth = window.innerWidth;
-
-                    if (screenWidth <= 768) {
-                        sidebar.classList.add('hide');
+                        reasonFilterLabel.style.display = "inline-block";
+                        reasonFilter.style.display = "inline-block";
+                        reasonHeader.style.display = "";
                     } else {
-                        sidebar.classList.remove('hide');
+
+                        reasonFilterLabel.style.display = "none";
+                        reasonFilter.style.display = "none";
+                        reasonHeader.style.display = "none";
                     }
+
                 }
 
-                window.addEventListener('resize', handleResize);
 
-                handleResize();
+                document.querySelectorAll(".status-button").forEach(function(button) {
+                    button.addEventListener("click", function() {
+                        const selectedStatus = button.getAttribute("data-status");
+
+                        document.querySelectorAll(".status-button").forEach(function(btn) {
+                            btn.classList.remove("active");
+                        });
+                        button.classList.add("active");
+
+                        toggleReasonFilter(selectedStatus);
+
+                        filterTableByStatusAndReason(selectedStatus, document.getElementById("reasonFilter").value);
+                    });
+                });
+
+                toggleReasonFilter(document.querySelector('.status-button.active').getAttribute("data-status"));
+
 
                 function toggleDropdown() {
                     $(".num").hide();
@@ -352,7 +522,6 @@ $select = mysqli_query($dbConn, "SELECT * FROM tbl_userapp") or die('query faile
                     });
                 }
 
-                // Add click event listener to the notifications to mark them as read
                 $(".notify_item").on("click", function() {
                     var notificationId = $(this).data("notification-id");
                     markNotificationAsRead(notificationId);
@@ -387,28 +556,29 @@ $select = mysqli_query($dbConn, "SELECT * FROM tbl_userapp") or die('query faile
 
                 rows.forEach(row => {
                     const statusCell = row.querySelector(".status");
+                    const reasonsCell = row.querySelector("td.reasons-cell");
+
                     if (status === "all" || statusCell.textContent === status) {
                         row.style.display = "";
                     } else {
                         row.style.display = "none";
+                    }
+
+                    // Always hide the reasons cell when the status is "all"
+                    if (reasonsCell) {
+                        reasonsCell.style.display = (status === "all") ? "none" : "";
                     }
                 });
             }
 
             document.querySelectorAll(".status-button").forEach(button => {
                 button.addEventListener("click", () => {
-                    // Remove the "active" class from all buttons
                     document.querySelectorAll(".status-button").forEach(btn => {
                         btn.classList.remove("active");
                     });
 
-                    // Add the "active" class to the clicked button
                     button.classList.add("active");
-
-                    // Get the status from the button's data attribute
                     const status = button.getAttribute("data-status");
-
-                    // Filter the table rows based on the selected status
                     filterTableByStatus(status);
                 });
             });

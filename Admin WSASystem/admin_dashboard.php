@@ -59,6 +59,66 @@ $inReviewCount = $row['inReviewCount'];
 $qualifiedCount = $row['qualifiedCount'];
 $acceptedCount = $row['acceptedCount'];
 $rejectedCount = $row['rejectedCount'];
+
+
+$combinedCounts = array(
+    'num_insufficient_gwa' => 0,
+    'num_failure_to_meet_eligible_criteria' => 0,
+    'num_lack_of_evidence' => 0,
+    'num_lack_of_supporting_documents' => 0,
+    'num_other_reason' => 0
+);
+
+
+$userAppReasonsQuery = "SELECT reasons, other_reason FROM tbl_userapp";
+$userAppResult = mysqli_query($dbConn, $userAppReasonsQuery);
+
+while ($row = mysqli_fetch_assoc($userAppResult)) {
+    if (!empty($row['reasons'])) {
+        $reasons = json_decode($row['reasons'], true);
+        updateCombinedCounts($reasons, $combinedCounts);
+    }
+
+    if (!empty($row['other_reason'])) {
+        $combinedCounts['num_other_reason']++;
+    }
+}
+
+$scholarshipReasonsQuery = "SELECT reasons, other_reason FROM tbl_scholarship_1_form";
+$scholarshipResult = mysqli_query($dbConn, $scholarshipReasonsQuery);
+
+while ($row = mysqli_fetch_assoc($scholarshipResult)) {
+
+    if (!empty($row['reasons'])) {
+        $reasons = json_decode($row['reasons'], true);
+        updateCombinedCounts($reasons, $combinedCounts);
+    }
+
+    if (!empty($row['other_reason'])) {
+        $combinedCounts['num_other_reason']++;
+    }
+}
+
+
+// // Print or use the combined counts as needed
+// print_r($combinedCounts);
+
+function updateCombinedCounts($reasons, &$combinedCounts)
+{
+    foreach ($reasons as $reason) {
+        $reasonKey = 'num_' . strtolower(str_replace(' ', '_', $reason));
+
+        if (array_key_exists($reasonKey, $combinedCounts)) {
+            $combinedCounts[$reasonKey]++;
+        } else {
+            // Output the reason key that is not updating
+            echo "Reason key not updating: $reasonKey\n";
+            var_dump($combinedCounts);
+        }
+    }
+}
+
+// echo json_encode($combinedCounts);
 ?>
 
 
@@ -137,11 +197,11 @@ $rejectedCount = $row['rejectedCount'];
         <nav>
             <div class="menu">
                 <i class='bx bx-menu'></i>
-                <span class="school-name">ISABELA STATE UNIVERSITY SANTIAGO</span>
+                <span class="school-name">EASE-CHOLAR</span>
             </div>
             <div class="right-section">
                 <div class="profile">
-                <a href="admin_profile.php" class="profile">
+                    <a href="admin_profile.php" class="profile">
                         <?php
                         $select_admin = mysqli_query($dbConn, "SELECT * FROM `tbl_super_admin` WHERE super_admin_id = '$super_admin_id'") or die('query failed');
                         $fetch = mysqli_fetch_assoc($select_admin);
@@ -150,9 +210,9 @@ $rejectedCount = $row['rejectedCount'];
                         } else {
                             echo '<img src="../user_profiles/isulogo.png">';
                         }
+
                         ?>
                     </a>
-
                 </div>
             </div>
         </nav>
@@ -215,7 +275,7 @@ $rejectedCount = $row['rejectedCount'];
                     ?>
 
                     <i class='bx bxs-group'></i>
-                    <a href="manage_all_users.php">
+                    <a href="manage_users.php">
                         <span class="text">
                             <h3><?php echo $total_count; ?></h3>
                             <p>Total Users</p>
@@ -332,6 +392,19 @@ $rejectedCount = $row['rejectedCount'];
                 </div>
             </div>
 
+            <div class="table-data">
+                <div class="order">
+                    <div class="scholarship-analytics">
+                        <div class="head">
+                            <h3>Statistical Analytics</h3>
+                        </div>
+                        <div class="reasons-chart">
+                            <canvas id="reasonsPieChart"></canvas>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
 
             <?php
             function formatDateSubmitted($dbDateSubmitted)
@@ -467,52 +540,69 @@ $rejectedCount = $row['rejectedCount'];
     </section>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/admin_logout.js"></script>
+    <script src="js/toggle_sidebar.js"></script>
     <script>
         $(document).ready(function() {
-            function confirmLogout() {
-                Swal.fire({
-                    title: "Logout",
-                    text: "Are you sure you want to log out?",
-                    icon: "warning",
-                    showCancelButton: true,
-                    confirmButtonColor: "#3085d6",
-                    cancelButtonColor: "#d33",
-                    confirmButtonText: "Yes, log out",
-                    cancelButtonText: "Cancel"
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        window.location.href = "admin_logout.php";
-                    }
-                });
-            }
-
-            document.querySelector(".logout").addEventListener("click", function(event) {
-                event.preventDefault();
-                confirmLogout();
-            });
+           
 
             const statusCounts = {
-                'Pending': <?php echo $pendingCount; ?>,
-                'In Review': <?php echo $inReviewCount; ?>,
-                'Qualified': <?php echo $qualifiedCount; ?>,
-                'Accepted': <?php echo $acceptedCount; ?>,
-                'Rejected': <?php echo $rejectedCount; ?>,
-            };
+    'Pending': <?php echo $pendingCount; ?>,
+    'In Review': <?php echo $inReviewCount; ?>,
+    'Qualified': <?php echo $qualifiedCount; ?>,
+    'Accepted': <?php echo $acceptedCount; ?>,
+    'Rejected': <?php echo $rejectedCount; ?>,
+};
 
-            const ctx = document.getElementById('applicationStatusChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'doughnut',
+const colors = {
+    'Pending': '#fd7238',
+    'In Review': '#ffce26',
+    'Qualified': '#00d084',
+    'Accepted': '#28a745',
+    'Rejected': '#ff0000',
+};
+
+const ctx = document.getElementById('applicationStatusChart').getContext('2d');
+
+new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+        labels: Object.keys(statusCounts),
+        datasets: [{
+            data: Object.values(statusCounts),
+            backgroundColor: Object.keys(statusCounts).map(status => colors[status]),
+        }],
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: true,
+                position: 'bottom',
+            },
+            title: {
+                display: true,
+                text: 'Application Statistics',
+                fontSize: 16,
+            },
+        },
+    },
+});
+
+
+
+            const chx = document.getElementById('reasonsPieChart').getContext('2d');
+            const reasonsData = <?php echo json_encode($combinedCounts); ?>;
+            console.log(reasonsData);
+
+            new Chart(chx, {
+                type: 'pie',
                 data: {
-                    labels: Object.keys(statusCounts),
+                    labels: ['Insufficient GWA', 'Failure to meet eligible criteria', 'Lack of evidence', 'Other Reason'],
                     datasets: [{
-                        data: Object.values(statusCounts),
-                        backgroundColor: [
-                            '#fd7238', // Pending
-                            '#ffce26', // In Review
-                            '#00d084', // Qualified
-                            '#28a745', // Accepted
-                            'red', // Rejected
-                        ],
+                        data: [reasonsData.num_insufficient_gwa, reasonsData.num_failure_to_meet_eligible_criteria, reasonsData.num_lack_of_evidence, reasonsData.num_other_reason],
+                        backgroundColor: ['#fd7238', '#ffce26', '#00d084', '#8B0000'],
                     }],
                 },
                 options: {
@@ -521,11 +611,11 @@ $rejectedCount = $row['rejectedCount'];
                     plugins: {
                         legend: {
                             display: true,
-                            position: 'bottom'
+                            position: 'bottom',
                         },
                         title: {
                             display: true,
-                            text: 'Application Statistics',
+                            text: 'Rejection Reasons',
                             fontSize: 16,
                         },
                     },
@@ -533,18 +623,18 @@ $rejectedCount = $row['rejectedCount'];
             });
 
 
-            document.getElementById("exportButton").addEventListener("click", function() {
-                var exportFormatSelect = document.getElementById("exportFormatSelect");
-                var selectedFormat = exportFormatSelect.value;
+            // document.getElementById("exportButton").addEventListener("click", function() {
+            //     var exportFormatSelect = document.getElementById("exportFormatSelect");
+            //     var selectedFormat = exportFormatSelect.value;
 
-                var exportURL = "generate_pdf.php";
+            //     var exportURL = "generate_pdf.php"; // Default to PDF export URL
 
-                if (selectedFormat === "excel") {
-                    exportURL = "generate_excel.php";
-                }
+            //     if (selectedFormat === "excel") {
+            //         exportURL = "generate_excel.php"; // Use Excel export URL if selected format is "excel"
+            //     }
 
-                window.location.href = exportURL;
-            });
+            //     window.location.href = exportURL;
+            // });
 
             const scholarshipAnalyticsTable = document.getElementById("scholarship-analytics-table");
             const recentApplicantsTable = document.getElementById("recent-applicants-table");
@@ -644,31 +734,6 @@ $rejectedCount = $row['rejectedCount'];
             });
 
 
-
-
-            const menuBar = document.querySelector('#content nav .bx.bx-menu');
-            const sidebar = document.getElementById('sidebar');
-
-            function toggleSidebar() {
-                sidebar.classList.toggle('hide');
-            }
-
-            menuBar.addEventListener('click', toggleSidebar);
-
-            function handleResize() {
-                const screenWidth = window.innerWidth;
-
-                if (screenWidth <= 768) {
-                    sidebar.classList.add('hide');
-                } else {
-                    sidebar.classList.remove('hide');
-                }
-            }
-
-            window.addEventListener('resize', handleResize);
-
-            handleResize();
-
             function toggleDropdown() {
                 $(".num").hide();
             }
@@ -733,5 +798,4 @@ $rejectedCount = $row['rejectedCount'];
     </script>
 
 </body>
-
 </html>

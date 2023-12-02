@@ -184,6 +184,7 @@ textarea {
   border: thin solid #d4d4d4;
   border-radius: 5px;
   padding: 10px;
+  outline: none;
 }
 
 .date-container{
@@ -195,6 +196,7 @@ textarea {
 .form-option{
   border-radius: 5px;
   padding: 5px;
+  outline: none;
   border: 1px solid #d4d4d4;
 }
 
@@ -217,9 +219,14 @@ button[type="submit"] {
   cursor: pointer;
   color: #fff;
   border-radius: 5px;
+  transition: opacity 0.15s;
 }
 
 button[type="submit"]:active {
   background-color: #aedea6;
   color: #000;
+}
+
+button[type="submit"]:hover {
+ opacity: 0.8;
 }

@@ -290,6 +290,7 @@ form.secActive .form.first{
 	display: grid;
 	grid-template-columns: repeat(2, 1fr);
 	grid-gap: 20px;
+	margin-bottom: 20px;
   }
   
   .container .input-field {
@@ -333,6 +334,7 @@ form.secActive .form.first{
 		display: grid;
     grid-template-columns: repeat(5, 1fr);
 		column-gap: 20px;
+		margin-bottom: 20px;
   }
 	.address-container{
 		display: flex;
@@ -380,6 +382,11 @@ margin-right: 20px;
 .input-field input[type="date"]:valid{
     color: #333;
 }
+
+.file-container {
+	margin-bottom: 5px;
+}
+
 .container form button, .backBtn{
     display: flex;
     align-items: center;
@@ -494,5 +501,21 @@ form .buttons button , .backBtn{
     padding-left: var(--bs-gutter-x,.75rem);
     margin-right: auto;
     margin-left: auto;
+}
+.container .fields-info {
+	display: grid;
+	grid-template-columns: repeat(1, 1fr);
+	grid-gap: 20px;
+}
+
+.file-container {
+	margin-bottom: 20px;
+}
+
+.container .select-input-field {
+	display: grid;
+	grid-template-columns: repeat(1, 1fr);
+	column-gap: 20px;
+	margin-bottom: 8px;
 }
 }

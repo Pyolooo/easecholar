@@ -1,6 +1,25 @@
 <?php
 require '../include/connection.php';
 
+function compressImage($source, $destination, $quality) {
+    $info = getimagesize($source);
+
+    if ($info['mime'] == 'image/jpeg') {
+        $image = imagecreatefromjpeg($source);
+    } elseif ($info['mime'] == 'image/png') {
+        $image = imagecreatefrompng($source);
+    } else {
+        return false;
+    }
+
+    $success = imagejpeg($image, $destination, $quality);
+
+    imagedestroy($image);
+
+    return $success ? $destination : false;
+}
+
+
 if (isset($_POST['submit'])) {
     $full_name = mysqli_real_escape_string($dbConn, $_POST['full_name']);
     $email = mysqli_real_escape_string($dbConn, $_POST['email']);
@@ -10,41 +29,81 @@ if (isset($_POST['submit'])) {
     $image_size = $_FILES['image']['size'];
     $image_tmp_name = $_FILES['image']['tmp_name'];
     $image_type = $_FILES['image']['type'];
-    $maxImageSize = 1024 * 1024;
+    $maxImageSize = 1024 * 1024 * 5;
 
-    $query = mysqli_prepare($dbConn, "SELECT * FROM `tbl_user` WHERE email = ? OR student_num = ?");
-    mysqli_stmt_bind_param($query, "ss", $email, $student_num);
+    $filename = 'default-avatar.png';
+
+    $query = mysqli_prepare($dbConn, "SELECT * FROM `tbl_user` WHERE email = ?");
+    mysqli_stmt_bind_param($query, "s", $email);
     mysqli_stmt_execute($query);
     $result = mysqli_stmt_get_result($query);
 
     if (mysqli_num_rows($result) > 0) {
-        $userExistsMessage = 'Email or student number already exists!';
+        $userExistsMessage = 'Email already exists!';
     } else {
-        // Move the default image assignment here, outside the 'else' block
-        $filename = 'default-avatar.png';
+        $userPasswordExistQuery = mysqli_prepare($dbConn, "SELECT * FROM `tbl_user` WHERE password = ?");
+        mysqli_stmt_bind_param($userPasswordExistQuery, "s", $password);
+        mysqli_stmt_execute($userPasswordExistQuery);
+        $userPasswordExistResult = mysqli_stmt_get_result($userPasswordExistQuery);
 
-        if (!empty($_FILES['image']['name'])) {
-            if (!in_array($image_type, array('image/jpeg', 'image/jpg', 'image/png'))) {
-                $imageTypeMessage = 'Only JPEG, JPG, and PNG images are allowed.';
-            } elseif ($image_size > $maxImageSize) {
-                $largeImageMessage = 'Image size is too large!';
+        if (mysqli_num_rows($userPasswordExistResult) > 0) {
+            $userPasswordExist = 'LRN already exists!';
+        } else {
+            $userStudentNumExistQuery = mysqli_prepare($dbConn, "SELECT * FROM `tbl_user` WHERE student_num = ?");
+            mysqli_stmt_bind_param($userStudentNumExistQuery, "s", $student_num);
+            mysqli_stmt_execute($userStudentNumExistQuery);
+            $userStudentNumExistResult = mysqli_stmt_get_result($userStudentNumExistQuery);
+
+            if (mysqli_num_rows($userStudentNumExistResult) > 0) {
+                $userStudentNumExist = 'Student ID already exists!!';
             } else {
-                $filename = uniqid() . '_' . $image;
-                $targetDirectory = $_SERVER['DOCUMENT_ROOT'] . '/user_profiles/';
-                $targetPath = $targetDirectory . $filename;
-
-                if (move_uploaded_file($image_tmp_name, $targetPath)) {
-                    if (file_exists($targetPath)) {
-                        $custom_id = 'ISU_' . sprintf("%03d", rand(1, 999));
-                        $insert = mysqli_prepare($dbConn, "INSERT INTO `tbl_user` (custom_id, full_name, student_num, email, password, image) VALUES(?, ?, ?, ?, ?, ?)");
-                        mysqli_stmt_bind_param($insert, "ssssss", $custom_id, $full_name, $student_num, $email, $password, $filename);
-
-                        if (mysqli_stmt_execute($insert)) {
-                            $successMessage = 'Registered successfully!';
+                if (!empty($_FILES['image']['name'])) {
+                    if (!in_array($image_type, array('image/jpeg', 'image/jpg', 'image/png'))) {
+                        $imageTypeMessage = 'Only JPEG, JPG, and PNG images are allowed.';
+                    } elseif ($image_size > $maxImageSize) {
+                        $largeImageMessage = 'Image size is too large!';
+                    } else {
+                        $filename = uniqid() . '_' . $image;
+                        $targetDirectory = $_SERVER['DOCUMENT_ROOT'] . '/user_profiles/';
+                        $targetPath = $targetDirectory . $filename;
+                
+                        // Compress the image before uploading
+                        $compressedPath = compressImage($image_tmp_name, $targetPath, 20);
+                
+                        if ($compressedPath) {
+                            if (rename($compressedPath, $targetPath)) {
+                                if (!file_exists($targetPath)) {
+                                    $registrationFailedMessage = 'Error moving the uploaded image.';
+                                } else {
+                                    
+                                    $custom_id = 'ISU_' . sprintf("%03d", rand(1, 999));
+                                    $insert = mysqli_prepare($dbConn, "INSERT INTO `tbl_user` (custom_id, full_name, student_num, email, password, image) VALUES(?, ?, ?, ?, ?, ?)");
+                                    mysqli_stmt_bind_param($insert, "ssssss", $custom_id, $full_name, $student_num, $email, $password, $filename);
+                
+                                    if (mysqli_stmt_execute($insert)) {
+                                        $successMessage = 'Registered successfully!';
+                                    } else {
+                                        error_log("Error executing insert query: " . mysqli_error($dbConn));
+                                        $registrationFailedMessage = 'Registration failed!';
+                                    }
+                                }
+                            } else {
+                                $registrationFailedMessage = 'Error moving the compressed image.';
+                            }
                         } else {
-                            error_log("Error executing insert query: " . mysqli_error($dbConn)); // Log the SQL error
-                            $registrationFailedMessage = 'Registration failed!';
+                            $registrationFailedMessage = 'Error compressing the image.';
                         }
+                    }
+                } else {
+                    $custom_id = 'ISU_' . sprintf("%03d", rand(1, 999));
+                    $insert = mysqli_prepare($dbConn, "INSERT INTO `tbl_user` (custom_id, full_name, student_num, email, password, image) VALUES(?, ?, ?, ?, ?, ?)");
+                    mysqli_stmt_bind_param($insert, "ssssss", $custom_id, $full_name, $student_num, $email, $password, $filename);
+                
+                    if (mysqli_stmt_execute($insert)) {
+                        $successMessage = 'Registered successfully!';
+                    } else {
+                        error_log("Error executing insert query: " . mysqli_error($dbConn));
+                        $registrationFailedMessage = 'Registration failed!';
                     }
                 }
             }
@@ -52,6 +111,8 @@ if (isset($_POST['submit'])) {
     }
 }
 ?>
+
+
 
 
 <!DOCTYPE html>
@@ -95,6 +156,30 @@ if (isset($_POST['submit'])) {
                     icon: "error",
                     title: "Email Exists",
                     text: "' . $userExistsMessage . '",
+                    showConfirmButton: false,
+                    timer: 2000
+                })
+            </script>';
+            }
+
+            if (isset($userPasswordExist)) {
+                echo '<script>
+                Swal.fire({
+                    icon: "error",
+                    title: "LRN Exists",
+                    text: "' . $userPasswordExist . '",
+                    showConfirmButton: false,
+                    timer: 2000
+                })
+            </script>';
+            }
+
+            if (isset($userStudentNumExist)) {
+                echo '<script>
+                Swal.fire({
+                    icon: "error",
+                    title: "Student ID Exists",
+                    text: "' . $userStudentNumExist . '",
                     showConfirmButton: false,
                     timer: 2000
                 })
@@ -183,31 +268,31 @@ if (isset($_POST['submit'])) {
                 <span class="input-container-addon">
                     <i class="fa fa-user"></i>
                 </span>
-                <input class="input-style" id="full_name" type="text" name="full_name" placeholder="First Name |  Middle Initial | Last Name" required <?php if (isset($_POST['full_name'])) echo 'value="' . htmlspecialchars($_POST['full_name']) . '"'; ?>>
+                <input class="input-style" id="full_name" type="text" name="full_name" placeholder="First Name |  Middle Initial | Last Name" required <?php echo (isset($_POST['full_name'])) ? 'value="' . htmlspecialchars($_POST['full_name']) . '"' : 'value=""'; ?>>
             </div>
 
             <div class="input-container">
                 <span class="input-container-addon">
                     <i class="fa fa-envelope-square"></i>
                 </span>
-                <input class="input-style" id="email" type="email" name="email" placeholder="Enter your email" required <?php if (isset($_POST['email'])) echo 'value="' . htmlspecialchars($_POST['email']) . '"'; ?>>
+                <input class="input-style" id="email" type="email" name="email" placeholder="Enter your email" required <?php echo (isset($_POST['email'])) ? 'value="' . htmlspecialchars($_POST['email']) . '"' : 'value=""'; ?>>
             </div>
 
             <div class="input-container">
                 <span class="input-container-addon">
                     <i class="fa fa-address-card"></i>
                 </span>
-                <input class="input-style" id="student_num" type="text" name="student_num" placeholder="Student ID number (20-00XXX)" required>
+                <input class="input-style" id="student_num" type="text" name="student_num" placeholder="Student ID number (20-00XXX)" required <?php echo (isset($_POST['student_num'])) ? 'value="' . htmlspecialchars($_POST['student_num']) . '"' : 'value=""'; ?>>
             </div>
-
 
             <div class="input-container">
                 <span class="input-container-addon">
                     <i class="fa fa-lock"></i>
                 </span>
-                <input class="input-style" id="password" type="password" name="password" placeholder="LRN's number" required>
+                <input class="input-style" id="password" type="number" name="password" placeholder="LRN's number" required <?php echo (isset($_POST['password'])) ? 'value="' . htmlspecialchars($_POST['password']) . '"' : 'value=""'; ?>>
             </div>
-            
+
+
             <label class="show-password" for="show-password">
                 <input type="checkbox" id="show-password"> Show Password
             </label>
@@ -217,6 +302,7 @@ if (isset($_POST['submit'])) {
             </div>
         </form>
     </div>
+    
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
     <script>
         document.querySelector('.form').addEventListener('submit', function(event) {
@@ -224,16 +310,16 @@ if (isset($_POST['submit'])) {
             var lrnNumber = document.getElementById('password').value;
 
             if (studentNum.length !== 8 || studentNum.indexOf('-') !== 2 || isNaN(studentNum.replace('-', ''))) {
-    event.preventDefault(); // Prevent form submission
-    swal("Invalid Student ID", "Student ID number must be exactly 8 characters long and formatted as 'XX-XXXXX', where X represents digits.", "error");
-}
+                event.preventDefault();
+                swal("Invalid Student ID", "Student ID number must be exactly 8 characters long and formatted as 'XX-XXXXX', where X represents digits.", "error");
+            }
 
-            // Check if the LRN number is exactly 12 digits long and contains only digits
             if (lrnNumber.length !== 12 || isNaN(lrnNumber)) {
-                event.preventDefault(); // Prevent form submission
+                event.preventDefault(); 
                 swal("Invalid LRN Number", "LRN number must be exactly 12 digits long and contain only digits.", "error");
             }
         });
+
         // Function to display the selected image and control label visibility
         function displaySelectedImage() {
             var input = document.getElementById('image-input');
@@ -246,46 +332,44 @@ if (isset($_POST['submit'])) {
 
                     reader.onload = function(e) {
                         selectedImage.src = e.target.result;
-                        selectedImage.style.display = ''; // Show the selected image
-                        imageLabel.style.display = 'none'; // Hide the label
+                        selectedImage.style.display = ''; 
+                        imageLabel.style.display = 'none'; 
                     };
 
                     reader.readAsDataURL(input.files[0]);
                 } else {
-                    selectedImage.src = ""; // Clear the selected image if no file is selected
-                    selectedImage.style.display = 'none'; // Hide the selected image
-                    imageLabel.style.display = 'block'; // Show the label
+                    selectedImage.src = ""; 
+                    selectedImage.style.display = 'none';
+                    imageLabel.style.display = 'block';
                 }
             });
         }
 
-        // Call the function to display the selected image
         displaySelectedImage();
 
         document.getElementById("show-password").addEventListener("change", function() {
             var passwordInput = document.getElementById("password");
             if (this.checked) {
-                passwordInput.type = "text";
+                passwordInput.type = "number";
             } else {
                 passwordInput.type = "password";
             }
         });
 
-        document.addEventListener('DOMContentLoaded', function () {
-        // Function to format student_num input with a dash after two digits and enforce 7 digits
-        function formatStudentNumInput() {
-            var studentNumInput = document.getElementById('student_num');
-            var inputValue = studentNumInput.value.replace(/[^0-9]/g, ''); // Remove non-digit characters
-            var formattedValue = inputValue.replace(/^(\d{2})?(\d{5})?$/, '$1-$2'); // Add dash after two digits and enforce 7 digits
-            studentNumInput.value = formattedValue;
-        }
+        document.addEventListener('DOMContentLoaded', function() {
+            function formatStudentNumInput() {
+                var studentNumInput = document.getElementById('student_num');
+                var inputValue = studentNumInput.value.replace(/[^0-9]/g, '');
+                var formattedValue = inputValue.replace(/^(\d{2})?(\d{5})?$/, '$1-$2');
+                studentNumInput.value = formattedValue;
+            }
 
-        // Add event listeners for input and blur events to format the input dynamically
-        var studentNumInput = document.getElementById('student_num');
-        studentNumInput.addEventListener('input', formatStudentNumInput);
-        studentNumInput.addEventListener('blur', formatStudentNumInput);
-    });
+            var studentNumInput = document.getElementById('student_num');
+            studentNumInput.addEventListener('input', formatStudentNumInput);
+            studentNumInput.addEventListener('blur', formatStudentNumInput);
+        });
     </script>
+
 
 </body>
 

@@ -49,6 +49,8 @@ body {
 	overflow-x: hidden;
 }
 
+
+
 .swal2-container.swal2-bottom, .swal2-container.swal2-center, .swal2-container.swal2-top {
 	grid-template-columns: auto minmax(0,1fr) auto;
 	z-index: 2000;
@@ -525,10 +527,10 @@ nav .profile img {
 	content: "";
 	position: absolute;
 	top: -30px;
-	left: 67%;
+	left: 72%;
 	transform: translateX(-50%);
 	border: 15px solid;
-	border-color: transparent transparent #fff transparent;
+	border-color: transparent transparent var(--grey) transparent;
 }
 
 .dropdown.active {
@@ -623,6 +625,7 @@ nav .profile img {
 	margin-right: auto;
 	font-size: 24px;
 	font-weight: 600;
+	color: #727272;
 }
 #content main .table-data .head .bx {
 	cursor: pointer;
@@ -645,9 +648,11 @@ nav .profile img {
 }
 #content main .table-data .order table td {
 	padding: 16px 0px;
+	font-size: 13px;
 }
 #content main .table-data .order table tr td:first-child {
 	padding-left: 6px;
+	font-size: 13px;
 }
 #content main .table-data .order table td img {
 	width: 36px;
@@ -658,6 +663,8 @@ nav .profile img {
 #content main .table-data .order table tbody tr:hover {
 	background: var(--grey);
 }
+
+
 #content main .table-data .order table tr td .status {
 	font-size: 13px;
 	padding: 6px 10px;
@@ -669,22 +676,27 @@ nav .profile img {
 }
 #content main .table-data .order table tr td p.status.pending {
     background: var(--orange);
+		margin-bottom: 0;
 }
 
 #content main .table-data .order table tr td p.status.inreview {
     background: var(--yellow);
+		margin-bottom: 0;
 }
 
 #content main .table-data .order table tr td p.status.qualified {
 	background: #00d084;
+	margin-bottom: 0;
 }
 
 #content main .table-data .order table tr td p.status.accepted {
 	background: #28a745;
+	margin-bottom: 0;
 }
 
 #content main .table-data .order table tr td p.status.rejected {
     background: red;
+		margin-bottom: 0;
 }
 
 
@@ -710,6 +722,7 @@ nav .profile img {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
+	font-size: 13px;
 }
 #content main .table-data .todo .todo-list li .bx {
 	cursor: pointer;
@@ -797,6 +810,7 @@ nav .profile img {
 	#content main .table-data .todo .todo-list {
 		min-width: 420px;
 	}
+
 	.dropdown {
     width: 300px;
     height: auto;
@@ -818,6 +832,7 @@ nav .profile img {
 	word-spacing: 5px;
 	color: #066606;
 	text-shadow: 0 0 1px darkgoldenrod;
+	visibility: hidden;
 }
 }
 

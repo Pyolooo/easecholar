@@ -87,6 +87,7 @@ if (isset($_GET['id'])) {
   <div class="wrapper">
     <form action="" method="POST" enctype="multipart/form-data">
       <div class="container">
+      <div class="top-section">
         <div class="head">
           <div class="img"><img src="../user_profiles/<?php echo $applicationData['image']; ?>" alt="Profile"></div>
           <p class="applicant-name"><?php echo $applicationData['applicant_name']; ?></p>
@@ -94,6 +95,25 @@ if (isset($_GET['id'])) {
             <h3 class="status-container">Status: <span class="status <?php echo strtolower($status); ?>"><?php echo $status; ?></span></h3>
           </div>
         </div>
+
+        <div class="reasons-container">
+      <label class="reason-label">Reasons:</label>
+      <?php
+      if (!empty($applicationData['reasons'])) {
+        $reasonsArray = json_decode($applicationData['reasons']);
+
+        foreach ($reasonsArray as $reason) {
+          echo '<div><span class="reason-list">' . htmlspecialchars($reason) . '</span></div>';
+        }
+      }
+
+      if (!empty($applicationData['other_reason'])) {
+        echo '<br><div><span class="other-reason">Other reason: </span> <span class = "other-reason-list"> ' . htmlspecialchars($applicationData['other_reason']) . '</span></div>';
+      }
+      ?>
+    </div>
+    </div>
+
         <div class="form-first">
           <h3 style="color:darkgreen">PERSONAL INFORMATION:</h3>
           <br>
@@ -204,12 +224,9 @@ if (isset($_GET['id'])) {
               $fileNames = explode(',', $applicationData['file']);
               foreach ($fileNames as $fileName) {
                 $filePath = '../file_uploads/' . $fileName;
-                // Check if the file exists on the server
                 if (file_exists($filePath)) {
-                  // Display a link to the file
                   echo '<p>File: <a href="' . $filePath . '" target="_blank">' . $fileName . '</a></p>';
                 } else {
-                  // Handle the case where the file is missing
                   echo '<p>File not found: ' . $fileName . '</p>';
                 }
               }
@@ -226,7 +243,6 @@ if (isset($_GET['id'])) {
             <?php
             $attachmentFiles = [];
 
-            // Retrieve attachment filenames from the 'attachments' column
             if (!empty($applicationData['attachments'])) {
               $attachmentFiles = explode(',', $applicationData['attachments']);
             }
@@ -234,20 +250,15 @@ if (isset($_GET['id'])) {
             if (!empty($attachmentFiles)) {
               foreach ($attachmentFiles as $attachmentName) {
                 $attachmentPath = '../file_uploads/' . $attachmentName;
-                // Check if the file exists on the server
                 if (file_exists($attachmentPath)) {
-                  // Display a link to the attachment
                   echo '<p>Attachment: <a href="' . $attachmentPath . '" target="_blank">' . $attachmentName . '</a></p>';
                 } else {
-                  // Handle the case where the attachment file is missing
                   echo '<p>Attachment not found: ' . $attachmentName . '</p>';
                 }
               }
             } else {
               echo '<p>No attachments uploaded</p>';
             }
-
-
             ?>
           </div>
 

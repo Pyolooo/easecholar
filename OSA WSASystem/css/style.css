@@ -173,8 +173,10 @@ body {
 	display: flex;
 	justify-content: center;
 }
+
 .notification .bxs-bell {
 	cursor: pointer;
+	font-size: x-large;
 }
 
 .dropdown {
@@ -229,7 +231,7 @@ body {
 	vertical-align: middle;
 	border-style: none;
 	width: 45px;
-	height: 40px;
+	height: 45px;
 	border-radius: 25px;
 }
 
@@ -285,7 +287,7 @@ body {
 .school-name{
 	margin-left: 30px;
 	font-weight: 600;
-	font-size: x-large;
+	font-size: 20px;
 	letter-spacing: 5px;
 	word-spacing: 5px;
 	color: #066606;
@@ -342,13 +344,6 @@ nav .menu {
 /* Move the notification bell to the right side */
 .right-section .notif {
     margin-left: auto;
-}
-
-/* Style the notification bell icon */
-.right-section .notification .bxs-bell {
-    cursor: pointer;
-    font-size: 24px;
-    color: var(--dark);
 }
 
 /* Style the notification count badge */

@@ -63,10 +63,10 @@ $number = 1;
 
 $pdf->SetFont('Arial', 'B', 10);
 $pdf->Cell(10, 10,  'No.', 1, 0, 'C');
-$pdf->Cell(40, 10, 'ID Number', 1, 0, 'C');
-$pdf->Cell(40, 10, 'Applicant Name', 1, 0, 'C');
-$pdf->Cell(40, 10, 'Course', 1, 0, 'C');
-$pdf->Cell(60, 10, 'Type of Scholarship', 1, 0, 'C');
+$pdf->Cell(25, 10, 'ID Number', 1, 0, 'C');
+$pdf->Cell(60, 10, 'Applicant Name', 1, 0, 'C');
+$pdf->Cell(20, 10, 'Course', 1, 0, 'C');
+$pdf->Cell(77, 10, 'Type of Scholarship', 1, 0, 'C');
 $pdf->Ln();
 
 $groupedApplicants = [];
@@ -88,12 +88,38 @@ while ($row = mysqli_fetch_assoc($result)) {
     }
 }
 
-// Helper function to calculate the number of lines for a given text and width
+
+// ...
+
+foreach ($groupedApplicants as $applicantName => $data) {
+    $pdf->SetFont('Arial', '', 9);
+
+    // Set a consistent line height for all cells
+    $lineHeight = 6;
+
+    // Calculate the number of lines for the MultiCell
+    $numLinesScholarship = calculateNumLines($pdf, implode(", ", $data['scholarships']), 77);
+
+    // Use the consistent line height for all cells
+    $pdf->Cell(10, $lineHeight * $numLinesScholarship, $number, 1, 0, 'C');
+    $pdf->Cell(25, $lineHeight * $numLinesScholarship, $data['idNumber'], 1, 0, 'C');
+    $pdf->Cell(60, $lineHeight * $numLinesScholarship, $applicantName, 1, 0, 'C');
+    $pdf->Cell(20, $lineHeight * $numLinesScholarship, $data['course'], 1, 0, 'C');
+
+  
+    $pdf->MultiCell(77, $lineHeight, implode(", ", $data['scholarships']), 1, 'C');
+
+    $pdf->SetY($pdf->GetY());
+
+    // Increment the row number
+    $number++;
+}
+
+
+
 function calculateNumLines($pdf, $text, $maxWidth) {
     $pdf->SetFont('Arial', '', 9);
-    $lineHeight = 10; // Set the line height (adjust as needed)
 
-    // Manually calculate the number of lines based on the width
     $words = explode(' ', $text);
     $currentWidth = 0;
     $numLines = 1;
@@ -112,33 +138,13 @@ function calculateNumLines($pdf, $text, $maxWidth) {
     return $numLines;
 }
 
-foreach ($groupedApplicants as $applicantName => $data) {
-    $pdf->SetFont('Arial', '', 9);
-
-    // Set the line height (adjust as needed)
-    $lineHeight = 10;
-
-    // Calculate the number of lines for the MultiCell
-    $numLines = calculateNumLines($pdf, implode(", ", $data['scholarships']), 60);
-
-    // Use the number of lines for the other cells
-    $pdf->Cell(10, $numLines * $lineHeight, $number++, 1, 0, 'C');
-    $pdf->Cell(40, $numLines * $lineHeight, $data['idNumber'], 1, 0, 'C');
-    $pdf->Cell(40, $numLines * $lineHeight, $applicantName, 1, 0, 'C');
-    $pdf->Cell(40, $numLines * $lineHeight, $data['course'], 1, 0, 'C');
-    $pdf->MultiCell(60, $lineHeight, implode(", ", $data['scholarships']), 1, 'C');
-
-    // Move to the next line
-    $pdf->Ln();
-}
 
 
-// Output the PDF as inline content
+
 $pdf->Output();
 
 $pdfContent = ob_get_clean();
 
-// Send appropriate headers for PDF display
 header('Content-Type: application/pdf');
 header('Content-Disposition: inline; filename="applicants.pdf"');
 

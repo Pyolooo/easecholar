@@ -23,6 +23,7 @@ if (isset($_GET['id'])) {
 
     if ($result->num_rows > 0) {
         $row = $result->fetch_assoc();
+        $scholarship_logo = $row['scholarship_logo'];
         $details = $row['details'];
         $requirements = explode("\n", $row['requirements']);
         $benefits = explode("\n", $row['benefits']);
@@ -46,10 +47,10 @@ if (isset($_GET['id'])) {
 
         <body>
             <div class="table-data">
-                <div class="label-container">
-                <h1 class="scholarship-title"><?php echo $row['scholarship']; ?></h1>
+                <div class="scholarship-container">
+                    <img class='scholarship-logo' src='../file_uploads/<?php echo basename($scholarship_logo); ?>' alt="Scholarship Logo">
+                    <h1 class="scholarship-title"><?php echo $row['scholarship']; ?></h1>
                 </div>
-
 
                 <hr>
                 <div class="scholarship-details"> <?php echo $row['details']; ?></div>
@@ -122,12 +123,10 @@ if (isset($_GET['id'])) {
 }
     ?>
     <script>
-        // JavaScript function to show the status information modal
         function showStatusInfo() {
             var statusInfoModal = document.getElementById('statusInfoModal');
             statusInfoModal.style.display = 'block';
 
-            // Close the modal if the user clicks outside of it
             window.onclick = function(event) {
                 if (event.target == statusInfoModal) {
                     statusInfoModal.style.display = 'none';
@@ -135,6 +134,5 @@ if (isset($_GET['id'])) {
             };
         }
     </script>
-        </body>
-
-        </html>
+    </body>
+</html>

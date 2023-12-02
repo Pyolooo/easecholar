@@ -87,13 +87,33 @@ if (isset($_GET['id']) && isset($_GET['user_id'])) {
   <div class="wrapper">
     <form action="" method="POST" enctype="multipart/form-data">
       <div class="container">
-        <div class="head">
-          <div class="img"><img src="../user_profiles/<?php echo $applicationData['image']; ?>" alt="Profile"></div>
-          <p class="applicant-name"><?php echo $applicationData['applicant_name']; ?></p>
-          <div class="reminder">
-            <h3 class="status-container">Status: <span class="status <?php echo strtolower($status); ?>"><?php echo $status; ?></span></h3>
+        <div class="top-section">
+          <div class="head">
+            <div class="img"><img src="../user_profiles/<?php echo $applicationData['image']; ?>" alt="Profile"></div>
+            <p class="applicant-name"><?php echo $applicationData['applicant_name']; ?></p>
+            <div class="reminder">
+              <h3 class="status-container">Status: <span class="status <?php echo strtolower($status); ?>"><?php echo $status; ?></span></h3>
+            </div>
+          </div>
+
+          <div class="reasons-container">
+            <label class="reason-label">Reasons:</label>
+            <?php
+            if (!empty($applicationData['reasons'])) {
+              $reasonsArray = json_decode($applicationData['reasons']);
+
+              foreach ($reasonsArray as $reason) {
+                echo '<div><span class="reason-list">' . htmlspecialchars($reason) . '</span></div>';
+              }
+            }
+
+            if (!empty($applicationData['other_reason'])) {
+              echo '<br><div><span class="other-reason">Other reason: </span> <span class = "other-reason-list"> ' . htmlspecialchars($applicationData['other_reason']) . '</span></div>';
+            }
+            ?>
           </div>
         </div>
+
         <div class="form-first">
           <h3 style="color:darkgreen">PERSONAL INFORMATION:</h3>
           <br>
@@ -323,7 +343,6 @@ if (isset($_GET['id']) && isset($_GET['user_id'])) {
                   echo '<p>No files uploaded</p>';
                 }
                 ?>
-
               </div>
 
 
@@ -381,7 +400,6 @@ if (isset($_GET['id']) && isset($_GET['user_id'])) {
                 }
                 ?>
               </div>
-
             </div>
 
             <hr><br>
@@ -409,19 +427,14 @@ if (isset($_GET['id']) && isset($_GET['user_id'])) {
             <div class="button-container">
               <button class="cancel-button" type="button" onclick="window.location.href='application_list.php'">Back</button>
             </div>
-
-
         </div>
     </form>
   </div>
-
 
   </div>
   </form>
 
   </div>
-  <script>
-  </script>
 </body>
 
 </html>

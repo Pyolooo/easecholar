@@ -21,13 +21,24 @@ if (!$dbConn) {
   die("Connection failed: " . mysqli_connect_error());
 }
 
-// Retrieve regular users (tbl_user)
-$sqlUser = "SELECT * FROM tbl_user";
+$rowsPerPage = isset($_GET['rowsPerPage']) ? intval($_GET['rowsPerPage']) : 10;
+$currentPage = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$offset = max(0, ($currentPage - 1) * $rowsPerPage);
+
+$itemsPerPage = $rowsPerPage;
+
+$sqlUser = "SELECT * FROM tbl_user LIMIT $offset, $itemsPerPage";
 $resultUser = mysqli_query($dbConn, $sqlUser);
 
 if (!$resultUser) {
   die("Query failed: " . mysqli_error($dbConn));
 }
+
+// Count the total number of rows
+$totalRows = mysqli_num_rows(mysqli_query($dbConn, "SELECT * FROM tbl_user"));
+
+// Calculate the total number of pages
+$totalPages = ceil($totalRows / $itemsPerPage);
 
 // Retrieve OSA users (tbl_admin)
 $sqlAdmin = "SELECT * FROM tbl_admin WHERE role = 'OSA'";
@@ -120,21 +131,22 @@ function formatExpireDate($dbExpireDate)
     <nav>
       <div class="menu">
         <i class='bx bx-menu'></i>
-        <span class="school-name">ISABELA STATE UNIVERSITY SANTIAGO</span>
+        <span class="school-name">EASE-CHOLAR</span>
       </div>
       <div class="right-section">
         <div class="profile">
-        <a href="admin_profile.php" class="profile">
-                        <?php
-                        $select_admin = mysqli_query($dbConn, "SELECT * FROM `tbl_super_admin` WHERE super_admin_id = '$super_admin_id'") or die('query failed');
-                        $fetch = mysqli_fetch_assoc($select_admin);
-                        if ($fetch && $fetch['profile'] != '') {
-                            echo '<img src="../user_profiles/' . $fetch['profile'] . '">';
-                        } else {
-                            echo '<img src="../user_profiles/isulogo.png">';
-                        }
-                        ?>
-                    </a>
+          <a href="admin_profile.php" class="profile">
+            <?php
+            $select_admin = mysqli_query($dbConn, "SELECT * FROM `tbl_super_admin` WHERE super_admin_id = '$super_admin_id'") or die('query failed');
+            $fetch = mysqli_fetch_assoc($select_admin);
+            if ($fetch && $fetch['profile'] != '') {
+              echo '<img src="../user_profiles/' . $fetch['profile'] . '">';
+            } else {
+              echo '<img src="../user_profiles/isulogo.png">';
+            }
+
+            ?>
+          </a>
         </div>
       </div>
     </nav>
@@ -164,6 +176,16 @@ function formatExpireDate($dbExpireDate)
 
       <div class="table-data">
         <div class="order">
+          <div class="rowsPerpage">
+            <label for="rowsPerPage">Number of Rows:</label>
+            <select id="rowsPerPage" onchange="changeRowsPerPage(<?php echo $currentPage; ?>)">
+              <option value="10" <?php if ($rowsPerPage == 10) echo 'selected'; ?>>10</option>
+              <option value="20" <?php if ($rowsPerPage == 20) echo 'selected'; ?>>20</option>
+              <option value="50" <?php if ($rowsPerPage == 50) echo 'selected'; ?>>50</option>
+              <option value="100" <?php if ($rowsPerPage == 100) echo 'selected'; ?>>100</option>
+            </select>
+          </div>
+
           <section class="table__header">
             <h3>Manage System Users</h3>
             <div class="input-group">
@@ -192,24 +214,58 @@ function formatExpireDate($dbExpireDate)
                 </thead>
                 <tbody>
                   <?php
+                  $number = 1;
                   while ($row = mysqli_fetch_assoc($resultUser)) {
                     $customId = $row['custom_id'];
                     $fullName = $row['full_name'];
                     $email = $row['email'];
                     $image = $row['image'];
 
+
+
                     echo '<tr>';
-                    echo '<td>' . $customId . '</td>';
+                    echo '<td>' . $number . '</td>';
                     echo '<td><img src="../user_profiles/' . $image . '" alt="">' . $fullName . '</td>';
                     echo '<td>' . $email . '</td>';
                     echo '<td><a class= "view-link" href="student_details.php?id=' . $customId . '">View</a></td>';
 
                     echo '</tr>';
+
+                    $number++;
                   }
                   ?>
                 </tbody>
               </table>
-              <div class="pagination"></div>
+              <div class="entries-range">
+                Showing <?php echo min(($currentPage - 1) * $rowsPerPage + 1, $totalRows); ?> to <?php echo min($currentPage * $rowsPerPage, $totalRows); ?> of <?php echo $totalRows; ?> entries
+              </div>
+              <div class="pagination">
+                <?php
+                if ($currentPage > 1) {
+                  echo '<button class="pagination-button" data-page="' . ($currentPage - 1) . '">&lt; Prev</button>';
+                }
+
+                for ($i = 1; $i <= $totalPages; $i++) {
+                  if ($totalPages > 5 && $i > 2 && $i < ($totalPages - 1) && ($i < ($currentPage - 1) || $i > ($currentPage + 1))) {
+                    if ($i == 3 && $currentPage > 4) {
+                      echo '<span class="pagination-ellipsis">...</span>';
+                    }
+                    continue;
+                  }
+
+                  echo '<button class="pagination-button' . ($currentPage == $i ? ' active' : '') . '" data-page="' . $i . '">' . $i . '</button>';
+                }
+
+                if ($totalPages > 5 && $currentPage < ($totalPages - 2)) {
+                  echo '<span class="pagination-ellipsis">...</span>';
+                }
+
+                if ($totalRows > $itemsPerPage && $currentPage < $totalPages) {
+                  echo '<button class="pagination-button" data-page="' . ($currentPage + 1) . '">Next &gt;</button>';
+                }
+                ?>
+              </div>
+
             </div>
 
             <div id="osaSection" style="display: none;">
@@ -276,6 +332,7 @@ function formatExpireDate($dbExpireDate)
 
 
 
+
                     echo '<tr>';
                     echo '<td>' . $superAdminId . '</td>';
                     echo '<td><img src="../user_profiles/' . $profile . '" alt="">' . $userName . '</td>';
@@ -292,7 +349,29 @@ function formatExpireDate($dbExpireDate)
     </main>
 
     <script src="js/applicants.js"></script>
+    <script src="js/admin_logout.js"></script>
+    <script src="js/toggle_sidebar.js"></script>
+    
     <script>
+      function changeRowsPerPage(page) {
+        const selectedRows = document.getElementById('rowsPerPage').value;
+        window.location.href = 'manage_users.php?rowsPerPage=' + selectedRows + '&page=' + page;
+      }
+
+
+
+      document.addEventListener("DOMContentLoaded", function() {
+        const paginationButtons = document.querySelectorAll('.pagination-button');
+
+        paginationButtons.forEach(button => {
+          button.addEventListener('click', function() {
+            const page = this.getAttribute('data-page');
+            changeRowsPerPage(page);
+          });
+        });
+      });
+
+
       document.addEventListener("click", function(event) {
         if (event.target.classList.contains("reg-status-button")) {
           const button = event.target;
@@ -311,9 +390,8 @@ function formatExpireDate($dbExpireDate)
             cancelButtonText: "Cancel"
           }).then((result) => {
             if (result.isConfirmed) {
-              // Send an AJAX request to update the user's status
               $.ajax({
-                url: "update_reg_status.php", // Replace with the PHP file to handle status updates for superAdmin users
+                url: "update_reg_status.php",
                 type: "POST",
                 data: {
                   superAdminId: superAdminId,
@@ -321,20 +399,15 @@ function formatExpireDate($dbExpireDate)
                 },
                 success: function(response) {
                   if (response === "success") {
-                    // Update the button text and data-status attribute
                     button.textContent = currentStatus === 1 ? "Activate" : "Deactivate";
                     button.setAttribute("data-status", currentStatus === 1 ? 0 : 1);
-                    // Change the background color of the button based on the new status
                     button.style.backgroundColor = currentStatus === 1 ? "green" : "red";
-                    // Show a success message
                     Swal.fire("Account Updated", "The superAdmin user's account has been updated.", "success");
                   } else {
-                    // Show an error message
                     Swal.fire("Error", "Failed to update the account. Please try again.", "error");
                   }
                 },
                 error: function() {
-                  // Handle errors if the AJAX request fails
                   Swal.fire("Error", "An error occurred while processing your request.", "error");
                 }
               });
@@ -344,23 +417,19 @@ function formatExpireDate($dbExpireDate)
       });
 
 
-
       document.addEventListener("DOMContentLoaded", function() {
         const filterButtons = document.querySelectorAll(".filter-button");
         const applicantsSection = document.getElementById("applicantsSection");
         const osaSection = document.getElementById("osaSection");
         const superAdminSection = document.getElementById("superAdminSection");
-        const createUserButton = document.getElementById("createUserButton"); // Get the "Create User" button
+        const createUserButton = document.getElementById("createUserButton");
 
-        // Initially, show Applicants section by default
         applicantsSection.style.display = "block";
-        createUserButton.style.display = "none"; // Hide the button by default
+        createUserButton.style.display = "none";
 
         filterButtons.forEach(button => {
           button.addEventListener("click", function() {
-            // Remove active class from all buttons
             filterButtons.forEach(btn => btn.classList.remove("active"));
-            // Add active class to the clicked button
             button.classList.add("active");
 
             // Hide all sections
@@ -373,13 +442,13 @@ function formatExpireDate($dbExpireDate)
             // Show the selected section based on the filter
             if (selectedFilter === "applicants") {
               applicantsSection.style.display = "block";
-              createUserButton.style.display = "none"; // Hide the button for applicants
+              createUserButton.style.display = "none";
             } else if (selectedFilter === "osa") {
               osaSection.style.display = "block";
-              createUserButton.style.display = ""; // Show the button for OSA
+              createUserButton.style.display = ""; 
             } else if (selectedFilter === "superAdmin") {
               superAdminSection.style.display = "block";
-              createUserButton.style.display = "none"; // Hide the button for superAdmin
+              createUserButton.style.display = "none"; 
             }
           });
         });
@@ -389,94 +458,17 @@ function formatExpireDate($dbExpireDate)
 
 
       $(document).ready(function() {
-        // Function to confirm logout
-        function confirmLogout() {
-          Swal.fire({
-            title: "Logout",
-            text: "Are you sure you want to log out?",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#3085d6",
-            cancelButtonColor: "#d33",
-            confirmButtonText: "Yes, log out",
-            cancelButtonText: "Cancel"
-          }).then((result) => {
-            if (result.isConfirmed) {
-              // If the user confirms, redirect to the logout script
-              window.location.href = "admin_logout.php";
-            }
-          });
-        }
-
-        // Attach the click event to the "Logout" link
-        document.querySelector(".logout").addEventListener("click", function(event) {
-          event.preventDefault(); // Prevent the link from navigating directly
-          confirmLogout();
-        });
-
-        // TOGGLE SIDEBAR
-        const menuBar = document.querySelector('#content nav .bx.bx-menu');
-        const sidebar = document.getElementById('sidebar');
-
-        function toggleSidebar() {
-          sidebar.classList.toggle('hide');
-        }
-
-        menuBar.addEventListener('click', toggleSidebar);
-
-        // Function to handle window resize and toggle sidebar based on screen width
-        function handleResize() {
-          const screenWidth = window.innerWidth;
-
-          if (screenWidth <= 768) {
-            sidebar.classList.add('hide');
-          } else {
-            sidebar.classList.remove('hide');
-          }
-        }
-
-        // Add a window resize event listener
-        window.addEventListener('resize', handleResize);
-
-        // Initial check and toggle based on current screen width
-        handleResize();
-
-        // Function to toggle the dropdown
-        function toggleDropdown() {
-          $(".num").hide(); // Hide the notification count when the dropdown is toggled
-        }
-
-        // Add click event listener to the bell icon to mark all notifications as read
-        $(".notification .bxs-bell").on("click", function(event) {
-          event.stopPropagation();
-          // Toggle the dropdown
-          $(".dropdown").toggleClass("active");
-          toggleDropdown();
-          // If the dropdown is being opened, mark all notifications as read
-          if ($(".dropdown").hasClass("active")) {
-            markAllNotificationsAsRead();
-          } else {
-            // If the dropdown is being closed, perform any other actions (if needed)
-          }
-        });
-
-        // Close the dropdown when clicking outside of it
-        $(document).on("click", function() {
-          $(".dropdown").removeClass("active");
-        });
 
         // Function to mark all notifications as read
         function markAllNotificationsAsRead() {
           $.ajax({
-            url: "mark_notification_as_read.php", // Replace with the correct path to your "mark_notification_as_read.php" file
+            url: "mark_notification_as_read.php",
             type: "POST",
             data: {
-              read_message: "all" // Pass "all" as a parameter to mark all notifications as read
+              read_message: "all" 
             },
             success: function() {
-              // On successful marking as read, remove the "unread" class from all notification items
               $(".notify_item").removeClass("unread");
-              // Fetch and update the notification count on the bell icon (if needed)
               fetchNotificationCount();
             },
             error: function() {
@@ -485,40 +477,9 @@ function formatExpireDate($dbExpireDate)
           });
         }
 
-        // Add click event listener to the notifications to mark them as read
         $(".notify_item").on("click", function() {
           var notificationId = $(this).data("notification-id");
           markNotificationAsRead(notificationId);
-        });
-
-        // Function to handle delete option click
-        $(".notify_options .delete_option").on("click", function(event) {
-          event.stopPropagation();
-          const notificationId = $(this).data("notification-id");
-          // Send an AJAX request to delete the notification from the database
-          $.ajax({
-            url: "delete_notification.php", // Replace with the PHP file to handle the delete operation
-            type: "POST",
-            data: {
-              notification_id: notificationId
-            },
-            success: function() {
-              // If deletion is successful, remove the notification from the dropdown
-              $(".notify_item[data-notification-id='" + notificationId + "']").remove();
-              // Fetch and update the notification count on the bell icon
-              fetchNotificationCount();
-            },
-            error: function() {
-              // Handle error if deletion fails
-            }
-          });
-        });
-
-        // Function to handle cancel option click
-        $(".notify_options .cancel_option").on("click", function(event) {
-          event.stopPropagation();
-          // Hide the options menu
-          $(this).closest(".options_menu").removeClass("active");
         });
       });
     </script>

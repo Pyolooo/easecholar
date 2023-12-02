@@ -378,7 +378,7 @@ nav .profile img {
 .school-name{
 	margin-left: 30px;
 	font-weight: 600;
-	font-size: x-large;
+	font-size: 20px;
 	letter-spacing: 5px;
 	word-spacing: 5px;
 	color: #066606;
@@ -611,7 +611,9 @@ margin-right: 20px;
 
 .notification .bxs-bell {
 	cursor: pointer;
+	font-size: x-large;
 }
+
 
 .dropdown {
 	width: 350px;
@@ -665,7 +667,7 @@ margin-right: 20px;
 	vertical-align: middle;
 	border-style: none;
 	width: 45px;
-	height: 40px;
+	height: 45px;
 	border-radius: 25px;
 }
 

@@ -590,10 +590,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
             <div class="input-field">
               <label>Year Graduated</label>
-              <input type="text" id="ter_year_grad" name="ter_year_grad" placeholder="YYYY or YYYY-YYYY" value="<?php echo $ter_year_grad; ?>" pattern="\d{4}(-\d{4})?" required>
-
+              <input type="text" id="ter_year_grad" name="ter_year_grad" placeholder="YYYY or YYYY-YYYY. Type 'NA' if not graduated yet" value="<?php echo $ter_year_grad; ?>" pattern="(\d{4}(-\d{4})?|NA)" required>
               <div class="validation-message" id="ter_year_grad-error"></div>
             </div>
+
           </div>
 
           <div class="form_3 data_info">
@@ -603,8 +603,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               <?php foreach ($requirements as $index => $requirement) { ?>
                 <div class="input-file">
                   <input id="checkbox-<?php echo $index; ?>" class="checkbox" type="checkbox" disabled>
+                  <div class="file-container">
                   <label class="requirement-label" for="file-input-<?php echo $index; ?>"><?php echo $requirement; ?></label>
                   <div class="requirement-validation" id="requirement-validation"></div>
+                  </div>
                   <input id="file-input-<?php echo $index; ?>" class="file-input" type="file" name="file[]" required>
                 </div>
               <?php } ?>
@@ -799,14 +801,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           }
         }
 
-        // Initial validation
         validateStatus();
 
         civil_status.addEventListener('change', function() {
           validateStatus();
         });
 
-        // Add validation logic for gender
         var gender = document.getElementById('gender');
         var gender_error = document.getElementById('gender-error');
 
@@ -821,7 +821,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           }
         }
 
-        // Initial validation
         validateGender();
 
         gender.addEventListener('change', function() {
@@ -829,9 +828,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         });
 
 
-        // Add validation logic for email
         var emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
-        var email = form.email; // Assuming form.email is the input element
+        var email = form.email;
 
         function validateEmail() {
           if (email.value.trim() === '') {
@@ -841,14 +839,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             document.getElementById("email-error").textContent = 'Please enter a valid email address';
             isValid = false;
           } else {
-            document.getElementById("email-error").textContent = ''; // Clear the validation message
+            document.getElementById("email-error").textContent = ''; 
           }
         }
 
-        // Initial validation
         validateEmail();
 
-        // Add an event listener to clear the validation message when the user types
+
         email.addEventListener('input', function() {
           validateEmail();
         });
@@ -870,7 +867,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         validateMobileNum();
 
-        // Add an event listener to clear the validation message when the user types
         mobileNum.addEventListener('input', function() {
           validateMobileNum();
         });
@@ -902,13 +898,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           year_lvl_error.textContent = 'Please select a year';
           isValid = false;
         } else {
-          year_lvl_error.textContent = ''; // Clear the validation message
+          year_lvl_error.textContent = '';
         }
 
 
 
         var idNumberRegex = /^\d+-\d{5}$/;
-        // Initial validation when the form is submitted or loaded
+
         if (id_number.value.trim() === '') {
           document.getElementById("id_number-error").textContent = 'ID Number is required';
           isValid = false;
@@ -917,11 +913,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           isValid = false;
         }
 
-        // Attach the input event listener
         document.getElementById('id_number').addEventListener('input', function() {
-          formatIdNumber(this); // Format the ID number
+          formatIdNumber(this);
 
-          // Validate the formatted ID number
           if (this.value.trim() === '') {
             document.getElementById("id_number-error").textContent = 'ID Number is required';
             isValid = false;
@@ -929,8 +923,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             document.getElementById("id_number-error").textContent = 'Please enter a valid ID number in the format XX-XXXX';
             isValid = false;
           } else {
-            document.getElementById("id_number-error").textContent = ''; // Clear the validation message
-            isValid = true; // Update isValid when the input is valid
+            document.getElementById("id_number-error").textContent = '';
+            isValid = true;
           }
         });
 
@@ -1044,11 +1038,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         var primYearInput = document.getElementById("prim_year_grad");
 
-        // Add an event listener for the input event
         primYearInput.addEventListener("input", function() {
-          // Check if the input is not empty and is in the correct format
           if (primYearInput.value.trim() !== "" && /^(\d{4}|\d{4}-\d{4})$/.test(primYearInput.value.trim())) {
-            // If correct format, clear the validation message
+
             document.getElementById("prim_year_grad-error").textContent = "";
           }
         });
@@ -1074,16 +1066,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         var secYearInput = document.getElementById("sec_year_grad");
 
-        // Add an event listener for the input event
         secYearInput.addEventListener("input", function() {
-          // Check if the input is not empty and is in the correct format
           if (secYearInput.value.trim() !== "" && /^(\d{4}|\d{4}-\d{4})$/.test(secYearInput.value.trim())) {
-            // If correct format, clear the validation message
+
             document.getElementById("sec_year_grad-error").textContent = "";
           }
         });
 
-        // Initial validation
         if (secYearInput.value.trim() === "") {
           isValid = false;
           document.getElementById("sec_year_grad-error").textContent = "Please enter your Secondary Year Graduated.";
@@ -1098,7 +1087,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         var terSchoolInput = document.getElementById("tertiary_school");
         var terYearGradInput = document.getElementById("ter_year_grad");
 
-        // Initial validation for Tertiary School
         if (terSchoolInput.value.trim() === "") {
           isValid = false;
           document.getElementById("tertiary_school-error").textContent = "Please enter your Tertiary School.";
@@ -1109,13 +1097,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           document.getElementById("tertiary_school-error").textContent = "";
         });
 
-        // Initial validation for Tertiary Year Graduated
         var terYearGradInputValue = terYearGradInput.value.trim();
 
         if (terYearGradInputValue === "") {
           isValid = false;
           document.getElementById("ter_year_grad-error").textContent = "Please enter your Tertiary Year Graduated or use 'NA' if not applicable.";
-        } else if (terYearGradInputValue.toUpperCase() !== "NA" && !/^(\d{4}|\d{4}-\d{4})$/.test(terYearGradInputValue)) {
+        } else if (terYearGradInputValue.toUpperCase() !== "NA" && !/^(\d{4}|\d{4}-\d{4})$/.test(terYearGradInputValue.toUpperCase())) {
           isValid = false;
           document.getElementById("ter_year_grad-error").textContent = "Invalid format. Please enter a valid year (YYYY) or range (YYYY-YYYY), or use 'NA'.";
         }
@@ -1154,13 +1141,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if (fileInput.value.trim() === '') {
               isValid = false;
-              // Display the validation message
               requirementValidation.textContent = '*Must upload a valid file (PDF, JPG, JPEG, PNG)';
               requirementLabel.style.color = 'red';
-              // You can also uncheck the corresponding checkbox if needed
-              // checkbox.checked = false;
             } else {
-              // Reset the validation message
               requirementValidation.textContent = '';
               requirementLabel.style.color = 'inherit';
             }
@@ -1181,7 +1164,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
         if (!isValid) {
-          event.preventDefault(); // Prevent form submission if validation fails
+          event.preventDefault();
         }
       });
     });

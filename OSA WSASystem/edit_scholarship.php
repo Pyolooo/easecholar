@@ -29,11 +29,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
   // Handle image update
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Check if a new image is selected
     if ($_FILES['image']['name'] != '') {
       $targetDir = $_SERVER['DOCUMENT_ROOT'] . '/file_uploads/';
         
-      // Generate a unique and secure filename
       $originalFileName = basename($_FILES["image"]["name"]);
       $extension = pathinfo($originalFileName, PATHINFO_EXTENSION);
       $uniqueFileName = uniqid('uploaded_image_') . '.' . $extension;
@@ -42,38 +40,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       $uploadOk = 1;
       $imageFileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
 
-      // Check if the file is an actual image
       $check = getimagesize($_FILES["image"]["tmp_name"]);
       if ($check === false) {
           $error_message = "File is not an image.";
           $uploadOk = 0;
       }
   
-      // Check if file already exists
       if (file_exists($targetFile)) {
           $error_message = "Sorry, the file already exists.";
           $uploadOk = 0;
       }
   
-      // Check file size
       if ($_FILES["image"]["size"] > 500000) {
           $error_message = "Sorry, your file is too large.";
           $uploadOk = 0;
       }
   
-      // Allow certain file formats
       $allowedFormats = ["jpg", "jpeg", "png"];
       if (!in_array($imageFileType, $allowedFormats)) {
           $error_message = "Sorry, only JPG, JPEG, and PNG files are allowed.";
           $uploadOk = 0;
       }
   
-      // Check if $uploadOk is set to 0 by an error
       if ($uploadOk == 0) {
           $error_message = "Sorry, your file was not uploaded.";
       } else {
-          // If everything is ok, try to upload file
+
           if (move_uploaded_file($_FILES["image"]["tmp_name"], $targetFile)) {
+
 // Update the scholarship_logo in the database
 $sql = "UPDATE tbl_scholarship SET scholarship_logo = ? WHERE scholarship_id = ?";
 $stmt = $dbConn->prepare($sql);
@@ -94,11 +88,9 @@ $stmt->close();
   }
 }  
 
-  // Check if the selected date is in the future
   if (strtotime($expireDate) <= time()) {
     $error_message = "The expiration date should be in the future.";
   } else {
-    // Perform the database update
     $sql = "UPDATE tbl_scholarship SET
           scholarship = ?,
           details = ?,
@@ -133,7 +125,7 @@ $stmt->close();
 }
 
 
-// Fetch current scholarship information from the database
+
 if (isset($_GET['id'])) {
   $scholarshipId = $_GET['id'];
   $sql = "SELECT * FROM tbl_scholarship WHERE scholarship_id = ?";
@@ -285,7 +277,6 @@ document.getElementById("previewButton").addEventListener("click", function() {
       var previewPages = {
         "tbl_userapp": "preview_application1.php",
         "tbl_scholarship_1_form": "preview_application2.php",
-        // Add more form tables and their respective preview pages as needed
       };
 
       if (previewPages.hasOwnProperty(selectedFormTable)) {
@@ -313,14 +304,13 @@ document.getElementById("previewButton").addEventListener("click", function() {
         // Add a submit event listener to the form to prevent submission if the form is not dirty
         form.addEventListener('submit', function (event) {
             if (!isFormDirty) {
-                // Form is not dirty; prevent submission
                 event.preventDefault();
                 Swal.fire({
                     icon: 'info',
                     title: 'No changes made',
                     text: 'Please update some data.',
                     showConfirmButton: false,
-                    timer: 2000 // Close the alert after 2 seconds
+                    timer: 2000
                 });
             }
         });

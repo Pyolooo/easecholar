@@ -382,7 +382,7 @@ nav .profile img {
 .school-name{
 	margin-left: 30px;
 	font-weight: 600;
-	font-size: x-large;
+	font-size: 20px;
 	letter-spacing: 5px;
 	word-spacing: 5px;
 	color: #066606;
@@ -614,12 +614,12 @@ nav .profile img {
 	font-weight: 600;
   }
   
-#content main .table-data .order table tr td:first-child {
+/* #content main .table-data .order table tr td:first-child {
 	display: flex;
 	align-items: center;
 	grid-gap: 12px;
 	padding-left: 6px;
-}
+} */
 
 #content main .table-data .order table tbody tr:hover {
 	background: var(--grey);
@@ -762,6 +762,17 @@ option {
 	font-weight: 700;
 	padding-top: 20px;
 }
+
+.reason-filter {
+	padding: 10px 5px;
+	background-color: #d5d1defe;
+}
+
+#reasonFilter {
+	padding: 3px 2px;
+	border-radius: 2px;
+}
+
 
 .status-filter {
 	border: none;
@@ -937,6 +948,18 @@ main.table {
     overflow: hidden;
 }
 
+.rowsPerpage{
+	padding: 0 1rem;
+}
+
+#rowsPerPage {
+	outline: none;
+	margin-right: 10px;
+	cursor: pointer;
+	border-radius: 5px;
+	padding: 3px 5px;
+}
+
 .table__header {
     width: 100%;
     background-color: #fff4;
@@ -1011,19 +1034,25 @@ table {
     width: 100%;
 }
 
+.image-applicant-container {
+	display: flex;
+	align-items: center;
+}
+
 td img {
     width: 36px;
     height: 36px;
     margin-right: .5rem;
     border-radius: 50%;
-
     vertical-align: middle;
+		display: flex;
 }
 
 table, th, td {
-    border-collapse: collapse;
-    padding: 1rem;
-    text-align: left;
+	border-collapse: collapse;
+	padding: 1rem .1rem;
+	text-align: center;
+	font-size: 13px;
 }
 
 thead th {

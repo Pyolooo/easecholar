@@ -23,6 +23,7 @@ if (isset($_GET['id'])) {
 
     if ($result->num_rows > 0) {
         $row = $result->fetch_assoc();
+        $scholarship_logo = $row['scholarship_logo'];
         $details = $row['details'];
         $requirements = explode("\n", $row['requirements']);
         $benefits = explode("\n", $row['benefits']);
@@ -46,8 +47,12 @@ if (isset($_GET['id'])) {
 
         <body>
             <div class="table-data">
+        
                 <div class="label-container">
+                <div class="scholarship-label">
+                <img class='scholarship-logo' src='../file_uploads/<?php echo basename($scholarship_logo); ?>' alt="Scholarship Logo">
                 <h1 class="scholarship-title"><?php echo $row['scholarship']; ?></h1>
+                </div>
                 <?php
                 if ($row['scholarship_status'] == 'Ongoing') {
                     echo '<a href="edit_scholarship.php?id=' . $scholarshipId . '" class="btn-edit"><i class="bx bxs-edit"></i></a>';
@@ -60,6 +65,7 @@ if (isset($_GET['id'])) {
                 }
                 ?>
                 </div>
+    
 
 
                 <hr>
@@ -138,7 +144,6 @@ if (isset($_GET['id'])) {
             var statusInfoModal = document.getElementById('statusInfoModal');
             statusInfoModal.style.display = 'block';
 
-            // Close the modal if the user clicks outside of it
             window.onclick = function(event) {
                 if (event.target == statusInfoModal) {
                     statusInfoModal.style.display = 'none';

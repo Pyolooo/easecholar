@@ -55,6 +55,7 @@ body {
 	overflow-x: hidden;
 }
 
+
 .swal2-container.swal2-bottom, .swal2-container.swal2-center, .swal2-container.swal2-top {
 	grid-template-columns: auto minmax(0,1fr) auto;
 	z-index: 2000;
@@ -665,7 +666,9 @@ nav .profile img {
 }
 .notification .bxs-bell {
 	cursor: pointer;
+	font-size: x-large;
 }
+
 
 .dropdown {
 	width: 350px;
@@ -881,6 +884,14 @@ padding: 5px 15px;
 	#content main .table-data .todo .todo-list {
 		min-width: 420px;
 	}
+	
+	.application-label {
+    margin-right: auto;
+    font-size: 15px;
+    font-weight: 600;
+    color: #565656;
+	}
+
 	.h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6{
 		font-size: 1rem;
 		margin-bottom: .5rem;
@@ -911,6 +922,7 @@ padding: 5px 15px;
     word-spacing: 5px;
     color: #066606;
     text-shadow: 0 0 1px darkgoldenrod;
+		visibility: hidden;
 	}
 }
 
@@ -1023,6 +1035,7 @@ table, th, td {
     border-collapse: collapse;
     padding: 1rem;
     text-align: left;
+		font-size: 13px;
 }
 
 thead th {

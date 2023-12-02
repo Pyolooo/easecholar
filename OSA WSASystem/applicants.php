@@ -11,13 +11,47 @@ if (!isset($_SESSION['admin_id'])) {
 $admin_id = $_SESSION['admin_id'];
 
 if (isset($_GET['logout'])) {
-    unset($admin_id);
     session_destroy();
     header('location: osa_login.php');
     exit();
 }
 
+$rowsPerPage = isset($_GET['rows']) ? intval($_GET['rows']) : 10;
+
+$currentPage = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$offset = ($currentPage - 1) * $rowsPerPage;
+
+$number = 1;
+
+$select = mysqli_query($dbConn, "SELECT ua.application_id, ua.image, ua.applicant_name, ua.scholarship_name, ua.date_submitted, ua.status, ua.reasons, ua.other_reason, ua.user_id, 'tbl_userapp' AS source
+FROM tbl_userapp ua
+JOIN tbl_user u ON ua.user_id = u.user_id
+UNION
+SELECT s1f.application_id, s1f.image, s1f.applicant_name, s1f.scholarship_name, s1f.date_submitted, s1f.status, s1f.reasons, s1f.other_reason, s1f.user_id, 'tbl_scholarship_1_form' AS source
+FROM tbl_scholarship_1_form s1f
+JOIN tbl_user u ON s1f.user_id = u.user_id
+ORDER BY date_submitted ASC
+LIMIT $offset, $rowsPerPage") or die('query failed');
+
+$countUserAppQuery = mysqli_query($dbConn, "SELECT COUNT(*) AS total FROM tbl_userapp") or die('count userapp query failed');
+$countUserAppData = mysqli_fetch_assoc($countUserAppQuery);
+
+$countScholarship1FormQuery = mysqli_query($dbConn, "SELECT COUNT(*) AS total FROM tbl_scholarship_1_form") or die('count scholarship_1_form query failed');
+$countScholarship1FormData = mysqli_fetch_assoc($countScholarship1FormQuery);
+
+$totalRows = $countUserAppData['total'] + $countScholarship1FormData['total'];
+
+
+$exactPages = floor($totalRows / $rowsPerPage);
+$remainingRows = $totalRows % $rowsPerPage;
+$totalPages = ($remainingRows > 0) ? $exactPages + 1 : $exactPages;
+
+$currentPage = min($currentPage, $totalPages);
+
+$totalPages = max($totalPages, 1);
+
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -82,7 +116,7 @@ if (isset($_GET['logout'])) {
         <nav>
             <div class="menu">
                 <i class='bx bx-menu'></i>
-                <span class="school-name">ISABELA STATE UNIVERSITY SANTIAGO</span>
+                <span class="school-name">EASE-CHOLAR</span>
             </div>
             <div class="right-section">
                 <div class="notif">
@@ -151,9 +185,9 @@ if (isset($_GET['logout'])) {
                     </div>
                 </div>
 
-                
+
                 <div class="profile">
-                <a href="osa_profile.php" class="profile">
+                    <a href="osa_profile.php" class="profile">
                         <?php
                         $select_osa = mysqli_query($dbConn, "SELECT * FROM `tbl_admin` WHERE admin_id = '$admin_id'") or die('query failed');
                         $fetch = mysqli_fetch_assoc($select_osa);
@@ -164,7 +198,6 @@ if (isset($_GET['logout'])) {
                         }
                         ?>
                     </a>
-
                 </div>
             </div>
         </nav>
@@ -200,11 +233,21 @@ if (isset($_GET['logout'])) {
             <div class="table-data">
                 <div class="order">
                     <section class="table__header">
+                        <div class="rowsPerpage">
+                            <label for="rowsPerPage">Rows:</label>
+                            <select id="rowsPerPage" onchange="changeRowsPerPage()">
+                                <option value="10" <?php if ($rowsPerPage == 10) echo 'selected'; ?>>10</option>
+                                <option value="20" <?php if ($rowsPerPage == 20) echo 'selected'; ?>>20</option>
+                                <option value="50" <?php if ($rowsPerPage == 50) echo 'selected'; ?>>50</option>
+                                <option value="100" <?php if ($rowsPerPage == 100) echo 'selected'; ?>>100</option>
+                            </select>
+                        </div>
+
                         <div class="export-container">
-                        <select title="Select Status" id="statusSelect">
-                            <option value="Accepted">Accepted</option>
-                            <option value="Rejected">Rejected</option>
-                        </select>
+                            <select title="Select Status" id="statusSelect">
+                                <option value="Accepted">Accepted</option>
+                                <option value="Rejected">Rejected</option>
+                            </select>
 
                             <select title="Select Scholarships" id="scholarshipSelect" name="scholarship_id">
                                 <option value="">All Scholarships</option>
@@ -218,7 +261,7 @@ if (isset($_GET['logout'])) {
                                     while ($row = mysqli_fetch_assoc($scholarshipResult)) {
                                         $scholarshipId = $row['scholarship_id'];
                                         $scholarshipName = $row['scholarship_name'];
-                                        echo '<option value="' . urlencode($scholarshipId) . '">' . $scholarshipName . '</option>';
+                                        echo '<option value="' . urlencode($scholarshipId) . '" class="select-option">' . $scholarshipName . '</option>';
                                     }
                                 }
                                 ?>
@@ -232,6 +275,7 @@ if (isset($_GET['logout'])) {
                             <button id="exportButton" class="btn-download" title="Export Data">
                                 <i class='bx bxs-file-export'></i> Export
                             </button>
+
 
                         </div>
                         <div class="input-group">
@@ -253,6 +297,17 @@ if (isset($_GET['logout'])) {
                             </div>
                         </div>
 
+                        <div class="reason-filter">
+                            <label for="reasonFilter">Filter by Reason:</label>
+                            <select id="reasonFilter" name="reasonFilter">
+                                <option value="">Select Reason</option>
+                                <option value="Insufficient GWA">Insufficient GWA</option>
+                                <option value="Failure to meet eligible criteria">Failure to meet eligible criteria</option>
+                                <option value="Lack of evidence">Lack of evidence</option>
+                                <option value="Lack of supporting documents">Lack of supporting documents</option>
+                            </select>
+                        </div>
+
 
                         <table>
                             <thead>
@@ -263,19 +318,10 @@ if (isset($_GET['logout'])) {
                                     <th>Submission <span class="icon-arrow">&UpArrow;</span></th>
                                     <th>Status <span class="icon-arrow">&UpArrow;</span></th>
                                     <th>Action <span class="icon-arrow">&UpArrow;</span></th>
+                                    <th id="reasonHeader" style="display: none;">Reason <span class="icon-arrow">&UpArrow;</span></th>
                                 </tr>
                             </thead>
-                            <?php
-                            $select = mysqli_query($dbConn, "SELECT ua.application_id, ua.image, ua.applicant_name, ua.scholarship_name, ua.date_submitted, ua.status, ua.user_id, 'tbl_userapp' AS source
-                    FROM tbl_userapp ua
-                    JOIN tbl_user u ON ua.user_id = u.user_id
-                    UNION
-                    SELECT s1f.application_id, s1f.image, s1f.applicant_name, s1f.scholarship_name, s1f.date_submitted, s1f.status, s1f.user_id, 'tbl_scholarship_1_form' AS source
-                    FROM tbl_scholarship_1_form s1f
-                    JOIN tbl_user u ON s1f.user_id = u.user_id") or die('query failed');
 
-                            $number = 1;
-                            ?>
 
                             <?php
                             while ($row = mysqli_fetch_array($select)) {
@@ -303,7 +349,11 @@ if (isset($_GET['logout'])) {
 
                                 <tr>
                                     <td><?= $number ?></td>
-                                    <td><img src="../user_profiles/<?= $row['image'] ?>" alt=""><?= $row['applicant_name'] ?></td>
+                                    <td>
+                                        <div class="image-applicant-container"><img src="../user_profiles/<?= $row['image'] ?>" alt="">
+                                            <p class="applicant_name"><?= $row['applicant_name'] ?></p>
+                                        </div>
+                                    </td>
                                     <td><?= $row['scholarship_name'] ?></td>
                                     <td><?= formatDateSubmitted($row['date_submitted']) ?></td>
                                     <td>
@@ -319,6 +369,33 @@ if (isset($_GET['logout'])) {
                                         ?>
                                         <strong><a class="view-link" href="<?= $reviewLink ?>">Review</a></strong>
                                     </td>
+
+                                    <?php if ($row['status'] == 'Rejected') { ?>
+                                        <td class="reasons-cell" style="display: none;">
+                                            <?php
+                                            // Check if reasons are not null and not empty
+                                            if (!empty($row['reasons'])) {
+                                                $reasons = json_decode($row['reasons']);
+
+                                                // Check if $reasons is an array
+                                                if (is_array($reasons) || is_object($reasons)) {
+                                                    foreach ($reasons as $reason) {
+                                                        echo $reason . "<br>";
+                                                    }
+                                                } else {
+                                                    echo "Invalid reasons format";
+                                                }
+                                            } else {
+                                                echo "No reasons provided";
+                                            }
+
+                                            if (!empty($row['other_reason'])) {
+                                                echo "Others: " . $row['other_reason'];
+                                            }
+                                            ?>
+                                        </td>
+
+                                    <?php } ?>
                                 </tr>
 
                             <?php
@@ -327,174 +404,268 @@ if (isset($_GET['logout'])) {
                             ?>
 
                         </table>
-                        <div class="pagination"></div>
-                    </section>
+                        <div class="entries-range">
+                            Showing <?php echo min(($currentPage - 1) * $rowsPerPage + 1, $totalRows); ?> to <?php echo min($currentPage * $rowsPerPage, $totalRows); ?> of <?php echo $totalRows; ?> entries
+                        </div>
+
+
+                        <div class="pagination">
+                            <?php
+                            if ($currentPage > 1) {
+                                echo '<button class="pagination-button" onclick="changePage(' . ($currentPage - 1) . ')">&lt; Prev</button>';
+                            }
+
+                            for ($i = 1; $i <= $totalPages; $i++) {
+                                if ($totalPages > 5 && $i > 2 && $i < ($totalPages - 1) && ($i < ($currentPage - 1) || $i > ($currentPage + 1))) {
+                                    if ($i == 3 && $currentPage > 4) {
+                                        echo '<span class="pagination-ellipsis">...</span>';
+                                    }
+                                    continue;
+                                }
+
+                                echo '<button class="pagination-button' . ($currentPage == $i ? ' active' : '') . '" onclick="changePage(' . $i . ')">' . $i . '</button>';
+                            }
+
+                            if ($totalPages > 5 && $currentPage < ($totalPages - 2)) {
+                                echo '<span class="pagination-ellipsis">...</span>';
+                            }
+
+
+                            if ($totalRows > $rowsPerPage && $currentPage < $totalPages) {
+                                echo '<button class="pagination-button" onclick="changePage(\'next\')">Next &gt;</button>';
+                            }
+                            ?>
+                        </div>
                 </div>
-        </main>
+    </section>
+    </div>
+    </main>
 
-        <script src="js/applicants.js"></script>
-        <script>
-            $(document).ready(function() {
-                function confirmLogout() {
-                    Swal.fire({
-                        title: "Logout",
-                        text: "Are you sure you want to log out?",
-                        icon: "warning",
-                        showCancelButton: true,
-                        confirmButtonColor: "#3085d6",
-                        cancelButtonColor: "#d33",
-                        confirmButtonText: "Yes, log out",
-                        cancelButtonText: "Cancel"
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            window.location.href = "osa_logout.php";
-                        }
-                    });
-                }
+    <script src="js/applicants.js"></script>
+    <script src="js/osa_logout.js"></script>
+    <script src="js/toggle_sidebar.js"></script>
+    <script src="js/bell_dropdown.js"></script>
+    <script>
+        function changePage(page) {
+            if (page === 'next' && <?php echo $currentPage; ?> < <?php echo $totalPages; ?>) {
+                page = <?php echo $currentPage; ?> + 1;
+            } else if (page === 'prev' && <?php echo $currentPage; ?> > 1) {
+                page = <?php echo $currentPage; ?> - 1;
+            }
 
+            window.location.href = "applicants.php?rows=" + document.getElementById("rowsPerPage").value + "&page=" + page;
+        }
 
-                document.querySelector(".logout").addEventListener("click", function(event) {
-                    event.preventDefault();
-                    confirmLogout();
-                });
+        function changeRowsPerPage() {
+            var selectedRows = document.getElementById("rowsPerPage").value;
+            var currentPage = <?php echo $currentPage; ?>;
+            var scholarshipSelect = document.getElementById("scholarshipSelect");
+            var selectedScholarshipId = scholarshipSelect.value;
+            var statusSelect = document.getElementById("statusSelect");
+            var selectedStatus = statusSelect.value;
+            var url = "applicants.php?rows=" + selectedRows + "&page=" + currentPage;
 
-                document.getElementById("exportButton").addEventListener("click", function() {
-    var scholarshipSelect = document.getElementById("scholarshipSelect");
-    var exportFormatSelect = document.getElementById("exportFormatSelect");
-    var statusSelect = document.getElementById("statusSelect"); // new line
-    var selectedScholarshipId = scholarshipSelect.value;
-    var selectedFormat = exportFormatSelect.value;
-    var selectedStatus = statusSelect.value; // new line
+            if (selectedScholarshipId) {
+                url += "&scholarship_id=" + encodeURIComponent(selectedScholarshipId);
+            }
 
-    var exportURL = "generate_pdf.php";
+            if (selectedStatus) {
+                url += "&status=" + encodeURIComponent(selectedStatus);
+            }
 
-    if (selectedFormat === "excel") {
-        exportURL = "generate_excel.php";
-    }
-
-    if (selectedScholarshipId) {
-        exportURL += "?scholarship_id=" + encodeURIComponent(selectedScholarshipId);
-    }
-
-    if (selectedStatus) { // new block
-        exportURL += (selectedScholarshipId ? "&" : "?") + "status=" + encodeURIComponent(selectedStatus);
-    }
-
-    window.location.href = exportURL;
-});
+            window.location.href = url;
+        }
 
 
+        $(document).ready(function() {
+           
 
+            document.getElementById("reasonFilter").addEventListener("change", function() {
+                const selectedStatus = document.querySelector('.status-button.active').getAttribute("data-status");
+                const selectedReason = this.value;
 
-                const menuBar = document.querySelector('#content nav .bx.bx-menu');
-                const sidebar = document.getElementById('sidebar');
-
-                function toggleSidebar() {
-                    sidebar.classList.toggle('hide');
-                }
-
-                menuBar.addEventListener('click', toggleSidebar);
-
-                function handleResize() {
-                    const screenWidth = window.innerWidth;
-
-                    if (screenWidth <= 768) {
-                        sidebar.classList.add('hide');
-                    } else {
-                        sidebar.classList.remove('hide');
-                    }
-                }
-
-                window.addEventListener('resize', handleResize);
-                handleResize();
-
-                function toggleDropdown() {
-                    $(".num").hide();
-                }
-
-                $(".notification .bxs-bell").on("click", function(event) {
-                    event.stopPropagation();
-                    $(".dropdown").toggleClass("active");
-                    toggleDropdown();
-                    if ($(".dropdown").hasClass("active")) {
-                        markAllNotificationsAsRead();
-                    } else {}
-                });
-
-                $(document).on("click", function() {
-                    $(".dropdown").removeClass("active");
-                });
-
-                function markAllNotificationsAsRead() {
-                    $.ajax({
-                        url: "mark_notification_as_read.php",
-                        type: "POST",
-                        data: {
-                            read_message: "all"
-                        },
-                        success: function() {
-                            $(".notify_item").removeClass("unread");
-                            fetchNotificationCount();
-                        },
-                        error: function() {
-                            alert("Failed to mark notifications as read.");
-                        }
-                    });
-                }
-
-                $(".notify_item").on("click", function() {
-                    var notificationId = $(this).data("notification-id");
-                    markNotificationAsRead(notificationId);
-                });
-
-                $(".notify_options .delete_option").on("click", function(event) {
-                    event.stopPropagation();
-                    const notificationId = $(this).data("notification-id");
-                    $.ajax({
-                        url: "delete_notification.php",
-                        type: "POST",
-                        data: {
-                            notification_id: notificationId
-                        },
-                        success: function() {
-                            $(".notify_item[data-notification-id='" + notificationId + "']").remove();
-                            fetchNotificationCount();
-                        },
-                        error: function() {}
-                    });
-                });
-
-                $(".notify_options .cancel_option").on("click", function(event) {
-                    event.stopPropagation();
-                    $(this).closest(".options_menu").removeClass("active");
-                });
+                filterTableByStatusAndReason(selectedStatus, selectedReason);
             });
 
-            function filterTableByStatus(status) {
+            function filterTableByStatusAndReason(status, reason) {
                 const rows = document.querySelectorAll(".table__body tbody tr");
 
-                rows.forEach(row => {
+                rows.forEach((row) => {
                     const statusCell = row.querySelector(".status");
-                    if (status === "all" || statusCell.textContent === status) {
+                    const reasonsCell = row.querySelector(".reasons-cell");
+
+                    // Check if the status and reason match the selected values
+                    if (
+                        (status === "all" || statusCell.textContent === status) &&
+                        (reason === "" || (reasonsCell && reasonsCell.textContent.includes(reason)))
+                    ) {
                         row.style.display = "";
                     } else {
                         row.style.display = "none";
                     }
                 });
             }
+            filterTableByStatusAndReasonOnLoad();
 
-            document.querySelectorAll(".status-button").forEach(button => {
-                button.addEventListener("click", () => {
-                    document.querySelectorAll(".status-button").forEach(btn => {
+
+
+            function filterTableByStatusAndReasonOnLoad() {
+                const selectedStatus = document.querySelector('.status-button.active').getAttribute("data-status");
+                const selectedReason = document.getElementById("reasonFilter").value;
+
+                filterTableByStatusAndReason(selectedStatus, selectedReason);
+            }
+
+            toggleReasonFilter(document.querySelector('.status-button.active').getAttribute("data-status"));
+
+            filterTableByStatusAndReasonOnLoad();
+
+
+            document.getElementById("reasonFilter").addEventListener("change", function() {
+                const selectedStatus = document.querySelector('.status-button.active').getAttribute("data-status");
+
+                filterTableByStatusAndReason(selectedStatus, this.value);
+            });
+
+            function toggleReasonFilter(selectedStatus) {
+                var reasonFilterLabel = document.querySelector('label[for="reasonFilter"]');
+                var reasonFilter = document.getElementById("reasonFilter");
+                var reasonHeader = document.getElementById("reasonHeader");
+
+                if (selectedStatus === "Rejected") {
+
+                    reasonFilterLabel.style.display = "inline-block";
+                    reasonFilter.style.display = "inline-block";
+                    reasonHeader.style.display = "";
+                } else {
+
+                    reasonFilterLabel.style.display = "none";
+                    reasonFilter.style.display = "none";
+                    reasonHeader.style.display = "none";
+                }
+
+            }
+
+
+            document.querySelectorAll(".status-button").forEach(function(button) {
+                button.addEventListener("click", function() {
+                    const selectedStatus = button.getAttribute("data-status");
+
+                    document.querySelectorAll(".status-button").forEach(function(btn) {
                         btn.classList.remove("active");
                     });
-
                     button.classList.add("active");
-                    const status = button.getAttribute("data-status");
-                    filterTableByStatus(status);
+
+                    toggleReasonFilter(selectedStatus);
+
+                    filterTableByStatusAndReason(selectedStatus, document.getElementById("reasonFilter").value);
                 });
             });
-        </script>
+
+            toggleReasonFilter(document.querySelector('.status-button.active').getAttribute("data-status"));
+
+
+
+            document.getElementById("exportButton").addEventListener("click", function() {
+                var scholarshipSelect = document.getElementById("scholarshipSelect");
+                var exportFormatSelect = document.getElementById("exportFormatSelect");
+                var statusSelect = document.getElementById("statusSelect"); // new line
+                var selectedScholarshipId = scholarshipSelect.value;
+                var selectedFormat = exportFormatSelect.value;
+                var selectedStatus = statusSelect.value; 
+
+                var exportURL = "generate_pdf.php";
+
+                if (selectedFormat === "excel") {
+                    exportURL = "generate_excel.php";
+                }
+
+                if (selectedScholarshipId) {
+                    exportURL += "?scholarship_id=" + encodeURIComponent(selectedScholarshipId);
+                }
+
+                if (selectedStatus) { // new block
+                    exportURL += (selectedScholarshipId ? "&" : "?") + "status=" + encodeURIComponent(selectedStatus);
+                }
+
+                window.location.href = exportURL;
+            });
+
+
+            function markAllNotificationsAsRead() {
+                $.ajax({
+                    url: "mark_notification_as_read.php",
+                    type: "POST",
+                    data: {
+                        read_message: "all"
+                    },
+                    success: function() {
+                        $(".notify_item").removeClass("unread");
+                        fetchNotificationCount();
+                    },
+                    error: function() {
+                        alert("Failed to mark notifications as read.");
+                    }
+                });
+            }
+
+            $(".notify_item").on("click", function() {
+                var notificationId = $(this).data("notification-id");
+                markNotificationAsRead(notificationId);
+            });
+
+            $(".notify_options .delete_option").on("click", function(event) {
+                event.stopPropagation();
+                const notificationId = $(this).data("notification-id");
+                $.ajax({
+                    url: "delete_notification.php",
+                    type: "POST",
+                    data: {
+                        notification_id: notificationId
+                    },
+                    success: function() {
+                        $(".notify_item[data-notification-id='" + notificationId + "']").remove();
+                        fetchNotificationCount();
+                    },
+                    error: function() {}
+                });
+            });
+
+        });
+
+        function filterTableByStatus(status) {
+            const rows = document.querySelectorAll(".table__body tbody tr");
+
+            rows.forEach(row => {
+                const statusCell = row.querySelector(".status");
+                const reasonsCell = row.querySelector("td.reasons-cell");
+
+                if (status === "all" || statusCell.textContent === status) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+
+                if (reasonsCell) {
+                    reasonsCell.style.display = (status === "all") ? "none" : "";
+                }
+            });
+        }
+
+
+
+        document.querySelectorAll(".status-button").forEach(button => {
+            button.addEventListener("click", () => {
+                document.querySelectorAll(".status-button").forEach(btn => {
+                    btn.classList.remove("active");
+                });
+
+                button.classList.add("active");
+                const status = button.getAttribute("data-status");
+                filterTableByStatus(status);
+            });
+        });
+    </script>
 </body>
 
 </html>

@@ -1,11 +1,9 @@
 <?php
 include '../include/connection.php';
 
-// Check if the custom_id parameter is set in the URL
 if (isset($_GET['id'])) {
   $customId = $_GET['id'];
 
-  // Retrieve user information based on custom_id
   $sql = "SELECT * FROM tbl_user WHERE custom_id = ?";
   $stmt = $dbConn->prepare($sql);
   $stmt->bind_param("s", $customId);
@@ -112,13 +110,10 @@ if (isset($_GET['id'])) {
           contentType: false,
           processData: false,
           success: function(response) {
-            // Check if the response contains the success message
             if (response.includes('Profile Updated Successfully')) {
-              // Display the success message
               $('#success-message').text(response);
             }
 
-            // Update the profile image
             $('#updated-profile-image').html(response);
           }
         });

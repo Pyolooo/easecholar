@@ -483,7 +483,6 @@ if (!$listResult) {
 
     <script src="js/osa_logout.js"></script>
     <script src="js/toggle_sidebar.js"></script>
-    <script src="js/bell_dropdown.js"></script>
     <script>
         $(document).ready(function() {
             $("#reminderModal").modal("show");
@@ -622,6 +621,25 @@ if (!$listResult) {
                     // Hide the "View All" link after showing all scholars
                     viewAllScholarsLink.style.display = "none";
                 });
+            });
+
+
+
+            function toggleDropdown() {
+                $(".num").hide();
+            }
+
+            $(".notification .bxs-bell").on("click", function(event) {
+                event.stopPropagation();
+                $(".dropdown").toggleClass("active");
+                toggleDropdown();
+                if ($(".dropdown").hasClass("active")) {
+                    markAllNotificationsAsRead();
+                } else {}
+            });
+
+            $(document).on("click", function() {
+                $(".dropdown").removeClass("active");
             });
 
 

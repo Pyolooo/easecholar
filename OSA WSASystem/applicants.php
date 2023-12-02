@@ -444,7 +444,6 @@ $totalPages = max($totalPages, 1);
     <script src="js/applicants.js"></script>
     <script src="js/osa_logout.js"></script>
     <script src="js/toggle_sidebar.js"></script>
-    <script src="js/bell_dropdown.js"></script>
     <script>
         function changePage(page) {
             if (page === 'next' && <?php echo $currentPage; ?> < <?php echo $totalPages; ?>) {
@@ -589,6 +588,23 @@ $totalPages = max($totalPages, 1);
                 }
 
                 window.location.href = exportURL;
+            });
+
+            function toggleDropdown() {
+                $(".num").hide();
+            }
+
+            $(".notification .bxs-bell").on("click", function(event) {
+                event.stopPropagation();
+                $(".dropdown").toggleClass("active");
+                toggleDropdown();
+                if ($(".dropdown").hasClass("active")) {
+                    markAllNotificationsAsRead();
+                } else {}
+            });
+
+            $(document).on("click", function() {
+                $(".dropdown").removeClass("active");
             });
 
 

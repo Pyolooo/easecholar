@@ -47,12 +47,13 @@ if (isset($_GET['id'])) {
 
         <body>
             <div class="table-data">
-        
                 <div class="label-container">
-                <div class="scholarship-label">
-                <img class='scholarship-logo' src='../file_uploads/<?php echo basename($scholarship_logo); ?>' alt="Scholarship Logo">
-                <h1 class="scholarship-title"><?php echo $row['scholarship']; ?></h1>
-                </div>
+                    <div class="scholarship-label">
+                        <img class='scholarship-logo' src='../file_uploads/<?php echo basename($scholarship_logo); ?>' alt="Scholarship Logo">
+                        <h1 class="scholarship-title"><?php echo $row['scholarship']; ?></h1>
+                    </div>
+
+                    <div class="scholarship-edit">
                 <?php
                 if ($row['scholarship_status'] == 'Ongoing') {
                     echo '<a href="edit_scholarship.php?id=' . $scholarshipId . '" class="btn-edit"><i class="bx bxs-edit"></i></a>';
@@ -64,6 +65,7 @@ if (isset($_GET['id'])) {
                     echo '<a href="edit_scholarship.php?id=' . $scholarshipId . '" class="btn-edit"><i class="bx bxs-edit"></i></a>';
                 }
                 ?>
+                    </div>
                 </div>
     
 

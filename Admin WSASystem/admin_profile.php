@@ -153,7 +153,7 @@ $dbConn->close();
                         <div id="updated-profile-image">
                             <?php
                             if (!empty($profile_path)) {
-                                echo "<img src='../user_profiles/{$profile_path}' width='250' height='250'>";
+                                echo '<img src="data:image/jpeg;base64,' . base64_encode($profile_path) . '" alt="Profile Image" width="250" height="250">';
                             }
                             ?>
                         </div>

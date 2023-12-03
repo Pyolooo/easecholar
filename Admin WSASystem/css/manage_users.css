@@ -920,6 +920,7 @@ table, th, td {
     border-collapse: collapse;
     padding: 1rem;
     text-align: left;
+		font-size: 12px;
 }
 
 thead th {

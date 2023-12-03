@@ -1,27 +1,12 @@
 <?php
-$serverName = "ease-cholar-server.mysql.database.azure.com";
-$databaseName = "easecholar";
-$username = "httzpwmikk"; 
-$password = "XTPPY2C81FS5328B$";
 
-// Check if the mysqli extension is available
-if (!function_exists('mysqli_init')) {
-    die('mysqli extension is not available. Please enable it in your PHP configuration.');
-}
+$host = "easecholar-do-user-15025878-0.c.db.ondigitalocean.com";
+$port = 25060;
+$username = "doadmin";
+$password = "AVNS_I9q9-Dls3cwYbepb0qX";
+$database = "defaultdb";
+$sslmode = "REQUIRED";
 
-// Construct the connection string with SSL options
-$connectionString = "Server=$serverName;Database=$databaseName;User Id=$username;Password=$password;Encrypt=true;TrustServerCertificate=false";
+$dbConn = mysqli_connect($host, $username, $password, $database, $port, null) or die('MySQL connect failed: ' . mysqli_connect_error());
 
-// Create a database connection with the mysqli_init function
-$dbConn = mysqli_init();
-if (!$dbConn) {
-    die("mysqli_init failed");
-}
-
-// Connect to the database using mysqli_real_connect with SSL
-if (!$dbConn->real_connect($serverName, $username, $password, $databaseName, 3306, NULL, MYSQLI_CLIENT_SSL)) {
-    die("Connect Error: " . mysqli_connect_error());
-}
-
-// Now $conn is your mysqli connection object
 ?>

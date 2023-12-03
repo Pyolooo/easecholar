@@ -1,7 +1,7 @@
 <?php
 $serverName = "ease-cholar-server.mysql.database.azure.com";
-$databaseName = "httzpwmikk";
-$username = "easecholar";
+$databaseName = "easecholar";
+$username = "httzpwmikk"; 
 $password = "XTPPY2C81FS5328B$";
 
 // Check if the mysqli extension is available

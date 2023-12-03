@@ -87,6 +87,8 @@ if (isset($_POST['message_content'])) {
 
   $columnToInsert = ($message_choice === 'request_attachments') ? 'attach_files' : 'osa_message_content';
 
+  $columnValue = !empty($message_content) ? $message_content : null;
+
   $source = 'tbl_scholarship_1_form';
 
   $insertQuery = "INSERT INTO `tbl_user_messages` (`application_id`, `admin_id`, `user_id`, `$columnToInsert`, `sent_at`, `read_status`, `source`)
@@ -99,7 +101,7 @@ if (isset($_POST['message_content'])) {
     exit();
   }
 
-  mysqli_stmt_bind_param($insertStmt, "iiiss", $application_id, $admin_id, $user_id, $message_content, $source);
+  mysqli_stmt_bind_param($insertStmt, "iiiss", $application_id, $admin_id, $user_id, $columnValue, $source);
   $insertResult = mysqli_stmt_execute($insertStmt);
 
   if ($insertResult) {

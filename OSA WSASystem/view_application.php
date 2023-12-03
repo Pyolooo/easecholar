@@ -81,12 +81,14 @@ if (isset($_GET['id'])) {
     exit();
 }
 
-// Handle form submission for sending messages
 if (isset($_POST['message_content'])) {
     $message_content = $_POST['message_content'];
     $message_choice = $_POST['message_choice'];
 
     $columnToInsert = ($message_choice === 'request_attachments') ? 'attach_files' : 'osa_message_content';
+
+    // Set $columnValue to $message_content or NULL based on the condition
+    $columnValue = !empty($message_content) ? $message_content : null;
 
     $source = 'tbl_userapp';
 
@@ -100,7 +102,7 @@ if (isset($_POST['message_content'])) {
         exit();
     }
 
-    mysqli_stmt_bind_param($insertStmt, "iiiss", $application_id, $admin_id, $user_id, $message_content, $source);
+    mysqli_stmt_bind_param($insertStmt, "iiiss", $application_id, $admin_id, $user_id, $columnValue, $source);
     $insertResult = mysqli_stmt_execute($insertStmt);
 
     if ($insertResult) {

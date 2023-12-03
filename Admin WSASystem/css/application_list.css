@@ -1039,6 +1039,11 @@ table {
 	align-items: center;
 }
 
+.image-applicant-container {
+	display: flex;
+	align-items: center;
+}
+
 td img {
     width: 36px;
     height: 36px;
@@ -1052,7 +1057,7 @@ table, th, td {
 	border-collapse: collapse;
 	padding: 1rem .1rem;
 	text-align: center;
-	font-size: 13px;
+	font-size: 11px;
 }
 
 thead th {

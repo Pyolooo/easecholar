@@ -19,7 +19,7 @@ if (isset($_GET['logout'])) {
 $rowsPerPage = isset($_GET['rows']) ? intval($_GET['rows']) : 10;
 
 $currentPage = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-$offset = ($currentPage - 1) * $rowsPerPage;
+$offset = max(0, ($currentPage - 1) * $rowsPerPage);
 
 $number = 1;
 
@@ -46,7 +46,7 @@ $exactPages = floor($totalRows / $rowsPerPage);
 $remainingRows = $totalRows % $rowsPerPage;
 $totalPages = ($remainingRows > 0) ? $exactPages + 1 : $exactPages;
 
-$currentPage = min($currentPage, $totalPages);
+// $currentPage = min($currentPage, $totalPages);
 
 $totalPages = max($totalPages, 1);
 
@@ -235,7 +235,7 @@ $totalPages = max($totalPages, 1);
                     <section class="table__header">
                         <div class="rowsPerpage">
                             <label for="rowsPerPage">Rows:</label>
-                            <select id="rowsPerPage" onchange="changeRowsPerPage()">
+                            <select id="rowsPerPage" onchange="changeRowsPerPage(<?php echo $currentPage; ?>)">
                                 <option value="10" <?php if ($rowsPerPage == 10) echo 'selected'; ?>>10</option>
                                 <option value="20" <?php if ($rowsPerPage == 20) echo 'selected'; ?>>20</option>
                                 <option value="50" <?php if ($rowsPerPage == 50) echo 'selected'; ?>>50</option>

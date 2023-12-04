@@ -19,7 +19,7 @@ if (isset($_GET['logout'])) {
 $rowsPerPage = isset($_GET['rows']) ? intval($_GET['rows']) : 10;
 
 $currentPage = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-$offset = ($currentPage - 1) * $rowsPerPage;
+$offset = max(0, ($currentPage - 1) * $rowsPerPage);
 
 $number = 1;
 

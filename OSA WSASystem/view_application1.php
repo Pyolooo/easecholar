@@ -110,7 +110,7 @@ if (isset($_POST['message_content'])) {
     $applicantName = $applicationData['applicant_name'];
     $phoneNumber = $applicationData['mobile_num'];
     $emailSubject = 'New Message from OSA';
-    $websiteLink = 'https://easecholarship.azurewebsites.net/';
+    $websiteLink = 'https://king-prawn-app-mtfg4.ondigitalocean.app/';
     $emailBody = "Dear $applicantName,\n\nYou have received a new message from OSA:\n\n$message_content\n\nPlease log in to check your messages.:\n$websiteLink\n";
 
     sendEmailNotification($applicantEmail, $applicantName, $emailSubject, $emailBody);
@@ -225,7 +225,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['status'])) {
       $applicantEmail = $applicationData['email'];
       $applicantName = $applicationData['applicant_name'];
       $emailSubject = 'Application Status Update';
-      $websiteLink = 'https://easecholarship.azurewebsites.net/';
+      $websiteLink = 'https://king-prawn-app-mtfg4.ondigitalocean.app/';
       $emailBody = "Dear $applicantName,\n\nYour application status has been updated to: $newStatus\n\nPlease visit the website to check your application:\n$websiteLink\n";
 
       sendEmailNotification($applicantEmail, $applicantName, $emailSubject, $emailBody);
@@ -446,6 +446,7 @@ $checkbox4Checked = in_array("Lack of supporting documents", $reasonsArray);
 
     <form action="" method="POST" enctype="multipart/form-data">
       <div class="container">
+      <p><a href="print_application1.php?id=<?php echo $application_id; ?>&user_id=<?php echo $user_id; ?>" target="_blank">Printable Version</a></p>
         <div class="top-section">
           <div class="head">
             <div class="img"><img src="../user_profiles/<?php echo $applicationData['image']; ?>" alt="Profile"></div>

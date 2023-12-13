@@ -143,8 +143,10 @@
   padding: 10.5px;
   outline: none;
   border: 1px solid #dedede;
-  border-top-right-radius: 2px;
-  border-bottom-right-radius: 2px;
+  border-radius: 2px;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border-left: none;
   color: #555;
   width: 150%;
 }

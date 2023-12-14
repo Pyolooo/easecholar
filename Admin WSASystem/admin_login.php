@@ -18,10 +18,9 @@ if (isset($_POST['submit'])) {
         $_SESSION["super_admin_id"] = $row["super_admin_id"];
         $successMessage = "Login successfully!";
     } elseif (isset($row)) {
-        $incorrectMessage = 'Incorrect Username or Password!';
+        $incorrectMessage = 'Please ensure you entered the correct password and try again.';
     } else {
-        // User not registered
-        $notRegistered = "User not registered";
+        $notRegistered = "Please ensure you entered the correct login credentials and try again";
     }
 }
 ?>
@@ -110,14 +109,14 @@ if (isset($_POST['submit'])) {
                 <span class="input-container-addon">
                     <i class="fa fa-envelope-square"></i>
                 </span>
-                <input class="input-style" name="username" type="text" placeholder="Enter your Username" required value="<?php echo isset($_COOKIE['admin_remember_user']) ? htmlspecialchars($_COOKIE['admin_remember_user']) : ''; ?>">
+                <input class="input-style" name="username" type="text" placeholder="Enter your Username" required <?php if (isset($_POST['username'])) echo 'value="' . htmlspecialchars($_POST['username']) . '"'; ?> value="<?php echo isset($_COOKIE['admin_remember_user']) ? htmlspecialchars($_COOKIE['admin_remember_user']) : ''; ?>">
             </div>
 
             <div class="input-container">
                 <span class="input-container-addon">
                     <i class="fa fa-lock"></i>
                 </span>
-                <input class="input-style" id="password" name="password" type="password" placeholder="Enter password" required value="<?php echo isset($_COOKIE['admin_remember_password']) ? htmlspecialchars($_COOKIE['admin_remember_password']) : ''; ?>">
+                <input class="input-style" id="password" name="password" type="password" placeholder="Enter password" required <?php if (isset($_POST['password'])) echo 'value="' . htmlspecialchars($_POST['password']) . '"'; ?> value="<?php echo isset($_COOKIE['admin_remember_password']) ? htmlspecialchars($_COOKIE['admin_remember_password']) : ''; ?>">
             </div>
             <label class="show-password" for="show-password">
                 <input type="checkbox" id="show-password"> Show Password

@@ -31,7 +31,7 @@ if (isset($_POST['submit'])) {
             $deactivatedMessage = 'Your account has been deactivated by the admin.';
         }
     } else {
-        $notRegistered = "Please ensure you entered the correct username and try again.";
+        $notRegistered = "Please ensure you entered the correct login credentials and try again";
     }
 }
 ?>
@@ -138,7 +138,7 @@ if (isset($_POST['submit'])) {
                 <span class="input-container-addon">
                     <i class="fa fa-lock"></i>
                 </span>
-                <input class="input-style" id="password" name="password" type="password" placeholder="Enter password" required value="<?php echo isset($_COOKIE['osa_remember_password']) ? htmlspecialchars($_COOKIE['osa_remember_password']) : ''; ?>">
+                <input class="input-style" id="password" name="password" type="password" placeholder="Enter password" required <?php if (isset($_POST['password'])) echo 'value="' . htmlspecialchars($_POST['password']) . '"'; ?> value="<?php echo isset($_COOKIE['osa_remember_password']) ? htmlspecialchars($_COOKIE['osa_remember_password']) : ''; ?>">
             </div>
 
             <label class="show-password" for="show-password">

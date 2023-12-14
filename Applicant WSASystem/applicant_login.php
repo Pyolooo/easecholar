@@ -135,7 +135,7 @@ if (isset($_POST['submit'])) {
                 <span class="input-container-addon">
                     <i class="fa fa-envelope-square"></i>
                 </span>
-                <input class="input-style" name="email_or_student_num" type="text" placeholder="Email or Student Number" required value="<?php echo isset($_COOKIE['remember_user']) ? htmlspecialchars($_COOKIE['remember_user']) : ''; ?>">
+                <input class="input-style" name="email_or_student_num" type="text" placeholder="Email or Student Number" required <?php if (isset($_POST['email_or_student_num'])) echo 'value="' . htmlspecialchars($_POST['email_or_student_num']) . '"'; ?> value="<?php echo isset($_COOKIE['remember_user']) ? htmlspecialchars($_COOKIE['remember_user']) : ''; ?>">
             </div>
 
 
@@ -143,7 +143,7 @@ if (isset($_POST['submit'])) {
                 <span class="input-container-addon">
                     <i class="fa fa-lock"></i>
                 </span>
-                <input class="input-style" id="password" name="password" type="password" placeholder="LRN's number" required value="<?php echo isset($_COOKIE['remember_password']) ? htmlspecialchars($_COOKIE['remember_password']) : ''; ?>">
+                <input class="input-style" id="password" name="password" type="password" placeholder="LRN's number" required <?php if (isset($_POST['password'])) echo 'value="' . htmlspecialchars($_POST['password']) . '"'; ?> value="<?php echo isset($_COOKIE['remember_password']) ? htmlspecialchars($_COOKIE['remember_password']) : ''; ?>">
             </div>
 
             <label class="show-password" for="show-password">

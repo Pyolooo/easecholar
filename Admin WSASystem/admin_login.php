@@ -64,7 +64,7 @@ if (isset($_POST['submit'])) {
                 echo '<script>
                 Swal.fire({
                     icon: "error",
-                    title: "Error",
+                    title: "Incorrect Password",
                     text: "' . $incorrectMessage . '",
                     showConfirmButton: false,
                     timer: 2000
@@ -77,7 +77,7 @@ if (isset($_POST['submit'])) {
                 echo '<script>
                 Swal.fire({
                     icon: "error",
-                    title: "Error",
+                    title: "User Not Found",
                     text: "' . $notRegistered . '",
                     showConfirmButton: false,
                     timer: 2000

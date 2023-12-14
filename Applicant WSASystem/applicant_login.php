@@ -22,18 +22,10 @@ if (isset($_POST['submit'])) {
             $_SESSION['user_id'] = $row['user_id'];
             $successMessage = 'Login Successfully';
         } else {
-            $incorrectMessage = 'Incorrect LRN!';
+            $incorrectMessage = 'Please double-check your Learner Reference Number and try again.';
         }
     } else {
-        $query = mysqli_prepare($dbConn, "SELECT * FROM tbl_user WHERE email = ? OR student_num = ?");
-        mysqli_stmt_bind_param($query, "ss", $emailOrStudentNum, $emailOrStudentNum);
-        mysqli_stmt_execute($query);
-        $result = mysqli_stmt_get_result($query);
-
-        if ($row = mysqli_fetch_assoc($result)) {
-            $notRegisteredMessage = 'User not registered.';
-        } else {
-        }
+            $notRegisteredMessage = 'Sorry, we couldn\'t find your account.';
     }
 }
 ?>
@@ -77,7 +69,7 @@ if (isset($_POST['submit'])) {
                 echo '<script>
                 Swal.fire({
                     icon: "error",
-                    title: "Error",
+                    title: "Incorrect LRN",
                     text: "' . $incorrectMessage . '",
                     showConfirmButton: false,
                     timer: 2000
@@ -89,12 +81,12 @@ if (isset($_POST['submit'])) {
             </script>';
             }
 
-            if (isset($notRegistered)) {
+            if (isset($notRegisteredMessage)) {
                 echo '<script>
               Swal.fire({
                   icon: "error",
-                  title: "Error",
-                  text: "' . $notRegistered . '",
+                  title: "Account not registered",
+                  text: "' . $notRegisteredMessage . '",
                   showConfirmButton: false,
                   timer: 2000
               }).then((result) => {
@@ -134,21 +126,6 @@ if (isset($_POST['submit'])) {
                           }
                       });
                       </script>';
-            }
-            if (isset($notRegisteredMessage)) {
-                echo '<script>
-                    Swal.fire({
-                        icon: "error",
-                        title: "Error",
-                        text: "' . $notRegisteredMessage . '",
-                        showConfirmButton: false,
-                        timer: 2000
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            window.location.href = "applicant_login.php";
-                        }
-                    });
-                    </script>';
             }
             ?>
             <div class="page-links">

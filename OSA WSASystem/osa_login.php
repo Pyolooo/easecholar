@@ -25,13 +25,13 @@ if (isset($_POST['submit'])) {
                 $_SESSION["admin_id"] = $row["admin_id"];
                 $successMessage = "Login successfully!";
             } else {
-                $incorrectMessage = 'Wrong Password!';
+                $incorrectMessage = 'Please ensure you entered the correct password and try again.';
             }
         } else {
             $deactivatedMessage = 'Your account has been deactivated by the admin.';
         }
     } else {
-        $notRegistered = "Wrong Username";
+        $notRegistered = "Please ensure you entered the correct username and try again.";
     }
 }
 ?>

@@ -112,7 +112,7 @@ if (isset($_POST['message_content'])) {
         $applicantName = $applicationData['applicant_name'];
         $phoneNumber = $applicationData['mobile_num'];
         $emailSubject = 'New Message from OSA';
-        $websiteLink = 'https://king-prawn-app-mtfg4.ondigitalocean.app/';
+        $websiteLink = 'https://easecholar.me/';
         $emailBody = "Dear $applicantName,\n\nYou have received a new message from OSA:\n\n$message_content\n\nPlease log in to check your messages.:\n$websiteLink\n";
 
         sendEmailNotification($applicantEmail, $applicantName, $emailSubject, $emailBody);
@@ -226,7 +226,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['status'])) {
             $applicantEmail = $applicationData['email'];
             $applicantName = $applicationData['applicant_name'];
             $emailSubject = 'Application Status Update';
-            $websiteLink = 'https://king-prawn-app-mtfg4.ondigitalocean.app/';
+            $websiteLink = 'https://easecholar.me/';
             $emailBody = "Dear $applicantName,\n\nYour application status has been updated to: $newStatus\n\nPlease visit the website to check your application:\n$websiteLink\n";
 
             sendEmailNotification($applicantEmail, $applicantName, $emailSubject, $emailBody);

@@ -133,12 +133,17 @@
 }
 
 .log-in form .button .submit {
+  cursor: pointer;
   border-radius: 10px;
   background-color: darkgreen;
   color: white;
   width: 100%;
   padding: 5px 5px;
   border: 1px solid #005900;
+}
+
+.log-in form .button .submit:hover {
+  opacity: 0.8;
 }
 
 .log-in form .input-container .input-style {

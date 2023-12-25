@@ -21,7 +21,7 @@ if (isset($_POST['submit'])) {
 
     if (isset($_FILES['profile']) && $_FILES['profile']['error'] === UPLOAD_ERR_OK) {
         $profile = $_FILES['profile']['name'];
-        move_uploaded_file($image_tmp_name, $image_folder . $profile);
+        move_uploaded_file($image_tmp_name, $image_folder);
     } else {
         $profile = 'default-avatar.png';
     }
@@ -85,7 +85,7 @@ if (isset($_POST['submit'])) {
 
     <div class="log-in">
         <form class="form" action="" method="POST" enctype="multipart/form-data">
-            <p class="form-title">REGISTRATION</p>
+            <p class="form-title">CREATE ACCOUNT</p>
             <?php
             if (isset($emailExistsMessage)) {
                 echo '<script>
@@ -180,7 +180,7 @@ if (isset($_POST['submit'])) {
                     <img id="selected-image" src="../user_profiles/default-avatar.png" alt="Selected Image">
                 </div>
                 <div class="round">
-                    <input class="input-style" type="file" name="profile" placeholder="Profile pic" accept="image/jpg, image/jpeg, image/png">
+                    <input class="input-style" type="file" id="image-input" name="profile" placeholder="Profile pic" accept="image/jpg, image/jpeg, image/png">
                     <i class='bx bxs-camera'></i>
                 </div>
             </div>

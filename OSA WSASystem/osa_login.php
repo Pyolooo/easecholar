@@ -31,7 +31,7 @@ if (isset($_POST['submit'])) {
             $deactivatedMessage = 'Your account has been deactivated by the admin.';
         }
     } else {
-        $notRegistered = "Please ensure you entered the correct login credentials and try again";
+        $notRegistered = "Please ensure you entered the correct username and try again.";
     }
 }
 ?>

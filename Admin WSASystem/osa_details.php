@@ -104,16 +104,13 @@ function formatExpireDate($dbExpireDate)
         <div class="update-container">
           <button class="cancel-button" type="button" onclick="window.location.href='manage_users.php'">Back</button>
           <?php
-          while ($row = mysqli_fetch_assoc($resultAdmin)) {
-            $status = $row['is_active'];
+          $status = $osaUser['is_active'];
 
-            if ($status == 0) {
-              echo '<button type="button" class="osa-status-button" data-id="' . $osaId . '" data-status="0">Activate</button>';
-            } else {
-              echo '<button type="button" class="osa-status-button" data-id="' . $osaId . '" data-status="1" style="background-color: red; border: none;">Deactivate</button>';
-            }
+          if ($status == 0) {
+            echo '<button type="button" class="osa-status-button" data-id="' . $osaId . '" data-status="0">Activate</button>';
+          } else {
+            echo '<button type="button" class="osa-status-button" data-id="' . $osaId . '" data-status="1" style="background-color: red; border: none;">Deactivate</button>';
           }
-
           ?>
         </div>
         <?php

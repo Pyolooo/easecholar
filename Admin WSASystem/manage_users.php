@@ -282,6 +282,7 @@ function formatExpireDate($dbExpireDate)
                 </thead>
                 <tbody>
                   <?php
+                  $number = 1;
                   while ($row = mysqli_fetch_assoc($resultAdmin)) {
                     $osaId = $row['admin_id'];
                     $fullName = $row['full_name'];
@@ -291,7 +292,7 @@ function formatExpireDate($dbExpireDate)
                     $status = $row['is_active'];
 
                     echo '<tr>';
-                    echo '<td>' . $osaId . '</td>';
+                    echo '<td>' . $number . '</td>';
                     echo '<td><img src="../user_profiles/' . $profile . '" alt="">' . $fullName . '</td>';
                     echo '<td>' . $email . '</td>';
                     echo '<td>' . $role . '</td>';
@@ -304,6 +305,8 @@ function formatExpireDate($dbExpireDate)
                     echo '<td><a class= "view-link" href="osa_details.php?id=' . $osaId . '">View</a></td>';
 
                     echo '</tr>';
+
+                    $number++;
                   }
 
                   ?>

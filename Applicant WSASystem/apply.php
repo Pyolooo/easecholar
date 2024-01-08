@@ -167,7 +167,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $isValid = true;
 
     // Server-side validation for required fields
-    if (empty($last_name) || empty($first_name) || empty($middle_name) || empty($dob) || empty($pob) || empty($gender) || empty($email) || empty($course) || empty($year_lvl) || empty($mobile_num) || empty($citizenship) || empty($barangay) || empty($town_city) || empty($province) || empty($zip_code) || empty($id_number) || empty($father_name) || empty($father_address) || empty($father_work) || empty($mother_name) || empty($mother_address) || empty($mother_work) || empty($gross_income) || empty($num_siblings)) {
+    if (empty($last_name) || empty($first_name) || empty($middle_name) || empty($dob) || empty($pob) || empty($gender) || empty($email) || empty($course) || empty($year_lvl) || empty($mobile_num) || empty($citizenship) || empty($barangay) || empty($town_city) || empty($province) || empty($zip_code) || empty($id_number) || empty($father_name) || empty($father_address) || empty($father_work) || empty($mother_name) || empty($mother_address) || empty($mother_work) || empty($gross_income) || (!isset($num_siblings) && $num_siblings !== '0')) {
         $isValid = false;
         echo "<script>alert('Please fill in all required fields.')</script>";
     }
@@ -520,7 +520,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
                     <div class="btns_wrap">
                         <div class="common_btns form_3_btns">
-                            <button type="button" class="btn_back"><span class="icon"><ion-icon name="arrow-back-sharp"></ion-icon></span>Back</button>
+                            <button type="button" onclick="window.location.href='scholarships.php'" class="btn_back">Cancel</button>
                             <button type="submit" class="btn_done" name="submit">Done</button>
                         </div>
                     </div>
